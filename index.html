@@ -797,6 +797,10 @@ body.view-report #side,body.view-report #detail{display:none}
 .mjc{display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
 .mjc>b{font-size:14.5px}.mjc>span{font-size:13px}.mjc .mj-sum{color:var(--ink);font-style:italic}.mjc small{font-size:12px}
 .mj-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.mb-job{display:flex!important;align-items:center;gap:10px;width:100%;margin-top:8px;padding:10px 12px!important;text-align:left;border:1px solid var(--primary)!important;background:#E3EEFB!important;color:var(--ink)!important;border-radius:8px!important;font-size:14px;cursor:pointer}
+.mb-job>.fa{font-size:18px;color:var(--primary)}.mb-job>span{flex:1;min-width:0}.mb-job em{font-style:normal;font-size:12px;color:var(--muted);margin-left:4px}
+.mb-job .mb-jgo{flex:none;color:var(--primary);white-space:nowrap}
+.mrow .jchip{align-self:flex-start;font-weight:700;color:var(--primary);background:#E3EEFB;border:1px solid rgba(0,0,0,.06);cursor:pointer}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1549,7 +1553,7 @@ function renderMain(){
   {const mb=document.querySelector('.tabs [data-view="mail"]');if(mb)mb.hidden=!mailOn()}
   if(S.view==="mail"&&!mailOn())S.view="list";
   if(S.view==="team"){renderTeam(el);return}
-  mjWatch();
+  mjWatch();mlWatch();
   if(S.view==="mail"){renderMail(el);mjPaint();return}
   if(S.view==="report"){renderReport(el);return}
   if(S.view==="today"){renderToday(el);mjPaint();return}
@@ -2875,7 +2879,12 @@ async function mailCall(op,x){
   const r=await fetch(PUSH_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({mail:Object.assign({op},x||{}),token})});
   return r.json();
 }
-const mailJobOf=s=>{const c=(String(s||"").match(/FDI\d{6}-\d+/i)||[])[0];if(!c)return null;return S.all.find(j=>String(j.code||"").toUpperCase()===c.toUpperCase()&&!(boss()&&isMine(j)))||null};
+/* Thư đã thành job / đã gắn vào job (máy chủ ghi ở mailjobs: status "tao" = bấm Tạo job, "gan" = AI/mã job tự gắn) */
+S.mlink={};let mlSub=null;
+function mlWatch(){if(!mailOn()||!db||mlSub)return;
+  try{mlSub=db.collection("mailjobs").where("status","in",["tao","gan"]).onSnapshot(sn=>{const o={};sn.docs.forEach(d=>{const x=d.data();if(x.mid&&x.jobId)o[String(x.mid)]={id:x.jobId,code:x.code||""}});S.mlink=o;if(S.view==="mail"){const R=$("#mbRead");if(R)R.innerHTML="";mailPaint()}},()=>{})}catch(e){}}
+const mailJobOf=(s,mid)=>{const l=mid&&S.mlink[String(mid)];if(l){const j=S.all.find(x=>x.id===l.id);if(j&&!(boss()&&isMine(j)))return j;if(!j&&l.code)return {id:l.id,code:l.code}}
+  const c=(String(s||"").match(/FDI\d{6}-\d+/i)||[])[0];if(!c)return null;return S.all.find(j=>String(j.code||"").toUpperCase()===c.toUpperCase()&&!(boss()&&isMine(j)))||null};
 const mailWho=a=>{a=String(a||"");const m=a.match(/^\s*"?([^"<]+?)"?\s*<([^>]+)>/);return m?m[1]:a.replace(/<|>/g,"")};
 const mailTime=t=>{if(!t)return "";const d=new Date(t),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"}):d.toLocaleDateString("vi-VN",{day:"2-digit",month:"2-digit"})+(d.getFullYear()!==n.getFullYear()?"/"+d.getFullYear():"")};
 function mailBadge(){const b=$("#mailBadge");if(!b)return;const n=(S.mail.unread||0)+((S.mj||[]).length);b.hidden=!n;b.textContent=n>99?"99+":n}
@@ -2906,16 +2915,17 @@ function mailPaint(){
   const ms=S.mail.list;
   L.innerHTML=(S.mail.q?`<div class="mb-qnote">Kết quả tìm “${esc(S.mail.q)}” <button class="ghost sm" data-mail="clearq">✕ Bỏ tìm</button></div>`:"")+
     (S.mail.err?`<div class="none">${esc(S.mail.err)}</div>`:!ms?`<div class="none"><span class="spin"></span> Đang tải thư…</div>`:!ms.length?`<div class="none">Không có thư nào.</div>`:
-    ms.map(m=>{const j=mailJobOf(m.s),who=S.mail.folder==="sent"?"Tới: "+mailWho(m.to):(m.fromN||m.from);
+    ms.map(m=>{const j=mailJobOf(m.s,m.id),who=S.mail.folder==="sent"?"Tới: "+mailWho(m.to):(m.fromN||m.from);
       return `<button class="mrow${m.read?"":" unread"}${S.mail.sel===m.id?" on":""}" data-mid="${esc(m.id)}" data-mf="${esc(m.f)}"><span class="mr-top"><b>${esc(who)}</b><time>${mailTime(m.t)}</time></span><span class="mr-s">${m.att?"📎 ":""}${esc(m.s)}</span><span class="mr-sum">${esc(m.sum)}</span>${j?`<span class="jchip" data-mjob="${esc(j.id)}">📁 ${esc(j.code)}</span>`:""}</button>`}).join(""));
   if(S.mail.compose)R.innerHTML=mailComposeHtml();
-  else if(!S.mail.sel)R.innerHTML=`<div class="none mb-empty">Chọn một thư để đọc.<br>Thư có mã job (FDI…) trong tiêu đề sẽ hiện nút 📁 mở job.</div>`;
+  else if(!S.mail.sel)R.innerHTML=`<div class="none mb-empty">Chọn một thư để đọc.<br>Thư đã tạo job hoặc thuộc một job sẽ hiện mã job 📁, bấm vào để mở job.</div>`;
   else{const m=S.mail.msg;if(!m||m.id!==S.mail.sel){R.innerHTML=`<div class="none"><span class="spin"></span> Đang mở thư…</div>`}
     else if(m.err)R.innerHTML=`<div class="mb-rh"><button class="ghost sm mb-back" data-mail="back">← Thư</button></div><div class="none">${esc(m.err)}</div>`;
-    else if(!R.querySelector(`[data-rid="${CSS.escape(m.id)}"]`)){const j=mailJobOf(m.s);
+    else if(!R.querySelector(`[data-rid="${CSS.escape(m.id)}"]`)){const j=mailJobOf(m.s,m.id);
       R.innerHTML=`<div class="mb-rh" data-rid="${esc(m.id)}"><button class="ghost sm mb-back" data-mail="back">← Thư</button><h3>${esc(m.s||"(không tiêu đề)")}</h3>
         <div class="mb-meta"><b>${esc(m.fromN||m.from)}</b> <span class="muted">&lt;${esc(m.from)}&gt; · ${m.t?new Date(m.t).toLocaleString("vi-VN"):""}</span><br><span class="muted">Tới: ${esc(m.to)}${m.cc&&m.cc!=="Not Provided"?" · Cc: "+esc(m.cc):""}</span></div>
-        <div class="mb-acts"><button class="ghost sm" data-mail="reply">↩ Trả lời</button><button class="ghost sm" data-mail="replyall">↩↩ Trả lời tất cả</button><button class="ghost sm" data-mail="forward">↪ Chuyển tiếp</button>${j?`<button class="ghost sm" data-mjob="${esc(j.id)}">📁 Mở ${esc(j.code)}</button>`:""}</div>
+        <div class="mb-acts"><button class="ghost sm" data-mail="reply">↩ Trả lời</button><button class="ghost sm" data-mail="replyall">↩↩ Trả lời tất cả</button><button class="ghost sm" data-mail="forward">↪ Chuyển tiếp</button></div>
+        ${j?`<button type="button" class="mb-job" data-mjob="${esc(j.id)}"><i class="fa fa-folder-open" aria-hidden="true"></i><span>Thư này thuộc job <b>${esc(j.code)}</b>${j.company||j.title?` · ${esc(String(j.company||j.title).slice(0,60))}`:""}${j.status?` <em>${esc(j.status)}</em>`:""}</span><b class="mb-jgo">Mở job →</b></button>`:""}
         ${m.att&&m.att.length?`<div class="mb-att">${m.att.map(a=>`<button class="ghost sm" data-matt="${esc(a.id)}" data-mname="${esc(a.n)}">📎 ${esc(a.n)} <span class="muted">${a.sz?Math.max(1,Math.round(a.sz/1024))+" KB":""}</span></button>`).join("")}</div>`:""}</div>
         <iframe class="mb-body" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" title="Nội dung thư"></iframe>`;
       R.querySelector("iframe").srcdoc=`<!doctype html><meta charset="utf-8"><base target="_blank"><style>body{font:14px/1.5 system-ui,Segoe UI,Arial,sans-serif;color:#222;margin:12px;word-wrap:break-word}img{max-width:100%;height:auto}blockquote{border-left:3px solid #ccc;margin:6px 0;padding-left:10px;color:#555}</style>`+(m.html||"<p>(Thư trống)</p>");
@@ -2936,7 +2946,7 @@ function mailCompose(kind){
   if(!kind||!m){S.mail.compose={to:"",cc:"",s:j?`${j.code} - ${j.company||j.title||""}`:"",body:"",job:j?j.id:"",files:[]}}
   else{const me=MAIL_ADDR.toLowerCase(),split=x=>String(x||"").split(/[,;]/).map(a=>a.trim()).filter(a=>a&&a!=="Not Provided"&&!a.toLowerCase().includes(me));
     const pre=kind==="forward"?"Fwd: ":"Re: ",sub=/^(re|fwd?):/i.test(m.s||"")&&kind!=="forward"?m.s:pre+(m.s||"");
-    const jj=mailJobOf(m.s);
+    const jj=mailJobOf(m.s,m.id);
     S.mail.compose={kind,reply:m.id,f:m.f,to:kind==="forward"?"":kind==="replyall"?[m.from].concat(split(m.to)).join(", "):m.from,cc:kind==="replyall"?split(m.cc).join(", "):"",s:sub,
       body:"",quote:`Vào ${m.t?new Date(m.t).toLocaleString("vi-VN"):""}, ${m.fromN||m.from} đã viết:\n`+mailText(m.html).slice(0,4000),job:jj?jj.id:"",files:[]}}
   mailPaint();setTimeout(()=>{const f=$(S.mail.compose.to?"#mcBody":"#mcTo");f&&f.focus()},0);
@@ -3271,7 +3281,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25h";
+const APP_VER="2026-11-25i";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
