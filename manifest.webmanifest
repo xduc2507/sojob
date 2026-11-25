@@ -1,0 +1,14 @@
+{
+  "name": "Theo dõi làm hàng · FDI",
+  "short_name": "Làm hàng FDI",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#E8F2EC",
+  "theme_color": "#1E6B45",
+  "lang": "vi",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
