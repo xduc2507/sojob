@@ -288,6 +288,7 @@
         <label class="fld" style="flex:2;min-width:180px;margin:0"><span>Email Google của nhân viên</span><input id="sj-me" type="email" autocomplete="off" spellcheck="false" placeholder="ten@gmail.com"></label>
         <label class="fld" style="flex:1;min-width:120px;margin:0"><span>Tên gọi</span><input id="sj-mn" autocomplete="off" placeholder="VD: Hạnh"></label>
         <button class="primary" id="sj-madd">Thêm</button></div>` : ""}
+      ${FB && ROLE === "owner" ? `<h2 style="margin-top:14px">Dung lượng</h2><div id="sj-dung" class="note">Đang tải…</div>` : ""}
       ${FB && ROLE !== "owner" ? "" : `<h2 style="margin-top:14px">Dữ liệu</h2>
       <div class="mrow" style="justify-content:flex-start;flex-wrap:wrap">
         <button id="sj-exp">Tải file sao lưu (.json)</button>
@@ -316,6 +317,8 @@
     };
     const clr = $("#sj-clear", d);
     if (clr) clr.onclick = () => { try { localStorage.removeItem(KEY_LS); } catch (e) {} $("#sj-key", d).value = ""; msg("Đã xoá key."); };
+    const dg = $("#sj-dung", d);
+    if (dg) { if (window.sojobDung) window.sojobDung(dg); else dg.textContent = "Chưa xem được dung lượng."; }
     const memBox = $("#sj-mem", d);
     if (memBox) {
       const draw = async () => {
