@@ -952,6 +952,44 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 .kc .asgl{display:flex!important;align-items:center;justify-content:space-between;gap:6px;min-width:0}
 .kc .asgl .asgchip{flex:0 1 auto;min-width:0}
 .kc .asgl .tm{flex:none;margin-left:auto}
+/* ===== Giao diện gọn 2026-11-25h ===== */
+#banner:empty,#latebar:empty{display:none}
+.tmore{display:none}
+.tmenu{position:fixed;right:8px;bottom:calc(74px + env(safe-area-inset-bottom,0px));z-index:45;background:var(--surface);border:1px solid var(--line);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.18);padding:6px;display:flex;flex-direction:column;gap:4px;min-width:180px}
+.tmenu button{display:flex;align-items:center;gap:10px;min-height:48px;padding:8px 14px;font-size:15px;text-align:left;border:0!important;background:none!important;color:var(--ink)!important;border-radius:8px!important}
+.tmenu button.on{background:#E3EEFB!important;color:var(--primary)!important;font-weight:700}
+.tmenu .tbadge,.tmenu .cbadge{margin-left:auto}
+.kb-bar{gap:8px 10px}
+.kb-fbtn{font-weight:600}.kb-fbtn.on{background:var(--accent-soft)!important;border-color:var(--primary)!important;color:var(--primary)!important}
+.kb-f{flex:1 1 100%;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:10px;border:1px solid var(--line);border-radius:8px;background:var(--surface-2)}
+.kb-f[hidden]{display:none}
+.nhint{display:flex;align-items:center;gap:10px;padding:8px 10px 8px 14px;border-radius:8px;background:var(--warn-soft);color:var(--ink);font-size:13.5px;border:1px solid rgba(178,106,0,.25)}
+.nhint>span{flex:1;min-width:0}.nhint .fa{color:var(--warn);font-size:16px}.nhint button{flex:none;min-height:36px!important;min-width:36px}
+/* thẻ job: tên 3 dòng, chữ to hơn, nhãn trung tính (đỏ = gấp/quá hạn, cam = vướng mắc) */
+.kc .t{font-size:14px!important;line-height:1.3!important;-webkit-line-clamp:3!important}
+.kc .ds{font-size:12.5px}
+.kc .tg span{font-size:11.5px!important;line-height:18px!important;padding:0 6px!important}
+.kc .ft .who{font-size:12.5px}
+.kc:not(.over) .tg .sv{background:var(--surface)!important;color:var(--ink)!important;border:1px solid var(--line-2,var(--line))!important;font-weight:700}
+.kc:not(.over) .tg .odm{background:var(--warn-soft)!important;color:var(--warn)!important;border-color:transparent!important}
+@media (max-width:780px){
+  body{padding-bottom:calc(66px + env(safe-area-inset-bottom,0px))}
+  .bar .tabs{position:fixed;left:0;right:0;bottom:0;z-index:18;flex-wrap:nowrap;gap:2px;margin:0;border:0!important;border-top:1px solid var(--line)!important;border-radius:0!important;
+    padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));background:var(--surface)!important;box-shadow:0 -2px 12px rgba(0,0,0,.08)}
+  .bar .tabs button{flex:1 1 0;min-width:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:4px 2px!important;min-height:56px!important;
+    font-size:11.5px!important;line-height:1.15;white-space:normal;text-align:center;position:relative;border-radius:8px!important}
+  .bar .tabs button[hidden]{display:none}
+  .bar .tabs button .ic-fa{font-size:20px;margin:0!important}
+  .bar .tabs button.on{background:#E3EEFB!important;color:var(--primary)!important;font-weight:700}
+  .bar .tabs .tbadge,.bar .tabs .cbadge{position:absolute;top:3px;left:calc(50% + 6px);margin:0}
+  .bar .tabs [data-view="list"],.bar .tabs [data-view="report"]{display:none}
+  .bar .tabs .tmore{display:flex}
+  body.has-detail .bar .tabs,body.has-detail .kb-fab{display:none}
+  .kb-fab{bottom:calc(80px + env(safe-area-inset-bottom,0px))!important}
+  .kb{height:calc(100dvh - 370px - env(safe-area-inset-bottom,0px));min-height:340px}
+  .mailbox{height:calc(100dvh - 330px - env(safe-area-inset-bottom,0px));min-height:380px}
+  .kc .t{font-size:14.5px!important}
+}
 </style>
 
 <header class="top">
@@ -973,7 +1011,7 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
       <div class="tabs" role="tablist">
         <button data-view="today"><i class="fa fa-sun-o ic-fa" aria-hidden="true"></i>Hôm nay<span class="cbadge" id="todayN" hidden></span></button><button data-view="team" hidden><i class="fa fa-comments ic-fa" aria-hidden="true"></i>Chat chung<span class="tbadge" id="teamBadge" hidden></span></button>
         <button data-view="board"><i class="fa fa-columns ic-fa" aria-hidden="true"></i>Quy trình</button>
-        <button data-view="list" class="on"><i class="fa fa-list ic-fa" aria-hidden="true"></i>Danh sách</button><button data-view="mail" hidden><i class="fa fa-envelope ic-fa" aria-hidden="true"></i>Email<span class="tbadge" id="mailBadge" hidden></span></button><button data-view="report" hidden><i class="fa fa-bar-chart ic-fa" aria-hidden="true"></i>Báo cáo</button>
+        <button data-view="list" class="on"><i class="fa fa-list ic-fa" aria-hidden="true"></i>Danh sách</button><button data-view="mail" hidden><i class="fa fa-envelope ic-fa" aria-hidden="true"></i>Email<span class="tbadge" id="mailBadge" hidden></span></button><button data-view="report" hidden><i class="fa fa-bar-chart ic-fa" aria-hidden="true"></i>Báo cáo</button><button type="button" class="tmore" data-more aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h ic-fa" aria-hidden="true"></i>Thêm</button>
       </div>
       <span class="sp"></span>
       <button type="button" id="fMine" class="sm fmine" aria-pressed="false" title="Chỉ hiện job mình phụ trách" hidden>👤 Việc của tôi</button><select id="fWho" class="fwho" aria-label="Lọc theo người phụ trách" hidden></select>
@@ -1439,14 +1477,20 @@ function renderBoard(el){
     return `<div class="col c${ci}" data-col="${esc(st)}"><div class="col-h"><span class="nm">${esc(COLNAME[st]||st)}<span class="nr">${isOpen(st)?`<button class="add" data-addcol="${esc(st)}" title="Tạo job ở cột “${esc(st)}”" aria-label="Tạo job ở cột ${esc(st)}">+</button>`:""}<span class="n">${n}</span></span></span><span class="sub">${sub}</span></div>
       <div class="col-b">${arr.map(kanbanCard).join("")||'<span class="none">Kéo thẻ vào đây</span>'}</div><span class="col-rz" title="Kéo để đổi độ rộng cột · bấm đúp: vừa màn hình" aria-hidden="true"></span></div>`;
   }).join("");
-  el.innerHTML=`<div class="kb-bar"><select id="kbGroup" aria-label="Lọc theo FWD / công ty"><option value="__all">Tất cả FWD / cty (${S.jobs.length})</option>${groups.map(g=>`<option value="${esc(g)}" ${S.group===g?"selected":""}>${esc(g)}</option>`).join("")}</select>
+  const nf=(S.group!=="__all"?1:0)+(S.svc?1:0);
+  el.innerHTML=`<div class="kb-bar"><button type="button" class="sm kb-fbtn${nf?" on":""}" data-kbf aria-expanded="${!!S.kbF}"><i class="fa fa-filter" aria-hidden="true"></i> Lọc${nf?` (${nf})`:""} ${S.kbF?"▴":"▾"}</button>
+    <span class="sum">${open.length} job đang mở${late?` · <button type="button" class="sumlink bad" data-kbsum="late" aria-haspopup="true">${late} đứng yên / quá hạn ▾</button>`:""}${blk?` · <button type="button" class="sumlink" data-kbsum="blk" aria-haspopup="true">${blk} có vướng mắc ▾</button>`:""}</span>
+    <div class="kb-f"${S.kbF?"":" hidden"}><select id="kbGroup" aria-label="Lọc theo FWD / công ty"><option value="__all">Tất cả FWD / cty (${S.jobs.length})</option>${groups.map(g=>`<option value="${esc(g)}" ${S.group===g?"selected":""}>${esc(g)}</option>`).join("")}</select>
     <select id="kbSvc" aria-label="Lọc theo loại dịch vụ"><option value="">Mọi dịch vụ</option>${SERVICES.map(s=>`<option value="${s}" ${S.svc===s?"selected":""}>${s} · ${SERVICE_NAME[s]}</option>`).join("")}</select>
     <button type="button" class="sm${S.bulkOn?" on":""}" data-bulk="toggle" title="Chọn nhiều thẻ để chuyển bước / giao việc cùng lúc">☑ Chọn nhiều</button>
-    <span class="sum">${open.length} job đang mở${late?` · <button type="button" class="sumlink bad" data-kbsum="late" aria-haspopup="true">${late} đứng yên / quá hạn ▾</button>`:""}${blk?` · <button type="button" class="sumlink" data-kbsum="blk" aria-haspopup="true">${blk} có vướng mắc ▾</button>`:""}</span>
-    <span class="kbw" title="Độ rộng mỗi cột (kéo thanh, hoặc kéo mép phải của cột)"><button type="button" class="sm ghost" data-kbw="-" aria-label="Thu hẹp cột">−</button><input type="range" id="kbW" min="150" max="360" step="10" value="${kbColW()}" aria-label="Độ rộng cột"><button type="button" class="sm ghost" data-kbw="+" aria-label="Nới rộng cột">+</button><button type="button" class="sm" data-kbw="fit" title="Chia đều cho vừa màn hình">Vừa màn hình</button></span></div>
+    <span class="kbw" title="Độ rộng mỗi cột (kéo thanh, hoặc kéo mép phải của cột)"><button type="button" class="sm ghost" data-kbw="-" aria-label="Thu hẹp cột">−</button><input type="range" id="kbW" min="150" max="360" step="10" value="${kbColW()}" aria-label="Độ rộng cột"><button type="button" class="sm ghost" data-kbw="+" aria-label="Nới rộng cột">+</button><button type="button" class="sm" data-kbw="fit" title="Chia đều cho vừa màn hình">Vừa màn hình</button></span>${nf?`<button type="button" class="sm ghost" data-kbfx>✕ Bỏ lọc</button>`:""}</div></div>
     <div class="kb" style="--colw:${kbColW()}px">${cols}</div>`;
 }
 let kmenu=null;
+document.addEventListener("click",e=>{
+  if(e.target.closest("[data-kbf]")){S.kbF=!S.kbF;renderMain();return}
+  if(e.target.closest("[data-kbfx]")){S.group="__all";S.svc="";renderAll();return}
+});
 function closeKmenu(){if(kmenu){kmenu.remove();kmenu=null}}
 function openKmenu(btn){
   closeKmenu();
@@ -1498,7 +1542,7 @@ function renderMain(){
   if(S.view==="team"&&!teamOn())S.view="list";
   teamWatch();peopleWatch();teamBadge();
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));$("#fStatus").hidden=S.view!=="list";
-  document.body.classList.toggle("view-team",S.view==="team");
+  document.body.classList.toggle("view-team",S.view==="team");tmoreSync();
   {const rb=document.querySelector('.tabs [data-view="report"]');if(rb)rb.hidden=!boss()}
   if(S.view==="report"&&!boss())S.view="list";
   fMinePaint();try{bulkBar()}catch(e){}
@@ -1783,7 +1827,20 @@ $("#space").addEventListener("click",e=>{const b=e.target.closest("[data-space]"
 $("#latebar").addEventListener("click",e=>{const x=e.target.closest("[data-xl]");if(x){x.dataset.xl==="in"?xlImport():xlExport();return}const b=e.target.closest("[data-late]");if(!b)return;S.fLate=b.dataset.late==="on";if(S.fLate&&S.view!=="board")S.view="list";renderAll(false)});
 $("#q").addEventListener("input",e=>{S.q=e.target.value;renderMain()});
 $("#fStatus").addEventListener("change",e=>{S.fStatus=e.target.value;renderMain()});
-document.querySelectorAll(".tabs button").forEach(b=>b.addEventListener("click",()=>{S.view=b.dataset.view;renderMain()}));
+document.querySelectorAll(".tabs button[data-view]").forEach(b=>b.addEventListener("click",()=>{tmenuClose();S.view=b.dataset.view;renderMain()}));
+/* Điện thoại: thanh tab ở đáy; Danh sách / Báo cáo nằm trong nút Thêm */
+function tmenuClose(){document.getElementById("tmenu")?.remove();document.querySelector(".tmore")?.setAttribute("aria-expanded","false")}
+function tmoreSync(){const m=document.querySelector(".tmore");if(!m)return;const on=S.view==="list"||S.view==="report";m.classList.toggle("on",on);
+  m.innerHTML=on?`<i class="fa fa-${S.view==="list"?"list":"bar-chart"} ic-fa" aria-hidden="true"></i>${S.view==="list"?"Danh sách":"Báo cáo"}`:`<i class="fa fa-ellipsis-h ic-fa" aria-hidden="true"></i>Thêm`}
+document.addEventListener("click",e=>{
+  const m=e.target.closest("[data-more]");
+  if(m){if(document.getElementById("tmenu")){tmenuClose();return}
+    const d=document.createElement("div");d.id="tmenu";d.className="tmenu";d.setAttribute("role","menu");
+    d.innerHTML=[...document.querySelectorAll('.tabs [data-view="list"],.tabs [data-view="report"]')].filter(b=>!b.hidden).map(b=>`<button type="button" role="menuitem" data-tv="${b.dataset.view}" class="${S.view===b.dataset.view?"on":""}">${b.innerHTML}</button>`).join("");
+    document.body.appendChild(d);m.setAttribute("aria-expanded","true");return}
+  const t=e.target.closest("#tmenu [data-tv]");if(t){tmenuClose();S.view=t.dataset.tv;renderMain();return}
+  if(document.getElementById("tmenu")&&!e.target.closest("#tmenu"))tmenuClose();
+});
 const sideOpen=o=>{document.body.classList.toggle("side-open",o);$("#sideBtn")?.setAttribute("aria-expanded",o?"true":"false")};
 $("#sideBtn")?.addEventListener("click",()=>sideOpen(!document.body.classList.contains("side-open")));
 document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.body.classList.contains("side-open"))sideOpen(false)});
@@ -3040,7 +3097,8 @@ function renderTeam(el){
 }
 function teamFit(){const b=document.querySelector(".teamchat");if(!b||S.view!=="team")return;
   const top=b.getBoundingClientRect().top+window.scrollY,vh=window.visualViewport?window.visualViewport.height:window.innerHeight;
-  b.style.height=Math.max(320,Math.round(vh-top-10))+"px"}
+  const tb=document.querySelector(".bar .tabs"),bot=tb&&getComputedStyle(tb).position==="fixed"?tb.offsetHeight:0; // điện thoại: chừa chỗ thanh tab đáy
+  b.style.height=Math.max(320,Math.round(vh-top-10-bot))+"px"}
 window.addEventListener("resize",()=>teamFit());window.visualViewport?.addEventListener("resize",()=>teamFit());
 function teamPaint(force){
   teamBadge();teamFit();
@@ -3213,7 +3271,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25g";
+const APP_VER="2026-11-25h";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -3222,7 +3280,10 @@ function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra t�
     sw:!!navigator.serviceWorker,standalone:isStandalone,ua:navigator.userAgent.slice(0,160),at:Date.now()};
   try{db.collection("push").doc(me()).set({diag:d},{merge:true}).catch(()=>{})}catch(e){}
 }
-function notifyHint(t,k){try{if(!sessionStorage.getItem(k)){sessionStorage.setItem(k,"1");toast(t)}}catch(e){}}
+function notifyHint(t,k){try{if(localStorage.getItem(k))return}catch(e){}
+  const m=$("#main");if(!m||document.getElementById("nhint"))return;
+  m.insertAdjacentHTML("afterbegin",`<div id="nhint" class="nhint" role="status"><i class="fa fa-bell-slash" aria-hidden="true"></i><span>${esc(t)}</span><button type="button" class="ghost sm" data-nhx="${esc(k)}" aria-label="Đóng, không hiện lại">✕</button></div>`)}
+document.addEventListener("click",e=>{const x=e.target.closest("[data-nhx]");if(!x)return;try{localStorage.setItem(x.dataset.nhx,"1")}catch(er){}document.getElementById("nhint")?.remove()});
 function pushGo(){return pushSetup().then(ok=>{if(ok)pushDiag("ok");else pushDiag("no-token")}).catch(e=>{pushDiag("setup",e);toast("Chưa bật được thông báo trên máy này: "+(e.message||e.code||e))})}
 // Thông báo luôn bật: trình duyệt (nhất là Safari iPhone) chỉ cho hỏi quyền trong lúc người dùng BẤM, nên hỏi ở lần bấm đầu tiên
 function autoNotify(){
