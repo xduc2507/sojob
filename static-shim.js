@@ -281,6 +281,7 @@
       <p class="note">Key chỉ lưu trong trình duyệt này và chỉ gửi tới api.anthropic.com. Đừng nhập key trên máy dùng chung. Không có key vẫn tạo job trống và nhập tay được.</p>
       <div class="mrow">${k ? '<button class="ghost danger" id="sj-clear">Xoá key</button>' : ""}
         <button class="primary" id="sj-save">Lưu key</button></div>` : ""}
+      ${FB ? `<h2 style="margin-top:14px">Zalo</h2><div id="sj-zalo" class="note"></div>` : ""}
       ${FB && ROLE === "owner" ? `<h2 style="margin-top:14px">Thành viên</h2>
       <p class="note">Nhân viên đăng nhập bằng Google của họ tại link này. Họ thấy job họ tạo và job bạn bấm “🔒 Chỉ mình tôi” → “👥 Đã chia sẻ”. Họ được xem tiền, sửa job, nhưng không xoá job và không vào được mục này.</p>
       <div id="sj-mem" class="note">Đang tải…</div>
@@ -319,6 +320,7 @@
       } catch (e) { msg("Chưa lưu được: " + (e.message || e.code), true); }
       mys.disabled = false;
     };
+    const zl = $("#sj-zalo", d); if (zl && window.sojobZalo) window.sojobZalo(zl); else if (zl) zl.remove();
     const dg = $("#sj-dung", d);
     if (dg) { if (window.sojobDung) window.sojobDung(dg); else dg.textContent = "Chưa xem được dung lượng."; }
     const memBox = $("#sj-mem", d);

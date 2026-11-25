@@ -809,6 +809,7 @@ body.view-report #side,body.view-report #detail{display:none}
 .mb-side #mbDung{margin-top:auto}.mb-side #mbDung+small{margin-top:6px}
 .dung-set{display:flex;flex-direction:column;gap:10px}.dung-set .dung{padding:10px 12px}.dung-set .dg-h{font-size:14px}.dung-set .dg-h b{font-size:15px}.dung-set small{font-size:12.5px}
 @media (max-width:780px){.mb-side #mbDung{margin-top:0;min-width:160px}.mb-side #mbDung .dung{padding:4px 8px}.mb-side #mbDung+small{display:none}}
+.zb-code{font:700 22px/1.2 var(--f-mono,monospace);letter-spacing:.04em;margin:4px 0;padding:8px 12px;background:var(--surface-2);border:1px dashed var(--line);border-radius:8px;display:inline-block;user-select:all}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1126,7 +1127,7 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 <div id="toast" hidden></div>
 
 <script src="firebase-config.js?v=483007a3c3"></script>
-<script src="static-shim.js?v=6dc41778a3"></script>
+<script src="static-shim.js?v=bb3a17dce6"></script>
 <script>
 const TYPES=["Báo giá","Khai HQ nhập","Khai HQ xuất","Vận chuyển","Chứng từ / C/O","Kiểm tra chuyên ngành","Khác"];
 const MODES=["","Sea FCL","Sea LCL","Air","Road","Express"];
@@ -2970,6 +2971,17 @@ function dungBar(label,used,total,note){
   return `<div class="dung${cls}"><div class="dg-h"><span>${label}</span><b>${pc}%</b></div><div class="dg-bar" role="progressbar" aria-valuemin="0" aria-valuemax="100" aria-valuenow="${Math.round(p)}"><i style="width:${Math.min(100,Math.max(p,used?1.5:0))}%"></i></div><small>${fmtSize(used)} / ${fmtSize(total)}${note?" · "+note:""}${warn?`<br><b>${warn}</b>`:""}</small></div>`}
 function dungMailHtml(){const m=S.dung&&S.dung.mail;return m&&m.total?dungBar("Hộp thư",m.used*1024,m.total*1024):""}
 function dungMailPaint(){const e=$("#mbDung");if(e)e.innerHTML=dungMailHtml()}
+/* Cài đặt → Zalo: lấy mã 6 số để nối Zalo với tài khoản Sổ (gửi tin cho Bot opsdad, nhắn "tạo job") */
+window.sojobZalo=el=>{
+  el.innerHTML=`<p style="margin:0 0 8px">Gửi hoặc chuyển tiếp thông tin, ảnh của lô cho <b>Bot opsdad</b> trên Zalo. Xong nhắn <b>tạo job</b> là có job ở cột Mới nhận, bạn là người phụ trách. Nhắn <b>gắn FDI…</b> để ghi vào job có sẵn.</p><button type="button" class="primary" data-zbma>Lấy mã nối Zalo</button><div class="zb-ma"></div>`;
+  el.querySelector("[data-zbma]").onclick=async e=>{const b=e.currentTarget,out=el.querySelector(".zb-ma");b.disabled=true;out.innerHTML=`<span class="spin"></span> Đang lấy mã…`;
+    try{const u=window.firebase&&firebase.auth().currentUser;if(!u)throw new Error("Chưa đăng nhập.");
+      const r=await fetch(PUSH_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({zbcode:true,token:await u.getIdToken()})});const o=await r.json();
+      if(!o.ok)throw new Error(o.msg||"Máy chủ chưa trả mã.");
+      out.innerHTML=`<p style="margin:10px 0 4px">Trong Zalo, tìm <b>${esc(o.bot||"Bot opsdad")}</b>, nhắn đúng dòng này:</p><p class="zb-code">nối ${esc(o.ma)}</p>${o.noi?'<p style="margin:4px 0 0;color:var(--ok)">✓ Zalo của bạn đã nối với Sổ.</p>':""}`}
+    catch(er){out.innerHTML=`<p style="color:var(--bad);margin:8px 0 0">${esc(er.message||String(er))}</p>`}
+    b.disabled=false};
+};
 /* Cài đặt (static-shim) gọi hàm này để vẽ mục Dung lượng cho chủ sổ */
 window.sojobDung=async el=>{
   el.innerHTML=`<span class="spin"></span> Đang tính…`;
@@ -3382,7 +3394,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25r";
+const APP_VER="2026-11-25s";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
