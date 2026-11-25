@@ -1131,7 +1131,7 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 const TYPES=["Báo giá","Khai HQ nhập","Khai HQ xuất","Vận chuyển","Chứng từ / C/O","Kiểm tra chuyên ngành","Khác"];
 const MODES=["","Sea FCL","Sea LCL","Air","Road","Express"];
 /* Quy trình lô hàng: 1 bảng, mỗi loại dịch vụ đi một đường (bỏ qua cột không liên quan) */
-const STAGES=["Mới nhận","Báo giá","Nhận & kiểm tra chứng từ","Đang khai báo","Đã truyền tờ khai","Trình tờ khai cho Hải quan","Kiểm hóa","Chờ điều xe","Đang vận chuyển","Bảng kê / debit","Chờ thu tiền","Hoàn thành"];
+const STAGES=["Mới nhận","Báo giá","Nhận & kiểm tra chứng từ","Đang khai báo","Đã truyền tờ khai","Trình tờ khai cho Hải quan","Kiểm hóa","Chờ điều xe","Đang vận chuyển","Bảng kê / debit","Nhập Ksmart","Hoàn thành"];
 const HQWAIT=["Đã truyền tờ khai","Trình tờ khai cho Hải quan","Kiểm hóa"]; // các bước chờ hải quan xử lý (máy chủ theo dõi tờ khai ở các bước này)
 const DONE="Hoàn thành",FAIL="Thất bại";
 const SERVICES=["HQ","VC","HQ+VC"];
@@ -1140,9 +1140,9 @@ const ROUTES={"HQ":[0,1,2,3,4,5,6,9,10,11],"VC":[0,1,7,8,9,10,11],"HQ+VC":[0,1,2
 const LANES=["","Xanh","Vàng","Đỏ"];
 const DEPOSIT=["","Chưa hoàn","Đã hoàn","Không có cược"];
 const FAIL_REASONS=["Khách không chốt giá","Khách huỷ lô","Hàng không về / đổi lịch","Khách dùng đơn vị khác","Khác"];
-const DEFAULT_STALL={"Mới nhận":1,"Báo giá":2,"Nhận & kiểm tra chứng từ":1,"Đang khai báo":1,"Đã truyền tờ khai":1,"Trình tờ khai cho Hải quan":1,"Kiểm hóa":1,"Chờ điều xe":1,"Đang vận chuyển":2,"Bảng kê / debit":2,"Chờ thu tiền":7};
+const DEFAULT_STALL={"Mới nhận":1,"Báo giá":2,"Nhận & kiểm tra chứng từ":1,"Đang khai báo":1,"Đã truyền tờ khai":1,"Trình tờ khai cho Hải quan":1,"Kiểm hóa":1,"Chờ điều xe":1,"Đang vận chuyển":2,"Bảng kê / debit":2,"Nhập Ksmart":1};
 /* trường bắt buộc khi đi vào bước */
-const REQ={"Đã truyền tờ khai":[["tkNo","Số tờ khai"],["tkDate","Ngày tờ khai","date"],["hqCode","Mã Hải quan (VD: 02CI)"]],"Đang vận chuyển":[["truck","Nhà xe / biển số"]],"Chờ thu tiền":[["debitAmount","Số tiền debit"]],"Hoàn thành":[["paidDate","Ngày khách trả","date"]]};
+const REQ={"Đã truyền tờ khai":[["tkNo","Số tờ khai"],["tkDate","Ngày tờ khai","date"],["hqCode","Mã Hải quan (VD: 02CI)"]],"Đang vận chuyển":[["truck","Nhà xe / biển số"]],"Nhập Ksmart":[["debitAmount","Số tiền debit"]],"Hoàn thành":[["paidDate","Ngày khách trả","date"]]};
 const LEGACY={"Đang làm":"Làm hàng","Chờ phản hồi":"Báo giá","Đã báo giá":"Báo giá","Hoàn tất":"Đã thu"};
 const PRIOS=["Gấp","Thường","Thấp"];
 const SOURCES=["Email","Zalo","Điện thoại","Khác"];
@@ -1344,7 +1344,7 @@ function setStatus(j,st,kind="move",note=""){
   if(kind!=="return")j.returnNote="";
   if(from!==st&&kind!=="return"&&kind!=="create")try{autoRule(j,"st:"+st)}catch(e){}
   if(st==="Báo giá"&&!j.quoteSentAt&&(j.quote||[]).length)j.quoteSentAt=TODAY();
-  if(st==="Chờ thu tiền"&&!j.debitDate)j.debitDate=TODAY();
+  if(st==="Nhập Ksmart"&&!j.debitDate)j.debitDate=TODAY();
   if(st===DONE&&!j.paidDate)j.paidDate=TODAY();
   if(!isOpen(st))j.blocker="";
   queueSave(j);
@@ -1457,7 +1457,7 @@ function renderProfile(force){
   const last=jobs.reduce((a,j)=>Math.max(a,j.createdAt||0),0);
   const debt={},paid={},yr=String(new Date().getFullYear());
   jobs.forEach(j=>{const c=j.debitCurrency||"VND",a=num(j.debitAmount);if(!a)return;
-    if(j.status==="Chờ thu tiền")debt[c]=(debt[c]||0)+a;
+    if(j.status==="Nhập Ksmart")debt[c]=(debt[c]||0)+a;
     if(j.status===DONE&&(j.paidDate||"").startsWith(yr))paid[c]=(paid[c]||0)+a});
   const fails={};jobs.filter(j=>j.status===FAIL).forEach(j=>{const r=j.failReason||"Chưa ghi lý do";fails[r]=(fails[r]||0)+1});
   const money=o=>Object.keys(o).length?Object.entries(o).map(([c,v])=>`${fmt(v,c)} ${c}`).join("<br>"):"0";
@@ -1667,7 +1667,7 @@ function reviewHtml(){
     ["Đang vướng mắc",j=>!!j.blocker,j=>j.blocker],
     ["Bị trả về",j=>!!j.returnNote,j=>j.returnNote],
     ["Chưa hoàn cược cont",depositPending,j=>j.deposit||"chưa ghi"],
-    ["Chờ thu tiền",j=>j.status==="Chờ thu tiền",j=>`${num(j.debitAmount)?fmt(j.debitAmount,j.debitCurrency)+" "+(j.debitCurrency||"VND"):"chưa ghi số tiền"}${j.debitDate?" · gửi debit "+dmy(j.debitDate):""}`]];
+    ["Nhập Ksmart",j=>j.status==="Nhập Ksmart",j=>`${num(j.debitAmount)?fmt(j.debitAmount,j.debitCurrency)+" "+(j.debitCurrency||"VND"):"chưa ghi số tiền"}${j.debitDate?" · gửi debit "+dmy(j.debitDate):""}`]];
   const parts=G.map(([name,f,why])=>{const arr=open.filter(f);if(!arr.length)return"";
     return `<div class="rv-g"><span class="rv-h">${name}<span class="mono">${arr.length}</span></span>${arr.map(j=>`<div class="rv" data-open="${j.id}" tabindex="0"><span class="mono">${esc(j.code)}</span><span class="t">${esc(j.title||"(chưa có tiêu đề)")}<small>${esc(groupKey(j))} · ${esc(j.status)} · ${esc(why(j))}</small></span><span class="pill svc">${svcTag(j)}</span></div>`).join("")}</div>`}).filter(Boolean);
   const stall=boss()?`<details class="rv-set"><summary>⚙ Ngưỡng tô đỏ: lô đứng yên quá bao nhiêu ngày ở mỗi bước (0 = tắt)</summary><div class="stall-grid">${STAGES.filter(isOpen).map(st=>`<label class="fld"><span>${esc(st)}</span><input type="number" min="0" step="1" inputmode="numeric" data-stall="${esc(st)}" value="${esc(S.stall[st]??"")}"></label>`).join("")}</div></details>`:"";
@@ -1719,7 +1719,7 @@ function addPlanItem(){
 const opt=(arr,v)=>arr.map(o=>`<option ${o===v?"selected":""} value="${esc(o)}">${esc(o||"—")}</option>`).join("");
 const F=(f,label,val,cls="",type="text")=>`<label class="fld ${cls}"><span>${label}</span><input id="f-${f}" data-f="${f}" type="${type}" value="${esc(val)}"></label>`;
 const SEL=(f,label,arr,val,cls="")=>`<label class="fld ${cls}"><span>${label}</span><select id="f-${f}" data-f="${f}">${opt(arr,val)}</select></label>`;
-const SHORT={"Mới nhận":"Mới","Nhận & kiểm tra chứng từ":"Chứng từ","Đang khai báo":"Khai báo","Đã truyền tờ khai":"Đã truyền TK","Trình tờ khai cho Hải quan":"Trình TK","Kiểm hóa":"Kiểm hóa","Chờ điều xe":"Điều xe","Đang vận chuyển":"Vận chuyển","Bảng kê / debit":"Bảng kê","Chờ thu tiền":"Thu tiền","Hoàn thành":"Xong"};
+const SHORT={"Mới nhận":"Mới","Nhận & kiểm tra chứng từ":"Chứng từ","Đang khai báo":"Khai báo","Đã truyền tờ khai":"Đã truyền TK","Trình tờ khai cho Hải quan":"Trình TK","Kiểm hóa":"Kiểm hóa","Chờ điều xe":"Điều xe","Đang vận chuyển":"Vận chuyển","Bảng kê / debit":"Bảng kê","Nhập Ksmart":"Ksmart","Hoàn thành":"Xong"};
 function stagesHtml(j){
   const r=route(j),list=r.includes(j.status)||!isOpen(j.status)?r:[...r,j.status].sort((a,b)=>stIdx(a)-stIdx(b));
   const si=stIdx(j.status),fail=j.status===FAIL;
@@ -2053,7 +2053,7 @@ D.addEventListener("input",e=>{
     if(f==="cost")v=roundMoney(num(String(v).replace(/[.,\s]/g,"")),"VND");
     if(f==="debitAmount")v=roundMoney(num(String(v).replace(/[.,\s]/g,"")),"VND");
     j[f]=v;
-    if(f==="debitDate"&&v&&isOpen(j.status)&&stIdx(j.status)<stIdx("Chờ thu tiền")){setStatus(j,"Chờ thu tiền","auto","Điền ngày gửi debit");syncStages(j)}
+    if(f==="debitDate"&&v&&isOpen(j.status)&&stIdx(j.status)<stIdx("Nhập Ksmart")){setStatus(j,"Nhập Ksmart","auto","Điền ngày gửi debit");syncStages(j)}
     if(f==="paidDate"&&v&&isOpen(j.status)){if(needDeposit(j)&&!["Đã hoàn","Không có cược"].includes(j.deposit))toast("Đã ghi ngày trả. Lô có vận chuyển chưa hoàn cược nên chưa chuyển Hoàn thành.");else{setStatus(j,DONE,"auto","Điền ngày khách trả");renderDetail(true)}}
     if(f==="blocker"&&!t.dataset.logged){t.dataset.logged="1";t.addEventListener("change",()=>{logH(j,{kind:"blocker",note:j.blocker||"(đã gỡ)"});queueSave(j)},{once:true})}
     queueSave(j);
@@ -2395,7 +2395,7 @@ async function xlImport(){
       const nNew=rows.filter(x=>!x.skip&&!x.old).length,nUpd=rows.filter(x=>x.old).length,nSkip=rows.filter(x=>x.skip).length;
       const dot=l=>l?`<span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:#${LANE_RGB[l].slice(2)};border:1px solid #999"></span> ${l}`:"";
       m.body.innerHTML=`${cands.length>1?`<label class="fld" style="max-width:320px"><span>Sheet</span><select id="xlSheet">${cands.map((c,i)=>`<option value="${i}" ${i===ci?"selected":""}>${esc(c.ws.name)}</option>`).join("")}</select></label>`:""}<p>Sheet “${esc(ws.name)}”: <b>${nNew}</b> job mới · <b>${nUpd}</b> job cập nhật (trùng số tờ khai)${nSkip?` · ${nSkip} dòng bỏ qua (thiếu số tờ khai)`:""}.</p>
-        <label class="fld" style="max-width:320px"><span>Dòng “TQ” đưa vào bước</span><select id="xlTq"><option>Chờ thu tiền</option><option>Hoàn thành</option></select></label>
+        <label class="fld" style="max-width:320px"><span>Dòng “TQ” đưa vào bước</span><select id="xlTq"><option>Nhập Ksmart</option><option>Hoàn thành</option></select></label>
         <div style="max-height:46vh;overflow:auto;margin-top:8px"><table class="lf-t"><tr><td></td><td><b>Ngày</b></td><td><b>Công ty</b></td><td><b>Số TK</b></td><td><b>Luồng</b></td><td><b>Thu</b></td><td><b>TT</b></td></tr>
         ${rows.slice(0,300).map(x=>`<tr style="${x.skip?"opacity:.45":""}"><td>${x.skip?"Bỏ":x.old?"Cập nhật":"Mới"}</td><td>${esc(x.date?dmy(x.date):"")}</td><td>${esc(x.company.slice(0,40))}</td><td class="mono">${esc(x.tk)}</td><td>${dot(x.lane)}</td><td class="mono">${x.thu?fmt(x.thu,"VND"):""}</td><td>${esc(x.stateRaw)}</td></tr>`).join("")}</table></div>`;
       const sel=m.body.querySelector("#xlSheet");if(sel)sel.onchange=()=>show(+sel.value);
@@ -2805,7 +2805,7 @@ const RULE_MSG={
   "lane:Đỏ":"🔴 Tờ khai luồng đỏ: chuẩn bị kiểm hoá, hẹn lịch với hải quan.",
   "lane:Vàng":"🟡 Tờ khai luồng vàng: chuẩn bị bộ chứng từ giấy để hải quan kiểm tra.",
   "st:Chờ điều xe":"🚚 Lô chuyển sang Chờ điều xe: đặt xe, báo nhà xe giờ lấy hàng và nơi giao.",
-  "st:Chờ thu tiền":"💰 Lô chờ thu tiền: theo dõi khách thanh toán debit."};
+  "st:Nhập Ksmart":"🧾 Lô cần nhập Ksmart: nhập xong thì chuyển bước, để quá 1 ngày sẽ báo đỏ."};
 function autoRule(j,key){
   if(!team()||(boss()&&isMine(j))||!RULE_MSG[key])return;
   j.ruleDone=j.ruleDone||{};if(j.ruleDone[key])return;j.ruleDone[key]=Date.now();queueSave(j);
@@ -3382,7 +3382,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25p";
+const APP_VER="2026-11-25q";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -3671,7 +3671,7 @@ Trả về DUY NHẤT JSON:
 }
 
 /* 3. Soạn tin nhắc thanh toán / trả rỗng – hoàn cược (gộp các lô của cùng FWD) */
-const owing=j=>isOpen(j.status)&&!j.paidDate&&(j.status==="Chờ thu tiền"||(num(j.debitAmount)>0&&stIdx(j.status)>=stIdx("Bảng kê / debit")));
+const owing=j=>isOpen(j.status)&&!j.paidDate&&(j.status==="Nhập Ksmart"||(num(j.debitAmount)>0&&stIdx(j.status)>=stIdx("Bảng kê / debit")));
 async function aiRemind(j){
   if(!sample){toast("Chế độ xem này không gọi được Claude.");return}
   const KINDS=["Nhắc thanh toán","Nhắc trả rỗng / hoàn cược cont"];
@@ -3877,7 +3877,7 @@ function debitOpen(j){
 function debitSent(j,total){
   j.debitAmount=total;j.debitCurrency="VND";const first=!j.debitDate;if(first)j.debitDate=TODAY();
   logH(j,{kind:"note",note:`Xuất debit ${fmt(total,"VND")} đ`});
-  if(isOpen(j.status)&&stIdx(j.status)<stIdx("Chờ thu tiền")){setStatus(j,"Chờ thu tiền","auto","Xuất debit");syncStages(j)}
+  if(isOpen(j.status)&&stIdx(j.status)<stIdx("Nhập Ksmart")){setStatus(j,"Nhập Ksmart","auto","Xuất debit");syncStages(j)}
   queueSave(j)}
 function debitPaid(j){
   if(!boss())return;j.paidDate=TODAY();logH(j,{kind:"note",note:"Đã thu tiền debit"});
@@ -3951,15 +3951,16 @@ function debitPrint(j,d){
 let tt;function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,Math.min(12000,Math.max(3500,String(t).length*55)))}
 
 /* ---------- boot ---------- */
-const OLDST={"Mới":"Mới nhận","Huỷ":DONE,"Đã thu":DONE,"Chờ thông quan":"Đã truyền tờ khai","Chờ trả rỗng":"Bảng kê / debit",[FAIL]:DONE}; // 2026-11-25: đổi/bỏ bước
+const OLDST={"Chờ thu tiền":"Nhập Ksmart","Mới":"Mới nhận","Huỷ":DONE,"Đã thu":DONE,"Chờ thông quan":"Đã truyền tờ khai","Chờ trả rỗng":"Bảng kê / debit",[FAIL]:DONE}; // 2026-11-25: đổi/bỏ bước
 function fixJob(j){
   if(LEGACY[j.status]){if(j.status==="Chờ phản hồi")j.waiting=true;j.status=LEGACY[j.status]}
   if(!SERVICES.includes(j.service)&&!j.svcPending)j.service=j.type==="Vận chuyển"?"VC":"HQ";
   const vc=j.service==="VC";
-  if(OLDST[j.status]){if(j.status===FAIL||j.status==="Huỷ")j.failReason=j.failReason||"Thất bại";j.status=OLDST[j.status];j._mig=true}
+  if(OLDST[j.status]){if(j.status===FAIL||j.status==="Huỷ")j.failReason=j.failReason||"Thất bại";if(j.status==="Chờ thu tiền")j.stageAt=Date.now(); // bước mới: tính 1 ngày từ lúc đổi tên
+j.status=OLDST[j.status];j._mig=true}
   else if(j.status==="Chốt"||j.status==="Làm hàng")j.status=vc?"Chờ điều xe":"Đang khai báo";
   else if(j.status==="Thông quan"){j.status=vc?"Đang vận chuyển":"Đã truyền tờ khai";j._mig=true}
-  else if(j.status==="Debit")j.status=j.debitDate?"Chờ thu tiền":"Bảng kê / debit";
+  else if(j.status==="Debit")j.status=j.debitDate?"Nhập Ksmart":"Bảng kê / debit";
   if(!STAGES.includes(j.status))j.status=STAGES[0];
   if(j.waiting){if(!j.blocker)j.blocker="Chờ khách phản hồi";j.waiting=false}
   if(!j.stageAt)j.stageAt=j.updatedAt||j.createdAt||Date.now();
