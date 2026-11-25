@@ -2043,6 +2043,8 @@ $("#content").addEventListener("drop",e=>{const c=e.target.closest("[data-col]")
 
 /* ---------- events: detail ---------- */
 const D=$("#detail");
+D.addEventListener("change",e=>{const t=e.target;if(t.dataset.f!=="tkNo")return;const j=cur();if(!j)return;
+  const v=String(t.value).replace(/\D/g,"");if(/^\d{11}$/.test(v)){t.value=v+"0";j.tkNo=v+"0";queueSave(j);toast("Số tờ khai 11 số: đã thêm số 0 ở cuối (bản gốc). Bấm Kiểm tra trạng thái để dò lần sửa mới nhất.")}});
 const LISTF=["vehicle","yard","cbm","title","fwd","company","deadline","priority","type","mode","pol","pod","debitAmount","debitCurrency","service","blocker","bl","cont","lane","deposit","tkNo","truck","cargo"];
 function syncStages(j){const b=D.querySelector("#stagebar");if(b)b.innerHTML=stagesHtml(j)}
 D.addEventListener("input",e=>{
@@ -3394,7 +3396,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25s";
+const APP_VER="2026-11-25t";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -3777,15 +3779,27 @@ function tkInputs(j){const g=f=>{const el=document.getElementById("f-"+f);return
   const m=d.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/);if(m)d=`${m[3]}-${m[2].padStart(2,"0")}-${m[1].padStart(2,"0")}`;
   const miss=[!mst&&"MST khách",!hq&&"Mã Hải quan",!tk&&"Số tờ khai",!d&&"Ngày tờ khai"].filter(Boolean);
   if(miss.length)throw new Error("Chưa kiểm tra được, còn thiếu: "+miss.join(", ")+".");
+  if(tk.length===11)tk+="0"; // chưa ghi lần sửa: mặc định bản gốc (số cuối 0)
   if(tk.length!==12)throw new Error("Số tờ khai phải đủ 12 số (đang có "+tk.length+" số).");
   if(!/^\d{4}-\d{2}-\d{2}$/.test(d))throw new Error("Ngày tờ khai chưa đúng dạng ngày.");
   return{mst,hq,tk,date:d}}
+/* Số tờ khai: 11 số đầu cố định, số cuối là lần sửa (0 = gốc, 1, 2…). Dò lên tới khi hải quan báo "không tồn tại" thì bản trước đó là bản mới nhất. */
+const TK_NONE=/không tồn tại/i;
+async function tkQuery(q){const api=tkApi(),r=await fetch(api+(api.includes("?")?"&":"?")+new URLSearchParams(q),{redirect:"follow"});if(!r.ok)throw new Error("HTTP "+r.status);return r.json()}
+async function tkLatest(q){
+  const base=q.tk.slice(0,11);let s=+q.tk.slice(11)||0,o=await tkQuery(q);
+  if(TK_NONE.test(o.msg||"")){ // số đang ghi không có: lùi về bản có thật gần nhất
+    while(s>0){s--;const x=await tkQuery({...q,tk:base+s});if(!TK_NONE.test(x.msg||""))return {tk:base+s,o:x}}
+    return {tk:q.tk,o}}
+  while(s<9){const x=await tkQuery({...q,tk:base+(s+1)});if(TK_NONE.test(x.msg||""))break;s++;o=x}
+  return {tk:base+s,o}}
 async function tkCheck(id){const j=S.all.find(x=>x.id===id);if(!j)return;
   let q;try{q=tkInputs(j)}catch(e){return toast(e.message)}
   if(!tkApi())return toast("Chưa cài máy chủ kiểm tra tờ khai (Apps Script).");
   TK_BUSY=id;renderAll(true);
-  try{const api=tkApi(),r=await fetch(api+(api.includes("?")?"&":"?")+new URLSearchParams(q),{redirect:"follow"});
-    if(!r.ok)throw new Error("HTTP "+r.status);const o=await r.json();
+  try{const L=await tkLatest(q),o=L.o;
+    if(L.tk!==String(j.tkNo||"")){const old=j.tkNo;j.tkNo=L.tk;q.tk=L.tk;logH(j,{kind:"note",note:`Số tờ khai cập nhật theo lần sửa mới nhất: ${old||"(trống)"} → ${L.tk}`});
+      const el=document.getElementById("f-tkNo");if(el)el.value=L.tk;toast(`Tờ khai đã sửa ${L.tk.slice(-1)} lần: đã đổi số tờ khai thành ${L.tk}.`)}
     j.tkCheck=Object.assign({at:Date.now(),q:q.tk},o.ok?{ok:true,mv:!!o.mv,status:o.status,lane:o.lane,kind:o.kind,tkNo:o.tkNo,url:o.url}:{ok:false,msg:o.msg});
     if(o.ok&&["Xanh","Vàng","Đỏ"].includes(o.lane)&&!j.lane){j.lane=o.lane;autoRule(j,"lane:"+o.lane)}
     logH(j,{kind:"note",note:"Kiểm tra tờ khai: "+(o.ok?`${o.status||"có mã vạch"}${o.lane?", luồng "+o.lane:""}`:o.msg)});
