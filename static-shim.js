@@ -273,7 +273,8 @@
     const k = getKey(), showKey = !FB || !!k || reason === "nokey"; // bản online đã có AI miễn phí qua máy chủ: chỉ hiện ô key Claude khi còn key cũ (để xoá) hoặc bản thử
     const d = overlay(`<h2>Cài đặt</h2>
       ${reason === "nokey" ? `<div class="banner">Muốn Claude đọc ảnh thì cần API key Claude của bạn (tính phí theo lượt dùng ở console.anthropic.com). Chưa có key: bấm <b>Đóng</b>, rồi bấm <b>Tạo job trống</b> hoặc <b>+ Tạo job</b> để gõ tay.</div>` : ""}
-      ${FB ? `<p class="note">Đang đăng nhập <b>${esc(fuser && fuser.email || "")}</b>${ROLE === "owner" ? " (chủ sổ)" : " (nhân viên)"}.</p>`
+      ${FB ? `<p class="note">Đang đăng nhập <b>${esc(fuser && fuser.email || "")}</b>${ROLE === "owner" ? " (chủ sổ)" : " (nhân viên)"}.</p>${ROLE === "owner" ? `
+      <div class="mrow" style="justify-content:flex-start;align-items:flex-end;flex-wrap:wrap"><label class="fld" style="flex:1;min-width:160px;margin:0"><span>Tên hiển thị của bạn (cả nhóm thấy)</span><input id="sj-myn" autocomplete="off" value="${esc(window.SOJOB_USER || "")}" placeholder="VD: Đức"></label><button class="primary" id="sj-mysave">Lưu tên</button></div>` : ""}`
         : `<p>Bản dùng thử trên GitHub Pages. Dữ liệu chỉ nằm <b>trong trình duyệt này</b>: máy khác, trình duyệt khác sẽ thấy sổ trống. Nhớ sao lưu thường xuyên.</p>`}
       ${showKey ? `<label class="fld"><span>API key Claude (lấy ở console.anthropic.com → API keys)</span>
         <input id="sj-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" value="${esc(k)}"></label>
@@ -306,6 +307,18 @@
     };
     const clr = $("#sj-clear", d);
     if (clr) clr.onclick = () => { try { localStorage.removeItem(KEY_LS); } catch (e) {} $("#sj-key", d).value = ""; msg("Đã xoá key."); };
+    const mys = $("#sj-mysave", d);
+    if (mys) mys.onclick = async () => {
+      const n = $("#sj-myn", d).value.trim().slice(0, 40), mail = String(fuser && fuser.email || "").toLowerCase();
+      if (!n) { msg("Nhập tên hiển thị.", true); return; }
+      mys.disabled = true;
+      try {
+        await fdb.doc("meta/people").set({ p: { [mail]: { n: n, at: Date.now(), set: "owner" } } }, { merge: true });
+        window.SOJOB_USER = n; try { localStorage.setItem("sojob.myName." + mail, n); } catch (e) {}
+        msg("Đã lưu tên: " + n + ". Tin nhắn và job mới sẽ ghi tên này.");
+      } catch (e) { msg("Chưa lưu được: " + (e.message || e.code), true); }
+      mys.disabled = false;
+    };
     const dg = $("#sj-dung", d);
     if (dg) { if (window.sojobDung) window.sojobDung(dg); else dg.textContent = "Chưa xem được dung lượng."; }
     const memBox = $("#sj-mem", d);
@@ -487,6 +500,7 @@
         window.SOJOB_ROLE = ROLE; window.SOJOB_EMAIL = mail;
         if (memName) try { localStorage.setItem("sojob.memName." + mail, memName); } catch (e) {}
         if (!memName && ROLE === "staff") try { memName = localStorage.getItem("sojob.memName." + mail) || ""; } catch (e) {}
+        if (!memName && ROLE === "owner") try { memName = localStorage.getItem("sojob.myName." + mail) || ""; } catch (e) {} // tên chủ sổ tự đặt (Cài đặt → Tên hiển thị)
         window.SOJOB_USER = memName || u.displayName || u.email || ""; // tên chủ sổ đặt cho nhân viên được ưu tiên
         const l = document.getElementById("sj-login"); if (l) l.remove();
         userBar();

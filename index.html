@@ -1131,7 +1131,7 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 <div id="toast" hidden></div>
 
 <script src="firebase-config.js?v=483007a3c3"></script>
-<script src="static-shim.js?v=461fabaa48"></script>
+<script src="static-shim.js?v=6dc41778a3"></script>
 <script>
 const TYPES=["Báo giá","Khai HQ nhập","Khai HQ xuất","Vận chuyển","Chứng từ / C/O","Kiểm tra chuyên ngành","Khác"];
 const MODES=["","Sea FCL","Sea LCL","Air","Road","Express"];
@@ -2548,9 +2548,12 @@ S.people={};let peopleSub=null;
 const TAG_ALL="Tất cả";
 function peopleWatch(){
   if(!team()||!db||peopleSub)return;
-  try{peopleSub=db.doc("meta/people").onSnapshot(s=>{S.people=(s.exists&&s.data().p)||{}},()=>{})}catch(e){}
-  const nm=window.SOJOB_USER||"",ml=me();
-  if(ml&&nm)db.doc("meta/people").set({p:{[ml]:{n:nm,at:Date.now()}}},{merge:true}).catch(()=>{});
+  const ml=me();let first=true;
+  try{peopleSub=db.doc("meta/people").onSnapshot(s=>{S.people=(s.exists&&s.data().p)||{};
+    const mine=S.people[ml],nm=window.SOJOB_USER||"";
+    if(mine&&mine.set==="owner"&&mine.n){if(window.SOJOB_USER!==mine.n){window.SOJOB_USER=mine.n;try{localStorage.setItem((boss()?"sojob.myName.":"sojob.memName.")+ml,mine.n)}catch(e){}}} // tên đã đặt (chủ sổ đặt cho nhân viên, hoặc chủ sổ tự đặt) thắng tên Google
+    else if(first&&ml&&nm&&(!mine||mine.n!==nm))db.doc("meta/people").set({p:{[ml]:{n:nm,at:Date.now()}}},{merge:true}).catch(()=>{});
+    first=false},()=>{})}catch(e){}
   if(boss())db.collection("members").get().then(q=>{const p={};q.docs.forEach(d=>{const n=String((d.data()||{}).name||"").trim();if(n)p[d.id.toLowerCase()]={n,at:Date.now(),set:"owner"}});if(Object.keys(p).length)return db.doc("meta/people").set({p},{merge:true})}).catch(()=>{});
 }
 const peopleList=()=>Object.entries(S.people).filter(([m,v])=>m!==me()&&v&&v.n).map(([m,v])=>({m,n:v.n})).sort((a,b)=>a.n.localeCompare(b.n,"vi"));
@@ -3382,7 +3385,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25n";
+const APP_VER="2026-11-25o";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
