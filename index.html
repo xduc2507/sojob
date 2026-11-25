@@ -1039,22 +1039,23 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 .kb .kc.urg{box-shadow:inset 4px 0 0 #D93025,0 1px 2px rgba(16,24,40,.06)}
 .kb .kc .ft{padding-top:7px;margin-top:1px;border-top:1px solid #EEF1F5}
 .kb .kc .mn{color:#8A93A0}
-/* quá hạn / đứng yên: nền hồng nhạt, vạch đỏ bên trái, chữ đọc dễ */
-.kb .kc.over{background:#FFF5F4;border-color:#F4C7C1;color:var(--ink);box-shadow:inset 4px 0 0 #D93025,0 1px 2px rgba(217,48,37,.10)}
-.kb .kc.over:hover{box-shadow:inset 4px 0 0 #D93025,0 6px 16px rgba(217,48,37,.16)}
-.kb .kc.over .ds,.kb .kc.over .mn,.kb .kc.over .who .co{color:var(--muted);opacity:1}
-.kb .kc.over .tm{color:#D93025;font-weight:700}
-.kb .kc.over .ft{border-top-color:#F6D9D5}
-.kb .kc.over .tg span{background:#fff;color:var(--muted);border:1px solid #EAD3CF}
-.kb .kc.over .tg .cd{background:transparent;border-color:transparent}
-.kb .kc.over .tg .sv{background:#fff!important;color:var(--ink)!important;border:1px solid #E3C9C4!important}
-.kb .kc.over .tg .u{background:var(--bad-soft);color:var(--bad);border-color:transparent}
-.kb .kc.over .tg .w,.kb .kc.over .tg .odm{background:var(--warn-soft)!important;color:var(--warn)!important;border-color:transparent!important}
-.kb .kc.over .note-l{background:#D93025;color:#fff}
-.kb .kc.over .note-b{background:var(--warn-soft);color:var(--warn)}.kb .kc.over .note-r{background:var(--bad-soft);color:var(--bad)}
-.kb .kc.over .pg{background:#F3D6D2}.kb .kc.over .pg i{background:var(--ok)}
-.kb .kc.over .cnew{color:var(--info)}
-.kb .kc.over span.cbadge{background:#D93025!important;color:#fff!important}
+/* quá hạn / đứng yên: thẻ đỏ đặc chữ trắng (giữ như cũ để nhìn là thấy) */
+.kb .kc.over{background:#C8402F;border-color:#B3382A;color:#fff;box-shadow:0 1px 3px rgba(200,64,47,.35)}
+.kb .kc.over:hover{box-shadow:0 6px 16px rgba(200,64,47,.4)}
+.kb .kc.over .t{color:#fff}
+.kb .kc.over .ds,.kb .kc.over .tm,.kb .kc.over .mn{color:#FBE3E0}
+.kb .kc.over .who,.kb .kc.over .who .co{color:#fff;opacity:1}
+.kb .kc.over .tm{font-weight:700}
+.kb .kc.over .ft{border-top-color:rgba(255,255,255,.25)}
+.kb .kc.over .tg span{background:rgba(255,255,255,.18)!important;color:#fff!important;border-color:transparent!important}
+.kb .kc.over .tg .sv{background:rgba(0,0,0,.25)!important}
+.kb .kc.over .tg .cd{background:transparent!important;opacity:.85}
+.kb .kc.over .note-l{background:#fff;color:#B3382A}
+.kb .kc.over .note-b,.kb .kc.over .note-r{background:rgba(255,255,255,.18);color:#fff}
+.kb .kc.over .pg{background:rgba(255,255,255,.3)}.kb .kc.over .pg i{background:#fff}
+.kb .kc.over .cnew{color:#fff}
+.kb .kc.over span.cbadge{background:#fff!important;color:#C8402F!important}
+.kb .kc.over .mn:hover{background:rgba(255,255,255,.18);color:#fff}
 /* Hoàn thành: nền xanh nhạt, thẻ trắng gọn; Thất bại: nền hồng nhạt, thẻ mờ */
 .kb .col.c10{--c:#2F8F4E;background:#F1F8F3;background:color-mix(in srgb,#2F8F4E 7%,#F5F7FA)}
 .kb .col.c10 .col-h{background:transparent;color:var(--ink)}.kb .col.c10 .col-h .sub{color:var(--muted)}
@@ -3381,7 +3382,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25m";
+const APP_VER="2026-11-25n";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
