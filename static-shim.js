@@ -270,17 +270,16 @@
   let settingsOpen = false;
   function openSettings(reason) {
     if (settingsOpen) return; settingsOpen = true;
-    const k = getKey();
+    const k = getKey(), showKey = !FB || !!k || reason === "nokey"; // bản online đã có AI miễn phí qua máy chủ: chỉ hiện ô key Claude khi còn key cũ (để xoá) hoặc bản thử
     const d = overlay(`<h2>Cài đặt</h2>
       ${reason === "nokey" ? `<div class="banner">Muốn Claude đọc ảnh thì cần API key Claude của bạn (tính phí theo lượt dùng ở console.anthropic.com). Chưa có key: bấm <b>Đóng</b>, rồi bấm <b>Tạo job trống</b> hoặc <b>+ Tạo job</b> để gõ tay.</div>` : ""}
-      ${FB ? `<p>Dữ liệu lưu <b>online</b> (Firebase)${fuser ? ", đang đăng nhập <b>" + esc(fuser.email || "") + "</b>" + (ROLE === "owner" ? " (chủ sổ)" : " (nhân viên)") : ""}. Điện thoại và máy tính đăng nhập cùng tài khoản sẽ thấy chung một sổ.</p>`
+      ${FB ? `<p class="note">Đang đăng nhập <b>${esc(fuser && fuser.email || "")}</b>${ROLE === "owner" ? " (chủ sổ)" : " (nhân viên)"}.</p>`
         : `<p>Bản dùng thử trên GitHub Pages. Dữ liệu chỉ nằm <b>trong trình duyệt này</b>: máy khác, trình duyệt khác sẽ thấy sổ trống. Nhớ sao lưu thường xuyên.</p>`}
-      <label class="fld"><span>API key Claude (lấy ở console.anthropic.com → API keys)</span>
+      ${showKey ? `<label class="fld"><span>API key Claude (lấy ở console.anthropic.com → API keys)</span>
         <input id="sj-key" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…" value="${esc(k)}"></label>
       <p class="note">Key chỉ lưu trong trình duyệt này và chỉ gửi tới api.anthropic.com. Đừng nhập key trên máy dùng chung. Không có key vẫn tạo job trống và nhập tay được.</p>
-      <div class="mrow"><span id="sj-msg" class="note"></span>
-        ${k ? '<button class="ghost danger" id="sj-clear">Xoá key</button>' : ""}
-        <button class="primary" id="sj-save">Lưu key</button></div>
+      <div class="mrow">${k ? '<button class="ghost danger" id="sj-clear">Xoá key</button>' : ""}
+        <button class="primary" id="sj-save">Lưu key</button></div>` : ""}
       ${FB && ROLE === "owner" ? `<h2 style="margin-top:14px">Thành viên</h2>
       <p class="note">Nhân viên đăng nhập bằng Google của họ tại link này. Họ thấy job họ tạo và job bạn bấm “🔒 Chỉ mình tôi” → “👥 Đã chia sẻ”. Họ được xem tiền, sửa job, nhưng không xoá job và không vào được mục này.</p>
       <div id="sj-mem" class="note">Đang tải…</div>
@@ -290,30 +289,20 @@
         <button class="primary" id="sj-madd">Thêm</button></div>` : ""}
       ${FB && ROLE === "owner" ? `<h2 style="margin-top:14px">Dung lượng</h2><div id="sj-dung" class="note">Đang tải…</div>` : ""}
       ${FB && ROLE !== "owner" ? "" : `<h2 style="margin-top:14px">Dữ liệu</h2>
+      ${FB ? '<p class="note">Máy chủ tự sao lưu mỗi đêm vào Google Drive (thư mục “So Job - Sao luu”, giữ 30 bản).</p>' : ""}
       <div class="mrow" style="justify-content:flex-start;flex-wrap:wrap">
         <button id="sj-exp">Tải file sao lưu (.json)</button>
         <button id="sj-imp">Khôi phục từ file…</button>
         <input id="sj-file" type="file" accept="application/json,.json" hidden>
-        ${FB ? '<button id="sj-mig">Đưa job đang lưu trên máy này lên kho online</button>' : ""}
       </div>`}
-      <div class="mrow"><button id="sj-close">Đóng</button></div>`);
+      <div class="mrow"><span id="sj-msg" class="note"></span><button id="sj-close">Đóng</button></div>`);
     const msg = (t, err) => { const n = $("#sj-msg", d); n.textContent = t; n.className = "note" + (err ? " err" : ""); };
     const close = () => { d.remove(); settingsOpen = false; };
     $("#sj-close", d).onclick = close;
-    $("#sj-save", d).onclick = () => {
+    const sv = $("#sj-save", d); if (sv) sv.onclick = () => {
       const v = $("#sj-key", d).value.trim();
       if (!/^sk-ant-[\w-]{20,}$/.test(v)) { msg("Key phải bắt đầu bằng sk-ant-…", true); return; }
       try { localStorage.setItem(KEY_LS, v); msg("Đã lưu key."); } catch (e) { msg("Trình duyệt chặn lưu (chế độ ẩn danh?).", true); }
-    };
-    const mig = $("#sj-mig", d);
-    if (mig) mig.onclick = async () => {
-      mig.disabled = true; msg("Đang đọc dữ liệu trên máy này…");
-      try {
-        const rows = (await allDocs()).filter(([k]) => COLS.includes(k.split("/")[0]));
-        if (!rows.length) { msg("Trình duyệt này không có job nào lưu trên máy."); mig.disabled = false; return; }
-        const n = await cloudPut(rows, true);
-        msg(n ? `Đã đưa ${n} mục lên kho online (bỏ qua mục đã có).` : "Mọi mục trên máy này đã có trên kho online.");
-      } catch (e) { msg("Chưa đưa lên được: " + (e.message || e.code || e), true); mig.disabled = false; }
     };
     const clr = $("#sj-clear", d);
     if (clr) clr.onclick = () => { try { localStorage.removeItem(KEY_LS); } catch (e) {} $("#sj-key", d).value = ""; msg("Đã xoá key."); };
