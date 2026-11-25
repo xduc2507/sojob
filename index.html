@@ -156,9 +156,8 @@ body.view-board .back{display:inline-block}
 .col-h .sub .bad{color:var(--bad);font-weight:600}
 .col-b{flex:1;overflow-y:auto;padding:8px;display:flex;flex-direction:column;gap:8px}
 .col-b .none{font-size:12px;color:var(--muted);text-align:center;padding:16px 0}
-.col.c0,.col.c2{--c:var(--info)}.col.c1{--c:var(--warn)}.col.c3,.col.c4{--c:var(--violet)}.col.c5,.col.c6,.col.c7{--c:var(--accent)}.col.c8,.col.c9{--c:var(--bad)}
-.col.c10{--c:#2F8F4E;background:#2F8F4E}.col.c10 .col-h{background:#3FA160;color:#fff;border-bottom-color:transparent}.col.c10 .col-h .sub{color:#E3F5E9}.col.c10 .col-h .nm .n{background:rgba(255,255,255,.2);color:#fff}
-.col.c11{--c:#C8402F;background:var(--bad-soft)}.col.c11 .col-h{background:var(--bad-soft);color:var(--bad)}
+.col.c0,.col.c2{--c:var(--info)}.col.c1{--c:var(--warn)}.col.c3,.col.c4,.col.c5,.col.c6{--c:var(--violet)}.col.c7,.col.c8{--c:var(--accent)}.col.c9,.col.c10{--c:var(--bad)}
+.col.c11{--c:#2F8F4E;background:#2F8F4E}.col.c11 .col-h{background:#3FA160;color:#fff;border-bottom-color:transparent}.col.c11 .col-h .sub{color:#E3F5E9}.col.c11 .col-h .nm .n{background:rgba(255,255,255,.2);color:#fff}
 .kc{position:relative;background:var(--surface);border:1px solid var(--line);border-left:3px solid transparent;border-radius:5px;padding:7px 9px 6px;display:flex;flex-direction:column;gap:4px;cursor:grab;box-shadow:0 1px 2px rgba(10,16,22,.06)}
 .kc:hover{box-shadow:0 3px 10px rgba(10,16,22,.12)}
 .kc.on{outline:2px solid var(--accent);outline-offset:-1px}
@@ -169,7 +168,7 @@ body.view-board .back{display:inline-block}
 .kc .tg{display:flex;gap:4px;flex-wrap:wrap}
 .kc .tg span{font-size:11px;padding:0 6px;border-radius:3px;background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
 .kc .tg .cd{margin-left:auto;background:transparent;border-color:transparent;padding:0;font-variant-numeric:tabular-nums}
-.kc.over .tg .cd,.col.c10 .kc .tg .cd{background:transparent;color:inherit;opacity:.85}
+.kc.over .tg .cd,.col.c11 .kc .tg .cd{background:transparent;color:inherit;opacity:.85}
 .row .cd{font-variant-numeric:tabular-nums}
 .kc .tg .w{background:var(--warn-soft);color:var(--warn);border-color:transparent;font-weight:600}
 .kc .tg .u{background:var(--bad-soft);color:var(--bad);border-color:transparent;font-weight:700}
@@ -178,7 +177,7 @@ body.view-board .back{display:inline-block}
 .kc .who{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-weight:500}
 .kc .tm{flex:none;font-size:11.5px;color:var(--muted)}
 .kc .who .co{font-style:normal;font-weight:400;color:var(--muted)}
-.kc.over .who .co,.col.c10 .kc .who .co{color:inherit;opacity:.85}
+.kc.over .who .co,.col.c11 .kc .who .co{color:inherit;opacity:.85}
 .kc .tm.ok{color:var(--ok);font-weight:600}.kc .tm.td{color:var(--warn);font-weight:700}
 .kc .pg{height:3px;border-radius:2px;background:var(--line);overflow:hidden}.kc .pg i{display:block;height:100%;background:var(--ok)}
 .kc .mn{position:absolute;top:5px;right:4px;border:0;background:transparent;color:var(--muted);padding:2px 6px;font-size:16px;line-height:1;border-radius:4px;min-height:26px}
@@ -190,11 +189,10 @@ body.view-board .back{display:inline-block}
 .kc.over .tm{font-weight:700}
 .kc.over .pg{background:rgba(255,255,255,.3)}.kc.over .pg i{background:#fff}
 /* thẻ đã thu: nền xanh */
-.col.c10 .kc{background:#3FA160;border-color:#358A52;color:#fff}
-.col.c10 .kc .ds,.col.c10 .kc .tm,.col.c10 .kc .mn{color:#E3F5E9}
-.col.c10 .kc .tg span{background:rgba(255,255,255,.18);color:#fff;border-color:transparent}
-.col.c10 .kc .pg{display:none}
-.col.c11 .kc{opacity:.85}
+.col.c11 .kc{background:#3FA160;border-color:#358A52;color:#fff}
+.col.c11 .kc .ds,.col.c11 .kc .tm,.col.c11 .kc .mn{color:#E3F5E9}
+.col.c11 .kc .tg span{background:rgba(255,255,255,.18);color:#fff;border-color:transparent}
+.col.c11 .kc .pg{display:none}
 .kc .tg .sv{font-weight:700;color:#fff;border-color:transparent}.kc .tg .sv-hq{background:#2558A6}.kc .tg .sv-vc{background:#A86A12}.kc .tg .sv-both{background:#6B46C1}
 .kc .tg .ln-g{background:var(--ok-soft);color:var(--ok);border-color:transparent}.kc .tg .ln-y{background:var(--warn-soft);color:var(--warn);border-color:transparent}.kc .tg .ln-r{background:var(--bad-soft);color:var(--bad);border-color:transparent;font-weight:700}
 .kc .note-b,.kc .note-r{font-size:12px;border-radius:4px;padding:2px 7px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -1027,7 +1025,7 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 .kb .col-h .nm{font-size:14px;font-weight:700;color:var(--ink);gap:8px}
 .kb .col-h .nm::before{counter-increment:kbst;content:counter(kbst);flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;color:#fff;background:var(--c);order:-1}
 .kb .col-h .nm{justify-content:flex-start}.kb .col-h .nr{margin-left:auto}
-.kb .col.c10 .col-h .nm::before{content:"✓"}.kb .col.c11 .col-h .nm::before{content:"✕"}
+.kb .col.c11 .col-h .nm::before{content:"✓"}
 .kb .col-h .nm .n{background:#fff;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 30%,#fff);font-weight:700;font-size:12px;padding:0 8px;min-width:24px;text-align:center}
 .kb .col-h .add{background:#fff;border:1px solid #E3E8EE;color:var(--muted);width:24px;height:24px;min-height:24px;padding:0;border-radius:50%;font-size:16px;display:grid;place-items:center}
 .kb .col-h .add:hover{background:var(--c);border-color:var(--c);color:#fff}
@@ -1056,18 +1054,15 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 .kb .kc.over .cnew{color:#fff}
 .kb .kc.over span.cbadge{background:#fff!important;color:#C8402F!important}
 .kb .kc.over .mn:hover{background:rgba(255,255,255,.18);color:#fff}
-/* Hoàn thành: nền xanh nhạt, thẻ trắng gọn; Thất bại: nền hồng nhạt, thẻ mờ */
-.kb .col.c10{--c:#2F8F4E;background:#F1F8F3;background:color-mix(in srgb,#2F8F4E 7%,#F5F7FA)}
-.kb .col.c10 .col-h{background:transparent;color:var(--ink)}.kb .col.c10 .col-h .sub{color:var(--muted)}
-.kb .col.c10 .col-h .nm .n{background:#fff;color:#2F8F4E}
-.kb .col.c10 .kc{background:#fff;border-color:#D7EADD;color:var(--ink)}
-.kb .col.c10 .kc .ds,.kb .col.c10 .kc .tm,.kb .col.c10 .kc .mn,.kb .col.c10 .kc .who .co{color:var(--muted);opacity:1}
-.kb .col.c10 .kc .tg span{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
-.kb .col.c10 .kc .tg .cd{background:transparent;border-color:transparent}
-.kb .col.c10 .kc .tg .sv{background:#fff!important;color:var(--ink)!important}
-.kb .col.c11{background:#FBF3F2;background:color-mix(in srgb,#C8402F 6%,#F5F7FA)}
-.kb .col.c11 .col-h{background:transparent;color:var(--ink)}
-.kb .col.c11 .kc{opacity:.75}
+/* Hoàn thành: nền xanh nhạt, thẻ trắng gọn */
+.kb .col.c11{--c:#2F8F4E;background:#F1F8F3;background:color-mix(in srgb,#2F8F4E 7%,#F5F7FA)}
+.kb .col.c11 .col-h{background:transparent;color:var(--ink)}.kb .col.c11 .col-h .sub{color:var(--muted)}
+.kb .col.c11 .col-h .nm .n{background:#fff;color:#2F8F4E}
+.kb .col.c11 .kc{background:#fff;border-color:#D7EADD;color:var(--ink)}
+.kb .col.c11 .kc .ds,.kb .col.c11 .kc .tm,.kb .col.c11 .kc .mn,.kb .col.c11 .kc .who .co{color:var(--muted);opacity:1}
+.kb .col.c11 .kc .tg span{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.kb .col.c11 .kc .tg .cd{background:transparent;border-color:transparent}
+.kb .col.c11 .kc .tg .sv{background:#fff!important;color:var(--ink)!important}
 @media (max-width:780px){.kb{gap:10px}.kb .col-h .nm{font-size:15px}.kb .kc{padding:11px 12px 10px}}
 @media (prefers-reduced-motion:reduce){.kb .kc:hover{transform:none}}
 </style>
@@ -1098,7 +1093,7 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
       <select id="fStatus" aria-label="Lọc trạng thái">
         <option value="open">Đang mở</option>
         <option value="all">Tất cả</option>
-        <option value="done">Hoàn thành / thất bại</option>
+        <option value="done">Hoàn thành</option>
       </select>
     </div>
     <div id="prof" class="card" hidden></div>
@@ -1136,17 +1131,18 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 const TYPES=["Báo giá","Khai HQ nhập","Khai HQ xuất","Vận chuyển","Chứng từ / C/O","Kiểm tra chuyên ngành","Khác"];
 const MODES=["","Sea FCL","Sea LCL","Air","Road","Express"];
 /* Quy trình lô hàng: 1 bảng, mỗi loại dịch vụ đi một đường (bỏ qua cột không liên quan) */
-const STAGES=["Mới nhận","Báo giá","Nhận & kiểm tra chứng từ","Đang khai báo","Chờ thông quan","Chờ điều xe","Đang vận chuyển","Chờ trả rỗng","Bảng kê / debit","Chờ thu tiền","Hoàn thành","Thất bại"];
+const STAGES=["Mới nhận","Báo giá","Nhận & kiểm tra chứng từ","Đang khai báo","Đã truyền tờ khai","Trình tờ khai cho Hải quan","Kiểm hóa","Chờ điều xe","Đang vận chuyển","Bảng kê / debit","Chờ thu tiền","Hoàn thành"];
+const HQWAIT=["Đã truyền tờ khai","Trình tờ khai cho Hải quan","Kiểm hóa"]; // các bước chờ hải quan xử lý (máy chủ theo dõi tờ khai ở các bước này)
 const DONE="Hoàn thành",FAIL="Thất bại";
 const SERVICES=["HQ","VC","HQ+VC"];
 const SERVICE_NAME={"HQ":"Thủ tục hải quan","VC":"Vận chuyển","HQ+VC":"Hải quan + vận chuyển"};
-const ROUTES={"HQ":[0,1,2,3,4,8,9,10],"VC":[0,1,5,6,7,8,9,10],"HQ+VC":[0,1,2,3,4,5,6,7,8,9,10]};
+const ROUTES={"HQ":[0,1,2,3,4,5,6,9,10,11],"VC":[0,1,7,8,9,10,11],"HQ+VC":[0,1,2,3,4,5,6,7,8,9,10,11]};
 const LANES=["","Xanh","Vàng","Đỏ"];
 const DEPOSIT=["","Chưa hoàn","Đã hoàn","Không có cược"];
 const FAIL_REASONS=["Khách không chốt giá","Khách huỷ lô","Hàng không về / đổi lịch","Khách dùng đơn vị khác","Khác"];
-const DEFAULT_STALL={"Mới nhận":1,"Báo giá":2,"Nhận & kiểm tra chứng từ":1,"Đang khai báo":1,"Chờ thông quan":2,"Chờ điều xe":1,"Đang vận chuyển":2,"Chờ trả rỗng":3,"Bảng kê / debit":2,"Chờ thu tiền":7};
+const DEFAULT_STALL={"Mới nhận":1,"Báo giá":2,"Nhận & kiểm tra chứng từ":1,"Đang khai báo":1,"Đã truyền tờ khai":1,"Trình tờ khai cho Hải quan":1,"Kiểm hóa":1,"Chờ điều xe":1,"Đang vận chuyển":2,"Bảng kê / debit":2,"Chờ thu tiền":7};
 /* trường bắt buộc khi đi vào bước */
-const REQ={"Chờ thông quan":[["tkNo","Số tờ khai"],["tkDate","Ngày tờ khai","date"],["hqCode","Mã Hải quan (VD: 02CI)"]],"Đang vận chuyển":[["truck","Nhà xe / biển số"]],"Chờ thu tiền":[["debitAmount","Số tiền debit"]],"Hoàn thành":[["paidDate","Ngày khách trả","date"]]};
+const REQ={"Đã truyền tờ khai":[["tkNo","Số tờ khai"],["tkDate","Ngày tờ khai","date"],["hqCode","Mã Hải quan (VD: 02CI)"]],"Đang vận chuyển":[["truck","Nhà xe / biển số"]],"Chờ thu tiền":[["debitAmount","Số tiền debit"]],"Hoàn thành":[["paidDate","Ngày khách trả","date"]]};
 const LEGACY={"Đang làm":"Làm hàng","Chờ phản hồi":"Báo giá","Đã báo giá":"Báo giá","Hoàn tất":"Đã thu"};
 const PRIOS=["Gấp","Thường","Thấp"];
 const SOURCES=["Email","Zalo","Điện thoại","Khác"];
@@ -1173,7 +1169,7 @@ const hasVC=j=>svcOf(j)!=="HQ";
 const needDeposit=j=>hasVC(j)&&!isTruck(j);
 function nextStage(j){const r=route(j),i=r.indexOf(j.status);if(i>=0)return r[i+1]||null;const si=stIdx(j.status);return r.find(s=>stIdx(s)>si)||null}
 function prevStage(j){const r=route(j),i=r.indexOf(j.status);if(i>=0)return i>0?r[i-1]:null;const si=stIdx(j.status);return [...r].reverse().find(s=>stIdx(s)<si)||null}
-const depositPending=j=>needDeposit(j)&&isOpen(j.status)&&stIdx(j.status)>=7&&!["Đã hoàn","Không có cược"].includes(j.deposit);
+const depositPending=j=>needDeposit(j)&&isOpen(j.status)&&stIdx(j.status)>=stIdx("Bảng kê / debit")&&!["Đã hoàn","Không có cược"].includes(j.deposit);
 
 const $=s=>document.querySelector(s);
 const esc=s=>String(s??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
@@ -1201,11 +1197,13 @@ const stageDays=j=>j.stageAt?Math.floor((Date.now()-j.stageAt)/864e5):null;
 const isOverdue=j=>isOpen(j.status)&&(dayDiff(j.deadline)??0)<0;
 const isStalled=j=>{if(!isOpen(j.status))return false;if(STRICT.includes(j.status))return isStrictLate(j);const n=num(S.stall[j.status]),d=stageDays(j);return n>0&&d!==null&&d>=n};
 /* 3 bước hải quan: tính quá hạn theo giờ, không tính Chủ nhật; phải ghi lý do, chủ sổ duyệt mới hết cảnh báo */
-const STRICT=["Nhận & kiểm tra chứng từ","Đang khai báo","Chờ thông quan"];
+const STRICT=["Nhận & kiểm tra chứng từ","Đang khai báo",...HQWAIT];
 const LATE_REASONS={
   "Nhận & kiểm tra chứng từ":["Khách chưa gửi đủ chứng từ","Chứng từ sai / lệch, chờ sửa","Chờ C/O","Chờ khách chốt mã HS / giá"],
   "Đang khai báo":["Chờ khách duyệt tờ khai nháp","Chờ giấy phép / kiểm tra chuyên ngành","Lỗi hệ thống VNACCS / ECUS","Chờ nộp thuế"],
-  "Chờ thông quan":["Luồng vàng, chờ duyệt hồ sơ","Luồng đỏ, chờ kiểm hoá","Chờ nộp thuế / bảo lãnh","Hải quan yêu cầu bổ sung","Chờ kết quả kiểm tra chuyên ngành"]};
+  "Đã truyền tờ khai":["Chờ hệ thống phân luồng","Chờ nộp thuế / bảo lãnh","Hải quan yêu cầu bổ sung","Lỗi hệ thống VNACCS / ECUS"],
+  "Trình tờ khai cho Hải quan":["Luồng vàng, chờ duyệt hồ sơ","Hải quan yêu cầu bổ sung","Chờ nộp thuế / bảo lãnh","Chờ kết quả kiểm tra chuyên ngành"],
+  "Kiểm hóa":["Luồng đỏ, chờ lịch kiểm hoá","Chờ kết quả kiểm tra chuyên ngành","Hải quan yêu cầu bổ sung","Chờ nộp thuế / bảo lãnh"]};
 function workMs(a,b){let t=0,x=a;while(x<b){const d=new Date(x),e=Math.min(b,new Date(d.getFullYear(),d.getMonth(),d.getDate()+1).getTime());if(d.getDay()!==0)t+=e-x;x=e}return t}
 /* Cảnh báo bật lúc 00:00: nửa đêm đầu tiên sau khi đủ mốc (không tính Chủ nhật), lặp lại mỗi 00:00 cho tới khi chuyển bước */
 const midnight=t=>{const d=new Date(t);return new Date(d.getFullYear(),d.getMonth(),d.getDate()+1).getTime()};
@@ -1527,7 +1525,7 @@ function kanbanCard(j){
     j.bl?`<span title="Số B/L">${esc(j.bl)}</span>`:"",hasVC(j)&&isTruck(j)?'<span>Xe tải</span>':"",hasVC(j)&&isTruck(j)&&j.cbm?`<span title="Số khối">${esc(j.cbm)} m³</span>`:"",hasVC(j)&&!isTruck(j)&&j.yard?`<span title="Bãi hạ cont">Hạ: ${esc(j.yard)}</span>`:"",j.cont?`<span title="${isTruck(j)?"Xe / tải trọng":"Số cont"}">${esc(j.cont)}</span>`:"",
     j.lane?`<span class="ln ln-${j.lane==="Xanh"?"g":j.lane==="Vàng"?"y":"r"}">Luồng ${esc(j.lane)}</span>`:"",
     depositPending(j)?'<span class="w">Chưa hoàn cược</span>':"",j.coNeed==="Có"&&j.coStatus!=="Đã cấp"&&isOpen(j.status)?`<span class="w" title="C/O form ${esc(j.coForm||"?")}">C/O ${esc(j.coStatus||"chưa xin")}</span>`:"",
-    num(j.debitAmount)&&stIdx(j.status)>=8?`<span class="mono">${fmt(j.debitAmount,j.debitCurrency)} ${esc(j.debitCurrency||"VND")}</span>`:"",j.example?'<span>VÍ DỤ</span>':"",`<span class="cd" title="${esc(cDateFull(j))}">${cDate(j)}</span>`].join("");
+    num(j.debitAmount)&&stIdx(j.status)>=stIdx("Bảng kê / debit")?`<span class="mono">${fmt(j.debitAmount,j.debitCurrency)} ${esc(j.debitCurrency||"VND")}</span>`:"",j.example?'<span>VÍ DỤ</span>':"",`<span class="cd" title="${esc(cDateFull(j))}">${cDate(j)}</span>`].join("");
   return `<div class="kc${S.sel===j.id?" on":""}${S.bulkOn&&S.bulk.has(j.id)?" bsel":""}${isLate(j)?" over":""}${j.priority==="Gấp"?" urg":""}" draggable="true" data-drag="${j.id}" data-open="${j.id}">
     <button class="mn" data-kmenu="${j.id}" aria-label="Thao tác với job ${esc(j.code)}">⋯</button>
     <span class="t" title="${esc(j.title||"")}">${esc(j.title||"(chưa có tiêu đề)")}</span>
@@ -1541,12 +1539,12 @@ function kanbanCard(j){
     <span class="asgl">${asgChip(j,true)}${timeTag(j)}</span>
   </div>`;
 }
-const COLNAME={[DONE]:"Hoàn thành (Done)",[FAIL]:"Thất bại (Failed)"};
+const COLNAME={[DONE]:"Hoàn thành (Done)"};
 function renderBoard(el){
   const all=visibleJobs(true);
   const groups=[...new Set(S.jobs.map(groupKey))].sort((a,b)=>a.localeCompare(b,"vi"));
   const open=all.filter(j=>isOpen(j.status)),late=open.filter(isLate).length,blk=open.filter(j=>j.blocker).length;
-  const shown=S.svc?[...ROUTES[S.svc].map(i=>STAGES[i]),FAIL]:STAGES;
+  const shown=S.svc?ROUTES[S.svc].map(i=>STAGES[i]):STAGES;
   const cols=shown.map(st=>{
     const ci=stIdx(st);
     let arr=all.filter(j=>j.status===st);
@@ -1583,7 +1581,7 @@ function openKmenu(btn){
     <button data-ka="prev" role="menuitem" ${pv?"":"disabled"}><i>←</i>Trả về${pv?`: ${esc(pv)}`:""}</button>
     <button data-ka="blk" role="menuitem" ${open?"":"disabled"}><i>⚠</i>${j.blocker?"Sửa / bỏ vướng mắc":"Ghi vướng mắc"}</button>
     <button data-ka="copy" role="menuitem"><i>⧉</i>Copy tóm tắt job</button><hr>
-    ${open?`<button data-ka="fail" class="bad" role="menuitem"><i>✕</i>Đánh dấu thất bại</button>`:`<button data-ka="reopen" role="menuitem"><i>↺</i>Mở lại job</button>`}`;
+    ${open?"":`<button data-ka="reopen" role="menuitem"><i>↺</i>Mở lại job</button>`}`;
   kmenu.dataset.id=j.id;
   document.body.appendChild(kmenu);
   const r=btn.getBoundingClientRect(),w=kmenu.offsetWidth,h=kmenu.offsetHeight;
@@ -1605,7 +1603,6 @@ document.addEventListener("click",e=>{
   else if(a==="next")moveAndRender(j,nextStage(j));
   else if(a==="prev")moveAndRender(j,prevStage(j));
   else if(a==="blk")editBlocker(j);
-  else if(a==="fail")moveAndRender(j,FAIL);
   else if(a==="reopen")moveAndRender(j,STAGES[0]);
   else if(a==="copy"){openJob(j.id);copy(briefText(j))}
 });
@@ -1722,7 +1719,7 @@ function addPlanItem(){
 const opt=(arr,v)=>arr.map(o=>`<option ${o===v?"selected":""} value="${esc(o)}">${esc(o||"—")}</option>`).join("");
 const F=(f,label,val,cls="",type="text")=>`<label class="fld ${cls}"><span>${label}</span><input id="f-${f}" data-f="${f}" type="${type}" value="${esc(val)}"></label>`;
 const SEL=(f,label,arr,val,cls="")=>`<label class="fld ${cls}"><span>${label}</span><select id="f-${f}" data-f="${f}">${opt(arr,val)}</select></label>`;
-const SHORT={"Mới nhận":"Mới","Nhận & kiểm tra chứng từ":"Chứng từ","Đang khai báo":"Khai báo","Chờ thông quan":"Thông quan","Chờ điều xe":"Điều xe","Đang vận chuyển":"Vận chuyển","Chờ trả rỗng":"Trả rỗng","Bảng kê / debit":"Bảng kê","Chờ thu tiền":"Thu tiền","Hoàn thành":"Xong"};
+const SHORT={"Mới nhận":"Mới","Nhận & kiểm tra chứng từ":"Chứng từ","Đang khai báo":"Khai báo","Đã truyền tờ khai":"Đã truyền TK","Trình tờ khai cho Hải quan":"Trình TK","Kiểm hóa":"Kiểm hóa","Chờ điều xe":"Điều xe","Đang vận chuyển":"Vận chuyển","Bảng kê / debit":"Bảng kê","Chờ thu tiền":"Thu tiền","Hoàn thành":"Xong"};
 function stagesHtml(j){
   const r=route(j),list=r.includes(j.status)||!isOpen(j.status)?r:[...r,j.status].sort((a,b)=>stIdx(a)-stIdx(b));
   const si=stIdx(j.status),fail=j.status===FAIL;
@@ -2056,7 +2053,7 @@ D.addEventListener("input",e=>{
     if(f==="cost")v=roundMoney(num(String(v).replace(/[.,\s]/g,"")),"VND");
     if(f==="debitAmount")v=roundMoney(num(String(v).replace(/[.,\s]/g,"")),"VND");
     j[f]=v;
-    if(f==="debitDate"&&v&&isOpen(j.status)&&stIdx(j.status)<9){setStatus(j,"Chờ thu tiền","auto","Điền ngày gửi debit");syncStages(j)}
+    if(f==="debitDate"&&v&&isOpen(j.status)&&stIdx(j.status)<stIdx("Chờ thu tiền")){setStatus(j,"Chờ thu tiền","auto","Điền ngày gửi debit");syncStages(j)}
     if(f==="paidDate"&&v&&isOpen(j.status)){if(needDeposit(j)&&!["Đã hoàn","Không có cược"].includes(j.deposit))toast("Đã ghi ngày trả. Lô có vận chuyển chưa hoàn cược nên chưa chuyển Hoàn thành.");else{setStatus(j,DONE,"auto","Điền ngày khách trả");renderDetail(true)}}
     if(f==="blocker"&&!t.dataset.logged){t.dataset.logged="1";t.addEventListener("change",()=>{logH(j,{kind:"blocker",note:j.blocker||"(đã gỡ)"});queueSave(j)},{once:true})}
     queueSave(j);
@@ -2405,7 +2402,7 @@ async function xlImport(){
       m.setActs([{label:`Nhập ${nNew+nUpd} dòng`,primary:true,fn:async b=>{
         const tqStage=m.body.querySelector("#xlTq").value;b.disabled=true;let done=0;S.bulk=true;
         try{for(const x of rows){if(x.skip)continue;
-          const huy=/^huy/.test(x.state),stage=huy?FAIL:/chua|^bq/.test(x.state)?"Chờ thông quan":/^tq/.test(x.state)?tqStage:"Đang khai báo";
+          const huy=/^huy/.test(x.state),stage=huy?DONE:/chua|^bq/.test(x.state)?"Đã truyền tờ khai":/^tq/.test(x.state)?tqStage:"Đang khai báo";
           const d=x.date||TODAY(),at=new Date(d+"T08:00:00").getTime();
           const fields={summary:x.note,failReason:huy?"Huỷ tờ khai":"",company:x.company,mst:x.mst,fwd:x.fwd,kind:x.kind,mode:KIND2MODE[x.kind]||"",qty:x.qty,hqOfficer:x.hqOfficer,doer:x.doer,monthly:x.monthly,tkDate:x.date};
           if(x.lane)fields.lane=x.lane;
@@ -2435,9 +2432,9 @@ async function xlExport(){
     ws.columns=XCOLS.map(([k,,h,w])=>({header:h,key:k,width:w}));
     const hd=ws.getRow(1);hd.font={bold:true,color:{argb:"FFFFFFFF"}};hd.alignment={horizontal:"center",vertical:"middle"};hd.height=22;
     hd.eachCell(c=>{c.fill={type:"pattern",pattern:"solid",fgColor:{argb:"FF1F6E43"}};c.border={bottom:{style:"thin"}}});
-    list.forEach(j=>{const d=jobDate(j);const tq=!isOpen(j.status)||stIdx(j.status)>stIdx("Chờ thông quan");
+    list.forEach(j=>{const d=jobDate(j);const tq=!isOpen(j.status)||stIdx(j.status)>stIdx("Kiểm hóa");
       const r=ws.addRow({date:new Date(d+"T00:00:00Z"),company:j.company||j.title,mst:j.mst||"",tkNo:j.tkNo||"",fwd:j.fwd||"",kind:j.kind||Object.keys(KIND2MODE).find(k=>KIND2MODE[k]===j.mode)||"",
-        qty:j.qty?(isNaN(+j.qty)?j.qty:+j.qty):"",thu:num(j.debitAmount)||0,chi:num(j.cost)||0,hqOfficer:j.hqOfficer||"",state:j.status===FAIL?"HỦY":tq?"TQ":"Chưa TQ",doer:j.doer||"",monthly:j.monthly||"",note:j.summary||""});
+        qty:j.qty?(isNaN(+j.qty)?j.qty:+j.qty):"",thu:num(j.debitAmount)||0,chi:num(j.cost)||0,hqOfficer:j.hqOfficer||"",state:j.status===FAIL||j.failReason==="Huỷ tờ khai"?"HỦY":tq?"TQ":"Chưa TQ",doer:j.doer||"",monthly:j.monthly||"",note:j.summary||""});
       r.getCell("date").numFmt="dd/mm/yyyy";r.getCell("thu").numFmt="#,##0";r.getCell("chi").numFmt="#,##0";
       r.getCell("tkNo").alignment={horizontal:"center"};r.getCell("state").alignment={horizontal:"center"};r.getCell("doer").alignment={horizontal:"center"};
       if(LANE_RGB[j.lane])r.getCell("tkNo").fill={type:"pattern",pattern:"solid",fgColor:{argb:LANE_RGB[j.lane]}}});
@@ -2704,7 +2701,7 @@ function renderReport(el){
   el.innerHTML=`<div class="rp"><div class="rp-h"><label class="fld"><span>Tháng</span><select id="rpMonth">${months.map(m=>`<option value="${m}"${m===S.rpMonth?" selected":""}>Tháng ${ml(m)}</option>`).join("")}</select></label>
       <button class="primary" id="rpXlsx">${ic("xlsx")}Xuất Excel</button><span class="muted">${SPACE==="mine"?"Việc riêng":"Sổ chung"} · tính theo ngày tờ khai, chưa có thì theo ngày tạo job</span></div>
     <div class="rp-k">
-      <div><b>${r.n}</b><span>job trong tháng</span><small>${r.done} xong · ${r.open} đang làm · ${r.fail} thất bại</small></div>
+      <div><b>${r.n}</b><span>job trong tháng</span><small>${r.done} xong · ${r.open} đang làm</small></div>
       <div><b>${v(r.dv)}</b><span>phí dịch vụ (chưa VAT)</span><small>chi hộ ${v(r.ch)}</small></div>
       <div><b>${v(r.lai)}</b><span>lãi gộp (phí dịch vụ − NET)</span><small>${r.noNet?`${r.noNet} job chưa nhập đủ NET`:"đủ NET"}</small></div>
       <div class="${r.noAll?"warn":""}"><b>${v(r.noAll)}</b><span>công nợ chưa thu (mọi tháng)</span><small>${r.noAllN} job đã gửi debit</small></div>
@@ -2753,7 +2750,7 @@ const RE_TQ=/thông quan|giải phóng|mang hàng về/i;
 function todayData(){
   const all=S.todayAll??boss(),T=TODAY();
   const pool=S.jobs.filter(j=>isOpen(j.status)&&(all||!team()||whoOf(j)===me()));
-  const tqDone=j=>j.status==="Chờ thông quan"&&j.tkCheck&&j.tkCheck.ok&&RE_TQ.test(j.tkCheck.status||"");
+  const tqDone=j=>HQWAIT.includes(j.status)&&j.tkCheck&&j.tkCheck.ok&&RE_TQ.test(j.tkCheck.status||"");
   const G=[
     {k:"tq",ic:"✅",t:"Đã thông quan, chờ chuyển bước",d:"Lấy mã vạch, điều xe hoặc làm bảng kê",js:pool.filter(tqDone),cls:"ok"},
     {k:"od",ic:"⚠",t:"Quá hạn",d:"Ghi lý do hoặc gia hạn",js:pool.filter(j=>isOverdue(j)),cls:"bad"},
@@ -3385,7 +3382,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25o";
+const APP_VER="2026-11-25p";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -3954,14 +3951,14 @@ function debitPrint(j,d){
 let tt;function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,Math.min(12000,Math.max(3500,String(t).length*55)))}
 
 /* ---------- boot ---------- */
-const OLDST={"Mới":"Mới nhận","Huỷ":FAIL,"Đã thu":DONE};
+const OLDST={"Mới":"Mới nhận","Huỷ":DONE,"Đã thu":DONE,"Chờ thông quan":"Đã truyền tờ khai","Chờ trả rỗng":"Bảng kê / debit",[FAIL]:DONE}; // 2026-11-25: đổi/bỏ bước
 function fixJob(j){
   if(LEGACY[j.status]){if(j.status==="Chờ phản hồi")j.waiting=true;j.status=LEGACY[j.status]}
   if(!SERVICES.includes(j.service)&&!j.svcPending)j.service=j.type==="Vận chuyển"?"VC":"HQ";
   const vc=j.service==="VC";
-  if(OLDST[j.status])j.status=OLDST[j.status];
+  if(OLDST[j.status]){if(j.status===FAIL||j.status==="Huỷ")j.failReason=j.failReason||"Thất bại";j.status=OLDST[j.status];j._mig=true}
   else if(j.status==="Chốt"||j.status==="Làm hàng")j.status=vc?"Chờ điều xe":"Đang khai báo";
-  else if(j.status==="Thông quan")j.status=vc?"Đang vận chuyển":"Chờ thông quan";
+  else if(j.status==="Thông quan"){j.status=vc?"Đang vận chuyển":"Đã truyền tờ khai";j._mig=true}
   else if(j.status==="Debit")j.status=j.debitDate?"Chờ thu tiền":"Bảng kê / debit";
   if(!STAGES.includes(j.status))j.status=STAGES[0];
   if(j.waiting){if(!j.blocker)j.blocker="Chờ khách phản hồi";j.waiting=false}
@@ -3983,6 +3980,7 @@ renderAll(true);
     applySpace();if(!fromCache){S.jobsServer=true;splitPartners()}
     if(!fromCache){clearTimeout(timer);$("#banner").innerHTML=""}
     S.loaded=true;if(S.sel&&!cur())S.sel=null;renderAll(false);
+    if(!fromCache&&boss())S.all.filter(j=>j._mig).forEach(j=>{delete j._mig;queueSave(j)}); // lưu lại bước đã đổi tên / đã bỏ
   };
   if(boss())db.collection("jobs").onSnapshot(snap=>onJobs(snap.docs,snap.metadata.fromCache),fail);
   else{const part={};const go=()=>{if(!part.a||!part.b)return;const m=new Map();[...part.a.docs,...part.b.docs].forEach(d=>m.set(d.id,d));onJobs([...m.values()],part.a.metadata.fromCache||part.b.metadata.fromCache)};
