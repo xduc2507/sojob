@@ -1004,6 +1004,56 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
   .mailbox{height:calc(100dvh - 330px - env(safe-area-inset-bottom,0px));min-height:380px}
   .kc .t{font-size:14.5px!important}
 }
+/* ===== Quy trình đẹp hơn (2026-11-25l): cột bo tròn nền nhạt theo màu bước, số bước, thẻ nổi nhẹ; thẻ quá hạn nền hồng viền đỏ thay vì đỏ đặc ===== */
+.kb{gap:12px;counter-reset:kbst;padding:2px 2px 10px}
+.kb .col{background:#F4F6F9;background:color-mix(in srgb,var(--c) 6%,#F5F7FA);border:1px solid #E3E8EE;border-top:4px solid var(--c);border-radius:12px;box-shadow:0 1px 2px rgba(16,24,40,.04)}
+.kb .col.over{border-color:var(--c);box-shadow:0 0 0 2px var(--c) inset}
+.kb .col-h{background:transparent;border-bottom:0;padding:10px 12px 6px;gap:3px}
+.kb .col-h .nm{font-size:14px;font-weight:700;color:var(--ink);gap:8px}
+.kb .col-h .nm::before{counter-increment:kbst;content:counter(kbst);flex:none;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;font-size:11.5px;font-weight:700;color:#fff;background:var(--c);order:-1}
+.kb .col-h .nm{justify-content:flex-start}.kb .col-h .nr{margin-left:auto}
+.kb .col.c10 .col-h .nm::before{content:"✓"}.kb .col.c11 .col-h .nm::before{content:"✕"}
+.kb .col-h .nm .n{background:#fff;color:var(--c);border:1px solid color-mix(in srgb,var(--c) 30%,#fff);font-weight:700;font-size:12px;padding:0 8px;min-width:24px;text-align:center}
+.kb .col-h .add{background:#fff;border:1px solid #E3E8EE;color:var(--muted);width:24px;height:24px;min-height:24px;padding:0;border-radius:50%;font-size:16px;display:grid;place-items:center}
+.kb .col-h .add:hover{background:var(--c);border-color:var(--c);color:#fff}
+.kb .col-h .sub{font-size:11.5px;color:var(--muted);padding-left:30px}
+.kb .col-b{padding:4px 8px 10px;gap:8px}
+.kb .col-b .none{border:1.5px dashed #D3DAE3;border-radius:10px;padding:18px 8px;color:#8A93A0;background:rgba(255,255,255,.5)}
+.kb .kc{background:#fff;border:1px solid #E3E8EE;border-left:1px solid #E3E8EE;border-radius:10px;padding:10px 11px 9px;gap:6px;box-shadow:0 1px 2px rgba(16,24,40,.06);color:var(--ink);transition:box-shadow .15s,transform .15s,border-color .15s}
+.kb .kc:hover{box-shadow:0 6px 16px rgba(16,24,40,.12);transform:translateY(-1px);border-color:#CFD6DF}
+.kb .kc.urg{box-shadow:inset 4px 0 0 #D93025,0 1px 2px rgba(16,24,40,.06)}
+.kb .kc .ft{padding-top:7px;margin-top:1px;border-top:1px solid #EEF1F5}
+.kb .kc .mn{color:#8A93A0}
+/* quá hạn / đứng yên: nền hồng nhạt, vạch đỏ bên trái, chữ đọc dễ */
+.kb .kc.over{background:#FFF5F4;border-color:#F4C7C1;color:var(--ink);box-shadow:inset 4px 0 0 #D93025,0 1px 2px rgba(217,48,37,.10)}
+.kb .kc.over:hover{box-shadow:inset 4px 0 0 #D93025,0 6px 16px rgba(217,48,37,.16)}
+.kb .kc.over .ds,.kb .kc.over .mn,.kb .kc.over .who .co{color:var(--muted);opacity:1}
+.kb .kc.over .tm{color:#D93025;font-weight:700}
+.kb .kc.over .ft{border-top-color:#F6D9D5}
+.kb .kc.over .tg span{background:#fff;color:var(--muted);border:1px solid #EAD3CF}
+.kb .kc.over .tg .cd{background:transparent;border-color:transparent}
+.kb .kc.over .tg .sv{background:#fff!important;color:var(--ink)!important;border:1px solid #E3C9C4!important}
+.kb .kc.over .tg .u{background:var(--bad-soft);color:var(--bad);border-color:transparent}
+.kb .kc.over .tg .w,.kb .kc.over .tg .odm{background:var(--warn-soft)!important;color:var(--warn)!important;border-color:transparent!important}
+.kb .kc.over .note-l{background:#D93025;color:#fff}
+.kb .kc.over .note-b{background:var(--warn-soft);color:var(--warn)}.kb .kc.over .note-r{background:var(--bad-soft);color:var(--bad)}
+.kb .kc.over .pg{background:#F3D6D2}.kb .kc.over .pg i{background:var(--ok)}
+.kb .kc.over .cnew{color:var(--info)}
+.kb .kc.over span.cbadge{background:#D93025!important;color:#fff!important}
+/* Hoàn thành: nền xanh nhạt, thẻ trắng gọn; Thất bại: nền hồng nhạt, thẻ mờ */
+.kb .col.c10{--c:#2F8F4E;background:#F1F8F3;background:color-mix(in srgb,#2F8F4E 7%,#F5F7FA)}
+.kb .col.c10 .col-h{background:transparent;color:var(--ink)}.kb .col.c10 .col-h .sub{color:var(--muted)}
+.kb .col.c10 .col-h .nm .n{background:#fff;color:#2F8F4E}
+.kb .col.c10 .kc{background:#fff;border-color:#D7EADD;color:var(--ink)}
+.kb .col.c10 .kc .ds,.kb .col.c10 .kc .tm,.kb .col.c10 .kc .mn,.kb .col.c10 .kc .who .co{color:var(--muted);opacity:1}
+.kb .col.c10 .kc .tg span{background:var(--surface-2);color:var(--muted);border:1px solid var(--line)}
+.kb .col.c10 .kc .tg .cd{background:transparent;border-color:transparent}
+.kb .col.c10 .kc .tg .sv{background:#fff!important;color:var(--ink)!important}
+.kb .col.c11{background:#FBF3F2;background:color-mix(in srgb,#C8402F 6%,#F5F7FA)}
+.kb .col.c11 .col-h{background:transparent;color:var(--ink)}
+.kb .col.c11 .kc{opacity:.75}
+@media (max-width:780px){.kb{gap:10px}.kb .col-h .nm{font-size:15px}.kb .kc{padding:11px 12px 10px}}
+@media (prefers-reduced-motion:reduce){.kb .kc:hover{transform:none}}
 </style>
 
 <header class="top">
@@ -1248,6 +1298,7 @@ async function createJob(data){
     tasks:[],quote:[],vat:8,quoteNote:"",quoteSentAt:"",debitAmount:0,debitCurrency:"VND",debitDate:"",paidDate:"",
     raw:"",images:[],createdAt:Date.now(),updatedAt:Date.now(),stageAt:Date.now(),history:[]
   },data);
+  {const t=String(j.title||"").trim();if(!/^\d{1,2}\/\d{1,2}(\D|$)/.test(t))j.title=dmShow(TODAY())+" - "+t} // quy định: tên job bắt đầu bằng ngày/tháng tạo (job từ ảnh, dán chữ, tạo trống…)
   if(!SERVICES.includes(j.service)){j.service="";j.svcPending=true}
   if(team()){j.createdBy=me();j.createdByName=window.SOJOB_USER||me();j.shared=!mineOn();if(!j.assignee){j.assignee=me();j.assigneeName=window.SOJOB_USER||me()}}
   logH(j,{kind:"create",to:j.status});
@@ -3315,7 +3366,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25k";
+const APP_VER="2026-11-25l";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
