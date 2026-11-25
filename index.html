@@ -802,6 +802,11 @@ html:not([data-ui="1office"]) .stages button:first-child{padding-left:10px!impor
 body.view-report .app{grid-template-columns:minmax(0,1fr)}
 body.view-report #side,body.view-report #detail{display:none}
 .rp{max-width:1100px}
+.mjbox{margin:0 0 12px;padding:12px 14px;border:1px solid var(--accent);border-radius:var(--r,12px);background:var(--accent-soft);display:flex;flex-direction:column;gap:8px}
+.mjbox h3{margin:0;font-size:15px}.mjbox>p{margin:0;font-size:12.5px}
+.mjc{display:flex;flex-direction:column;gap:3px;padding:10px 12px;background:var(--surface);border:1px solid var(--line);border-radius:10px}
+.mjc>b{font-size:14.5px}.mjc>span{font-size:13px}.mjc .mj-sum{color:var(--ink);font-style:italic}.mjc small{font-size:12px}
+.mj-acts{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1650,9 +1655,10 @@ function renderMain(){
   {const mb=document.querySelector('.tabs [data-view="mail"]');if(mb)mb.hidden=!mailOn()}
   if(S.view==="mail"&&!mailOn())S.view="list";
   if(S.view==="team"){renderTeam(el);return}
-  if(S.view==="mail"){renderMail(el);return}
+  mjWatch();
+  if(S.view==="mail"){renderMail(el);mjPaint();return}
   if(S.view==="report"){renderReport(el);return}
-  if(S.view==="today"){renderToday(el);return}
+  if(S.view==="today"){renderToday(el);mjPaint();return}
   if(S.view==="tpl"){
     if(el.dataset.v==="tpl"&&el.contains(document.activeElement))return;
     el.dataset.v="tpl";
@@ -2980,7 +2986,7 @@ async function mailCall(op,x){
 const mailJobOf=s=>{const c=(String(s||"").match(/FDI\d{6}-\d+/i)||[])[0];if(!c)return null;return S.all.find(j=>String(j.code||"").toUpperCase()===c.toUpperCase()&&!(boss()&&isMine(j)))||null};
 const mailWho=a=>{a=String(a||"");const m=a.match(/^\s*"?([^"<]+?)"?\s*<([^>]+)>/);return m?m[1]:a.replace(/<|>/g,"")};
 const mailTime=t=>{if(!t)return "";const d=new Date(t),n=new Date();return d.toDateString()===n.toDateString()?d.toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"}):d.toLocaleDateString("vi-VN",{day:"2-digit",month:"2-digit"})+(d.getFullYear()!==n.getFullYear()?"/"+d.getFullYear():"")};
-function mailBadge(){const b=$("#mailBadge");if(!b)return;const n=S.mail.unread||0;b.hidden=!n;b.textContent=n>99?"99+":n}
+function mailBadge(){const b=$("#mailBadge");if(!b)return;const n=(S.mail.unread||0)+((S.mj||[]).length);b.hidden=!n;b.textContent=n>99?"99+":n}
 async function mailLoad(quiet){
   if(S.mail.busy)return;S.mail.busy=true;if(!quiet){S.mail.err="";mailPaint()}
   try{const o=await mailCall("list",{folder:S.mail.folder,q:S.mail.q,limit:50});
@@ -3100,6 +3106,46 @@ document.addEventListener("change",async e=>{
     const b64=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(String(r.result).split(",")[1]||"");r.readAsDataURL(f)});
     c.files.push({n:f.name,b64,sz:f.size});tot+=f.size}
   mailPaint();
+});
+/* ---------- Job từ email (máy chủ AI đọc thư mới → "chờ duyệt"; bấm Tạo job → job ở cột Mới nhận, Sổ chung) ---------- */
+S.mj=[];let mjSub=null;
+function mjWatch(){
+  if(!mailOn()||!db||mjSub)return;
+  try{mjSub=db.collection("mailjobs").where("status","==","cho").onSnapshot(sn=>{S.mj=sn.docs.map(d=>Object.assign({id:d.id},d.data())).sort((a,b)=>(b.at||0)-(a.at||0));mjPaint();mailBadge()},()=>{})}catch(e){}
+}
+function mjHtml(){
+  const L=S.mj||[];if(!L.length||!mailOn())return "";
+  return `<section class="mjbox"><h3>📨 Job từ email · chờ duyệt <span class="mono">${L.length}</span></h3><p class="muted">AI đọc thư gửi tới ${MAIL_ADDR} và nhận ra yêu cầu làm hàng mới. Kiểm tra rồi bấm <b>Tạo job</b>: job vào cột <b>Mới nhận</b> ở Sổ chung.</p>`+
+    L.map(x=>{const a=x.ai||{},sub=[a.congTy,a.fwd&&a.fwd!==a.congTy?"FWD "+a.fwd:"",a.dichVu,a.hang,a.bl?"B/L "+a.bl:"",a.cont,a.tkNo?"TK "+a.tkNo:""].filter(Boolean).join(" · ");
+      return `<div class="mjc"><b>${esc(a.tieuDe||x.s||"(không tiêu đề)")}</b>${sub?`<span>${esc(sub)}</span>`:""}${a.tomTat?`<span class="mj-sum">${esc(a.tomTat)}</span>`:""}<small class="muted">✉ ${esc(x.fromN||x.from)} · ${esc(x.s||"")} · ${mailTime(x.t||x.at)}</small>
+        <div class="mj-acts"><button class="primary sm" data-mjok="${esc(x.id)}">✓ Tạo job</button><button class="ghost sm" data-mjmail="${esc(x.id)}">Xem thư</button><button class="ghost sm" data-mjskip="${esc(x.id)}">Bỏ qua</button></div></div>`}).join("")+`</section>`;
+}
+function mjPaint(){
+  document.querySelectorAll(".mjbox").forEach(x=>x.remove());
+  const h=mjHtml();if(!h)return;
+  const host=S.view==="mail"?$("#mailbox"):S.view==="today"?document.querySelector("#content .td"):null;
+  if(host)host.insertAdjacentHTML("beforebegin",h);
+}
+async function mjCreate(id,btn){
+  const x=(S.mj||[]).find(m=>m.id===id);if(!x)return;const a=x.ai||{};
+  if(btn){btn.disabled=true;btn.textContent="Đang tạo…"}
+  try{await db.doc("mailjobs/"+id).update({status:"tao",by:me(),byAt:Date.now()})}
+  catch(e){if(btn){btn.disabled=false;btn.textContent="✓ Tạo job"}return toast("Chưa duyệt được: "+(e?.message||e?.code))}
+  const sv=SERVICES.includes(a.dichVu)?a.dichVu:"",type=!sv?"Khác":sv==="VC"?"Vận chuyển":a.hang==="Xuất khẩu"?"Khai HQ xuất":"Khai HQ nhập";
+  const data={title:dmShow(TODAY())+" - "+(a.tieuDe||x.s||"Job từ email"),fwd:a.fwd||"",company:a.congTy||"",type,source:"Email",status:STAGES[0],
+    bl:a.bl||"",cont:a.cont||"",tkNo:String(a.tkNo||"").replace(/\D/g,"").slice(0,12),mst:a.mst||"",deadline:/^\d{4}-\d{2}-\d{2}$/.test(a.han||"")?a.han:"",
+    contact:a.lienHe||"",cargo:a.hangHoa||"",summary:((a.tomTat||"")+"\n✉ Từ email của "+(x.fromN||x.from)+" <"+(x.from||"")+">: "+(x.s||"")).trim(),mailRef:{mid:x.mid||"",f:x.f||""},tasks:sv?tplTasks(type):[]};
+  if(sv){data.service=sv;if(sv!=="HQ")data.vehicle="Xe cont"}
+  if(SPACE==="mine")await setSpace("team");
+  const j=await createJob(data);
+  if(sv){if(sv!=="VC")addFee(j,FEE_HQ,"tờ khai",true);if(sv!=="HQ")addFee(j,FEE_VC,isTruck(j)?"chuyến":"cont");queueSave(j)}
+  try{await db.doc("mailjobs/"+id).update({jobId:j.id,code:j.code})}catch(e){}
+  S.view="list";renderMain();openJobAny(j.id);toast(`Đã tạo ${j.code} ở cột Mới nhận. Kiểm tra lại thông tin trong phiếu job.`);
+}
+document.addEventListener("click",async e=>{
+  const ok=e.target.closest("[data-mjok]");if(ok){mjCreate(ok.dataset.mjok,ok);return}
+  const sk=e.target.closest("[data-mjskip]");if(sk){if(!confirm("Bỏ qua thư này, không tạo job?"))return;try{await db.doc("mailjobs/"+sk.dataset.mjskip).update({status:"bo",by:me(),byAt:Date.now()})}catch(er){toast("Chưa bỏ qua được: "+(er?.message||er?.code))}return}
+  const mv=e.target.closest("[data-mjmail]");if(mv){const x=(S.mj||[]).find(m=>m.id===mv.dataset.mjmail);if(!x)return;S.mail.folder="inbox";S.mail.q="";S.view="mail";renderMain();mailOpen(x.mid,x.f);return}
 });
 /* ---------- Chat chung: cả nhóm trao đổi, gắn job bấm được ---------- */
 const TEAM_PAGE=200;
@@ -3332,7 +3378,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25e";
+const APP_VER="2026-11-25f";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
