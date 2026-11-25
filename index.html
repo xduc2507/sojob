@@ -751,16 +751,6 @@ table.q tr.chrow td:first-child{box-shadow:inset 3px 0 0 #f0b400}.chtag{display:
 @media (max-width:780px){.brand .blogo img{height:28px}.brand b{font-size:14px}}
 @media (max-width:420px){.brand b{display:none}}
 /* nút + menu chọn giao diện */
-.uibtn{width:40px;height:36px;padding:0!important;display:inline-flex;align-items:center;justify-content:center;background:transparent!important;border:1px solid rgba(255,255,255,.35)!important;color:#fff!important;border-radius:2px}
-.uibtn .fa{font-size:15px;margin:0}
-.uipop{position:fixed;top:58px;right:16px;z-index:90;width:min(300px,calc(100vw - 32px));background:var(--surface);border:1px solid var(--line);box-shadow:0 8px 28px rgba(0,0,0,.18);padding:8px;display:flex;flex-direction:column;gap:4px;border-radius:6px}
-.uipop>b{font-size:13px;color:var(--muted);padding:4px 8px}
-.uipop button{display:flex;gap:10px;align-items:flex-start;text-align:left;width:100%;min-height:52px;padding:8px 10px;border:1px solid transparent!important;background:none!important;border-radius:4px!important;color:var(--ink)!important}
-.uipop button:hover{background:var(--surface-2)!important}
-.uipop button.on{border-color:var(--accent)!important;background:var(--accent-soft)!important}
-.uipop .uic{flex:0 0 18px;font-weight:700;color:var(--accent)}
-.uipop button b{display:block;font-size:14.5px}.uipop button small{display:block;color:var(--muted);font-size:12.5px}
-.uipop .uin{color:var(--muted);font-size:12px;padding:2px 8px 4px}
 /* Thanh tiến trình: ô bằng nhau, chữ đủ và căn giữa.
    Rộng thì 1 hàng; vừa thì 2 hàng đều nhau; hẹp (điện thoại) thì 4 ô mỗi hàng. */
 #stagebar{container-type:inline-size}
@@ -770,9 +760,9 @@ table.q tr.chrow td:first-child{box-shadow:inset 3px 0 0 #f0b400}.chtag{display:
 @container (max-width:440px){.stages,.stages.few{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
 .stages button{flex:none!important;min-width:0!important;width:100%;display:flex;align-items:center;justify-content:center;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:12.5px!important;line-height:1.2;min-height:34px!important}
 /* giao diện hiện tại: mũi tên đều nhau, chừa chỗ cho đầu mũi tên để chữ nằm giữa phần thân */
-html:not([data-ui="1office"]) .stages button{padding:4px 10px 4px 16px!important}
-html:not([data-ui="1office"]) .stages button:first-child{padding-left:10px!important}
-@container (max-width:440px){html:not([data-ui="1office"]) .stages button{padding:4px 4px 4px 11px!important;font-size:12px!important}html:not([data-ui="1office"]) .stages button:first-child{padding-left:6px!important}.stages button{font-size:12px!important}.stages button.now{letter-spacing:-.02em}}
+.stages button{padding:4px 10px 4px 16px!important}
+.stages button:first-child{padding-left:10px!important}
+@container (max-width:440px){.stages button{padding:4px 4px 4px 11px!important;font-size:12px!important}.stages button:first-child{padding-left:6px!important}.stages button{font-size:12px!important}.stages button.now{letter-spacing:-.02em}}
 /* Chuyển tiếp: khung xổ xuống chứa các bước */
 .d-head{position:relative}
 .stpop{position:absolute;right:12px;top:52px;z-index:30;width:min(600px,calc(100% - 24px));background:var(--surface);border:1px solid var(--line);border-radius:6px;box-shadow:0 10px 28px rgba(0,0,0,.18);padding:12px;display:flex;flex-direction:column;gap:10px}
@@ -963,145 +953,6 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 .kc .asgl .asgchip{flex:0 1 auto;min-width:0}
 .kc .asgl .tm{flex:none;margin-left:auto}
 </style>
-<style id="ui1o" media="not all">
-/* ===== Theo dõi làm hàng – BẢN THỬ kiểu 1office =====
-   Nền trắng / xám rất nhạt, chữ #2B2D33, chữ phụ #676D78, MỘT màu nhấn (navy FDI #14316E), nút bo 4px, chữ Inter Tight.
-   Khoảng thở rộng, ít khung viền; chỉ đổi kiểu dáng, giữ nguyên cấu trúc và chức năng. */
-:root{
-  --ink:#2B2D33;--muted:#676D78;--line:#E6E8EC;--line-2:#D5D9E0;--bg:#F6F7F9;--surface:#FFFFFF;--surface-2:#F6F7F9;
-  --accent:#14316E;--accent-2:#1D4494;--accent-soft:#EAF0FA;--accent-ink:#fff;
-  --primary:var(--accent);--info:var(--accent);--info-soft:var(--accent-soft);--nav:#FFFFFF;
-  --ok:#1F8A4C;--ok-soft:#E6F4EC;--warn:#B26A00;--warn-soft:#FDF2E0;--bad:#D93025;--bad-soft:#FDECEA;--violet:#3B5BA9;--violet-soft:#ECF0FA;
-  --f-body:"Inter Tight",system-ui,"Segoe UI",sans-serif;
-  --r:8px;--r-sm:4px;--r-md:8px;--r-lg:8px;--ring:0 0 0 3px rgba(20,49,110,.18)}
-@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
-  --ink:#E6E8EC;--muted:#A1A7B2;--line:#2C313A;--line-2:#3A404B;--bg:#15181D;--surface:#1C2026;--surface-2:#22262D;
-  --accent:#7FA2E8;--accent-2:#9BB6EE;--accent-soft:#1E2A42;--nav:#1C2026}}
-:root[data-theme="dark"]{--ink:#E6E8EC;--muted:#A1A7B2;--line:#2C313A;--line-2:#3A404B;--bg:#15181D;--surface:#1C2026;--surface-2:#22262D;--accent:#7FA2E8;--accent-soft:#1E2A42;--nav:#1C2026}
-body{font-family:var(--f-body)!important;font-size:15px;line-height:1.55;background:var(--bg)!important;color:var(--ink);font-variant-numeric:tabular-nums;letter-spacing:-.003em}
-.mono,.jcode,.code{font-family:var(--f-body)!important;font-variant-numeric:tabular-nums}
-*:focus-visible{outline:none!important;box-shadow:var(--ring)!important}
-@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
-
-/* ---------- Thanh trên: trắng gọn, viền mảnh ---------- */
-.top{background:var(--nav)!important;color:var(--ink)!important;border:0!important;border-bottom:1px solid var(--line)!important;box-shadow:none!important;min-height:64px}
-.top .brand .blogo{background:transparent!important;padding:0!important}
-.top .brand .blogo img{height:36px!important}
-.top .brand b{color:var(--ink)!important;font-weight:700;font-size:16px;letter-spacing:-.01em}
-.top button:not(.primary){background:transparent!important;border:1px solid var(--line)!important;color:var(--ink)!important}
-.top button:not(.primary):hover{background:var(--surface-2)!important;border-color:var(--line-2)!important}
-.top #btnManual{background:var(--accent)!important;border:1px solid var(--accent)!important;color:#fff!important;font-weight:600}
-.top #btnManual:hover{background:var(--accent-2)!important}
-.top #btnManual .fa{color:#fff!important}
-.top input{background:var(--surface-2)!important;border:1px solid transparent!important;color:var(--ink)!important;min-height:40px;border-radius:var(--r-sm)!important}
-.top input:focus{background:#fff!important;border-color:var(--accent)!important}
-.top .space{border:1px solid var(--line)!important;background:var(--surface-2)!important;border-radius:var(--r-sm)!important;padding:2px}
-.top .space button{border:0!important;background:transparent!important;color:var(--muted)!important;border-radius:3px!important;font-weight:500}
-.top .space button.on{background:#fff!important;color:var(--ink)!important;font-weight:600;box-shadow:0 1px 2px rgba(0,0,0,.08)!important}
-.top .space button .fa{color:inherit!important}
-.nbell{background:transparent!important;border:1px solid var(--line)!important;color:var(--ink)!important;border-radius:var(--r-sm)!important}
-.nbell .nb{background:var(--bad)!important;box-shadow:0 0 0 2px #fff!important}
-
-/* ---------- Nút: bo 4px ---------- */
-button{font-family:inherit;border-radius:var(--r-sm)!important;font-size:14px;min-height:40px;padding:6px 16px;font-weight:500;cursor:pointer;transition:background-color .15s,border-color .15s,color .15s}
-button:where(:not(.primary):not(.ghost):not(.x):not(.cpop-x)){background:#fff!important;border:1px solid var(--line-2)!important;color:var(--ink)!important}
-button:where(:not(.primary):not(.ghost):not(.x):not(.cpop-x)):hover:where(:not(:disabled)){border-color:var(--accent)!important;color:var(--accent)!important}
-button.primary{background:var(--accent)!important;border:1px solid var(--accent)!important;color:#fff!important;font-weight:600}
-button.primary:hover:not(:disabled){background:var(--accent-2)!important}
-button.ghost{background:transparent!important;border:1px solid transparent!important;color:var(--accent)!important}
-button.ghost:hover:not(:disabled){background:var(--accent-soft)!important}
-button.go,button.debitbtn,button.tkbtn{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
-button.go .fa,button.debitbtn .fa,button.tkbtn .fa,button.primary .fa{color:#fff!important}
-button.primary.bad,button.danger:not(.ghost){background:var(--bad)!important;border-color:var(--bad)!important;color:#fff!important}
-button.ghost.danger{color:var(--bad)!important}
-button.sm{font-size:13px;min-height:34px;padding:4px 12px}
-.fa.ic-fa{color:inherit}
-.chips2 button.on{background:var(--accent)!important;border-color:var(--accent)!important;color:#fff!important}
-
-/* ---------- Ô nhập ---------- */
-input,select,textarea{font-family:inherit;font-size:15px!important;border:1px solid var(--line-2)!important;border-radius:var(--r-sm)!important;background:#fff!important;color:var(--ink)}
-input:not([type=checkbox]):not([type=radio]),select{min-height:40px;padding:6px 12px}
-input:focus,select:focus,textarea:focus{border-color:var(--accent)!important;box-shadow:var(--ring)!important}
-input::placeholder,textarea::placeholder{color:#A0A6B0}
-.fld>span{font-size:13px!important;font-weight:500;color:var(--muted)!important}
-
-/* ---------- Khung: trắng trên nền xám nhạt, viền rất mảnh ---------- */
-.card,#content,#detail,#prof{background:var(--surface)!important;border:1px solid var(--line)!important;border-radius:var(--r)!important;box-shadow:none!important}
-.sec{padding:20px 22px!important;border-bottom:1px solid var(--line)}
-.sec h3{background:transparent!important;color:var(--ink)!important;font-size:16px!important;font-weight:700!important;margin:0 0 14px!important;padding:0!important;min-height:0!important;border:0!important;text-transform:none!important;letter-spacing:-.01em;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap}
-.sec h3 .mono{color:var(--muted)!important;font-weight:500;font-size:13.5px}
-.sec h3 button{background:#fff!important;border:1px solid var(--line-2)!important;color:var(--ink)!important;min-height:34px;font-size:13px;font-weight:500}
-.sec h3 button:hover{border-color:var(--accent)!important;color:var(--accent)!important}
-.sec h3 button .fa{color:inherit!important}
-.sec h3 button.on{border-color:var(--accent)!important;color:var(--accent)!important;background:var(--accent-soft)!important}
-.review summary{background:var(--surface-2)!important;color:var(--ink)!important}
-
-/* Đầu phiếu job */
-.l2 .jcode{color:var(--muted)!important;font-size:13.5px!important;font-weight:500}
-.d-head input.title{font-size:22px!important;font-weight:700;letter-spacing:-.015em;border:0!important;border-bottom:1px solid transparent!important;border-radius:0!important;padding:4px 0!important;background:transparent!important}
-.d-head input.title:hover{border-bottom-color:var(--line-2)!important}
-.d-head input.title:focus{border-bottom-color:var(--accent)!important;box-shadow:none!important}
-
-/* Tiến trình: bước gọn, đã qua tô nhạt, hiện tại tô đậm màu nhấn */
-.stages{gap:4px!important}
-.stages button{clip-path:none!important;border-radius:var(--r-sm)!important;border:1px solid var(--line)!important;min-height:34px!important;padding:4px 6px!important;font-size:12.5px!important;font-weight:500;background:#fff!important;color:var(--muted)!important}
-.stages button.past{background:var(--accent-soft)!important;color:var(--accent)!important;border-color:transparent!important}
-.stages button.now{background:var(--accent)!important;color:#fff!important;border-color:var(--accent)!important;font-weight:600}
-
-/* ---------- Danh sách ---------- */
-.row{padding:14px 18px!important;border-bottom:1px solid var(--line)!important}
-.row:hover{background:var(--surface-2)!important}
-.row.on{background:var(--accent-soft)!important;box-shadow:inset 3px 0 0 var(--accent)!important}
-.grp-h{background:#fff!important;color:var(--muted)!important;font-size:13px!important;font-weight:600;padding:10px 18px!important;text-transform:none!important;letter-spacing:0!important;border-bottom:1px solid var(--line)!important}
-@media (min-width:781px){
-  #side .g{background:transparent!important;border:0!important;border-radius:var(--r-sm)!important;min-height:40px;font-size:14px;color:var(--ink)!important;justify-content:space-between;font-weight:500}
-  #side .g:hover{background:#fff!important}
-  #side .g.on{background:#fff!important;color:var(--accent)!important;font-weight:600;box-shadow:inset 3px 0 0 var(--accent),0 1px 2px rgba(0,0,0,.05)!important}
-}
-
-/* Tab: chữ, gạch chân màu nhấn */
-.tabs{background:transparent!important;border:0!important;border-radius:0!important;gap:20px;padding:0;border-bottom:1px solid var(--line)!important}
-.tabs button,.tabs button.on.on:not(.x){background:transparent!important;border:0!important;border-bottom:2px solid transparent!important;border-radius:0!important;color:var(--muted)!important;font-size:15px!important;font-weight:500;min-height:44px;padding:6px 2px!important}
-.tabs button.on,.tabs button.on.on:not(.x){color:var(--ink)!important;font-weight:600;border-bottom-color:var(--accent)!important}
-
-/* Báo giá */
-table.q th{font-size:12.5px!important;color:var(--muted)!important;font-weight:500;border-bottom:1px solid var(--line-2)!important;padding:8px 4px!important}
-table.q td{border-bottom:1px solid var(--line)!important}
-table.q td input{min-height:36px!important;font-size:14px!important}
-.tot b{font-size:19px;color:var(--ink);font-weight:700}
-
-/* Quy trình */
-.col{background:var(--surface-2)!important;border:0!important;border-top:3px solid var(--c)!important;border-radius:var(--r)!important}
-.col-h .nm{font-weight:600!important;font-size:14px!important;color:var(--ink)}
-.kc{background:#fff!important;border:1px solid var(--line)!important;border-radius:var(--r)!important;box-shadow:0 1px 2px rgba(16,24,40,.04)!important}
-.kc:hover{border-color:var(--accent)!important}
-.kc .t{font-weight:600!important;font-size:13.5px!important}
-.kc.over{background:var(--bad)!important;border-color:var(--bad)!important;color:#fff!important}.kc.over .t{color:#fff!important}
-
-/* Chat */
-.chat .m{border-radius:var(--r)!important;font-size:14.5px}
-.chat .m.me{background:var(--accent-soft)!important}
-.teamchat{border:1px solid var(--line)!important;border-radius:var(--r)!important;background:#fff!important}
-
-/* Menu nổi, hộp thoại */
-.kmenu,.npanel,.tm-sug,.mn-sug,#chatPops .cpop,.dbbox .sheet,.modal .sheet,.qpre{border-radius:var(--r)!important;box-shadow:0 12px 32px rgba(16,24,40,.14)!important;border:1px solid var(--line)!important}
-.modal .sheet h2{font-weight:700;font-size:20px;letter-spacing:-.015em}
-.pill{border-radius:999px!important}
-
-
-@media (max-width:780px){
-  body{font-size:16px}
-  button{min-height:44px;font-size:15px}button.sm{min-height:40px}
-  input:not([type=checkbox]):not([type=radio]),select{min-height:44px;font-size:16px!important}
-  .sec{padding:16px!important}
-  .tabs{gap:14px;overflow-x:auto;flex-wrap:nowrap}
-  .stages button{min-height:40px!important}
-  .top .brand .blogo img{height:30px!important}
-}
-
-/* nút chọn giao diện */
-.top #btnUi{background:transparent!important;border:1px solid var(--line)!important;color:var(--ink)!important}
-</style>
 
 <header class="top">
   <div class="brand"><span class="blogo"><img src="fdi-mark.png" alt="FDI Co., Ltd" width="94" height="24"></span><b>THEO DÕI LÀM HÀNG</b></div>
@@ -1109,7 +960,6 @@ table.q td input{min-height:36px!important;font-size:14px!important}
   <input id="q" type="search" placeholder="Tìm job, FWD, công ty, số B/L…" aria-label="Tìm job">
   <button id="btnManual" class="primary" title="Tạo job: gõ tay, hoặc dán ảnh / email để tự điền"><i class="fa fa-plus ic-fa" aria-hidden="true"></i>Tạo job</button>
   <button id="nbell" class="nbell" aria-label="Thông báo" aria-expanded="false" hidden><i class="fa fa-bell" aria-hidden="true" style="font-size:16px"></i><span class="nb" id="nbN" hidden></span></button>
-  <button id="btnUi" class="uibtn" aria-haspopup="true" aria-expanded="false" aria-label="Chọn giao diện" title="Chọn giao diện"><i class="fa fa-paint-brush" aria-hidden="true"></i></button>
   <button id="btnNew" class="primary" title="Dán ảnh chụp email / Zalo để Claude tạo job" hidden>+ Từ ảnh</button>
 </header>
 
@@ -2916,22 +2766,7 @@ async function pushTest(){
     if(!o.ok)return toast("Chưa gửi được: "+(o.msg||"lỗi máy chủ"));
     toast(o.sent?`Đã gửi tới ${o.sent} máy của bạn${o.xoa?` (đã dọn ${o.xoa} máy cũ không còn dùng)`:""}. Chờ vài giây để thông báo hiện.`:`Không máy nào nhận được (đang đăng ký ${o.may||0} máy${o.xoa?`, vừa dọn ${o.xoa} máy hỏng`:""}). Mở app trên điện thoại, cho phép thông báo rồi thử lại.`)}
   catch(e){toast("Không kết nối được máy chủ thông báo. Thử lại sau.")}}
-/* ---------- Chọn giao diện: Hiện tại / Kiểu 1office (nhớ trên từng máy) ---------- */
-const UI_LS="sojob.ui",UI_LIST=[["cu","Giao diện hiện tại","Thanh xanh, chữ Open Sans"],["1office","Kiểu 1office","Nền trắng gọn, chữ Inter Tight"]];
-function uiGet(){try{return localStorage.getItem(UI_LS)||"cu"}catch(e){return "cu"}}
-function uiApply(v){const st=document.getElementById("ui1o");if(st)st.media=v==="1office"?"all":"not all";
-  if(v==="1office"&&!document.getElementById("fontIT")){const l=document.createElement("link");l.id="fontIT";l.rel="stylesheet";l.href="https://fonts.googleapis.com/css2?family=Inter+Tight:wght@400;500;600;700&display=swap";document.head.appendChild(l)}
-  document.documentElement.dataset.ui=v}
-uiApply(uiGet());
-function uiPop(open){document.getElementById("uipop")?.remove();const b=document.getElementById("btnUi");if(b)b.setAttribute("aria-expanded",open?"true":"false");if(!open)return;
-  const cur=uiGet(),p=document.createElement("div");p.id="uipop";p.className="uipop";p.setAttribute("role","menu");p.setAttribute("aria-label","Chọn giao diện");
-  p.innerHTML=`<b>Giao diện</b>`+UI_LIST.map(([k,t,d])=>`<button type="button" role="menuitemradio" aria-checked="${k===cur}" data-ui="${k}" class="${k===cur?"on":""}"><span class="uic">${k===cur?"✓":""}</span><span><b>${t}</b><small>${d}</small></span></button>`).join("")+`<small class="uin">Chỉ đổi trên máy này.</small>`;
-  document.body.appendChild(p);p.querySelector("button.on")?.focus()}
-document.addEventListener("click",e=>{
-  if(e.target.closest("#btnUi")){uiPop(!document.getElementById("uipop"));return}
-  const x=e.target.closest("#uipop [data-ui]");if(x){try{localStorage.setItem(UI_LS,x.dataset.ui)}catch(er){}uiApply(x.dataset.ui);uiPop(false);toast("Đã đổi sang: "+UI_LIST.find(u=>u[0]===x.dataset.ui)[1]);return}
-  if(document.getElementById("uipop")&&!e.target.closest("#uipop"))uiPop(false)});
-document.addEventListener("keydown",e=>{if(e.key==="Escape"&&document.getElementById("uipop"))uiPop(false)});
+try{localStorage.removeItem("sojob.ui")}catch(e){}
 /* ---------- Đã xem (kiểu Zalo / Teams): mỗi người ghi mốc đã đọc tới tin nào; hiện avatar dưới tin mới nhất họ đã xem ---------- */
 S.seen={};let seenSub={id:null,off:null},teamSeenSub=null;const seenSent={};
 const seenCol=key=>key==="team"?"teamseen":"jobs/"+key+"/seen";
@@ -3378,7 +3213,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25f";
+const APP_VER="2026-11-25g";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
