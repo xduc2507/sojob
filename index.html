@@ -1,6 +1,11 @@
 <!doctype html><html lang="vi"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="referrer" content="same-origin"><style>:root{color-scheme:light;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}body{margin:0;font:14px system-ui,-apple-system,"Segoe UI",sans-serif}img{max-width:100%}[hidden]{display:none!important}</style></head><body><title>Theo dõi làm hàng · FDI</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
+<script src="firebase-config.js?v=483007a3c3"></script>
+<script src="static-shim.js?v=bb3a17dce6"></script>
+<script>/* giao diện app máy tính: bật khi mở bằng app đã cài (cửa sổ riêng); ?desk=1 bật, ?desk=0 tắt (nhớ trên máy) */
+(function(){try{var q=location.search.match(/[?&]desk=([01])/);if(q)localStorage.setItem("sojob.desk",q[1]);var v=localStorage.getItem("sojob.desk");
+if(v==="1"||(v!=="0"&&matchMedia("(display-mode: standalone)").matches))document.documentElement.classList.add("desk")}catch(e){}})();</script>
 <meta name="theme-color" content="#1E6B45">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -1072,6 +1077,100 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 .kb .col.c11 .kc .tg .sv{background:#fff!important;color:var(--ink)!important}
 @media (max-width:780px){.kb{gap:10px}.kb .col-h .nm{font-size:15px}.kb .kc{padding:11px 12px 10px}}
 @media (prefers-reduced-motion:reduce){.kb .kc:hover{transform:none}}
+/* ===== Giao diện kiểu app máy tính (2026-11-26c): giữ bố cục 3 cột, mỗi khung tự cuộn, thanh tiêu đề + thanh trạng thái,
+   chữ Segoe UI, góc vuông 4px, viền rõ, nút/ô nhập cao đều 28px. Chỉ áp cho bản cài trên máy tính (cửa sổ riêng) hoặc thêm ?desk=1; màn rộng ≥1181px. Trình duyệt thường và điện thoại giữ nguyên. ===== */
+:root{--dk-side:#f5f6f7;--dk-pane:#ffffff;--dk-bg:#eceef0;--dk-line:#d9dde1;--dk-line2:#c6ccd2;--dk-hover:#eef1f4;--dk-sel:#e3eefa;--dk-head:#f7f8f9;--dk-top:44px;--dk-sb:24px}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--dk-side:#131c26;--dk-pane:#16202b;--dk-bg:#0f1720;--dk-line:#2a3846;--dk-line2:#34485a;--dk-hover:#1d2a37;--dk-sel:#16324a;--dk-head:#1a2531}}
+:root[data-theme="dark"]{--dk-side:#131c26;--dk-pane:#16202b;--dk-bg:#0f1720;--dk-line:#2a3846;--dk-line2:#34485a;--dk-hover:#1d2a37;--dk-sel:#16324a;--dk-head:#1a2531}
+.dk-sb{display:none}
+@media (min-width:1181px){
+  html.desk,html.desk body{height:100%}
+  html.desk body{overflow:hidden;background:var(--dk-bg);font-family:"Segoe UI Variable Text","Segoe UI",system-ui,-apple-system,Arial,sans-serif;font-size:13px}
+  /* thanh tiêu đề */
+  html.desk .top{height:var(--dk-top);padding-block:0!important;gap:10px}
+  html.desk .brand .blogo{padding:2px 5px;border-radius:3px}
+  html.desk .brand .blogo img{height:26px}
+  html.desk .brand b{font-size:13.5px;font-weight:600;letter-spacing:.03em}
+  html.desk .top input{height:30px;min-height:30px!important;max-width:440px;border-radius:4px!important;margin-left:auto;margin-right:auto;background:rgba(255,255,255,.95)}
+  html.desk .top button{min-height:30px;border-radius:4px!important}
+  /* thân: 3 khung sát nhau, ngăn bằng đường kẻ, mỗi khung tự cuộn */
+  html.desk .app{height:calc(100dvh - var(--dk-top) - var(--dk-sb));padding:0!important;gap:0;align-items:stretch;grid-template-columns:220px minmax(0,1fr) minmax(0,600px)}
+  html.desk .app>*{min-height:0}
+  html.desk #side{position:static;top:auto;max-height:none;height:100%;overflow:auto;background:var(--dk-side);border-right:1px solid var(--dk-line);padding:6px 6px 12px;gap:1px}
+  html.desk #main{height:100%;overflow:auto;background:var(--dk-bg);padding:0 12px 12px;gap:10px}
+  html.desk #main>*{flex-shrink:0}
+  html.desk #detail{position:static;top:auto;max-height:none;height:100%;overflow:auto;border:0!important;border-left:1px solid var(--dk-line)!important;border-radius:0!important;margin:0;box-shadow:none!important;background:var(--dk-pane)}
+  html.desk body.view-board .app,html.desk body.view-report .app{grid-template-columns:minmax(0,1fr)}
+  html.desk body.view-board.has-detail #detail{position:fixed;top:var(--dk-top);bottom:var(--dk-sb);height:auto;box-shadow:-6px 0 18px rgba(0,0,0,.14)!important}
+  /* cột trái kiểu thư mục */
+  html.desk .side-h{font-size:11px;font-weight:600;letter-spacing:.04em;padding:10px 10px 4px}
+  html.desk .g{border-radius:4px;padding:6px 10px;min-height:30px}
+  html.desk .g:hover{background:var(--dk-hover)}
+  html.desk .g.on{background:var(--dk-sel);box-shadow:inset 3px 0 0 var(--primary);font-weight:600}
+  /* thanh lệnh (tab + lọc): dính trên cùng khung giữa, tab gạch chân như ribbon */
+  html.desk .bar{position:sticky;top:0;z-index:4;background:var(--dk-pane);margin:0 -12px;padding:0 12px;border-bottom:1px solid var(--dk-line);min-height:42px;gap:8px}
+  html.desk .bar .tabs{background:none!important;border:0!important;padding:0;gap:2px;align-self:stretch;flex-wrap:nowrap}
+  html.desk .bar .tabs button{flex:none;white-space:nowrap;display:inline-flex;align-items:center;border-radius:0!important;min-height:42px!important;padding:0 10px!important;font-size:13px!important;color:var(--ink)!important;background:none!important;box-shadow:none}
+  html.desk .bar .tabs button:hover{background:var(--dk-hover)!important}
+  html.desk .bar .tabs button[hidden],html.desk .bar .tabs button.tmore{display:none!important}
+  html.desk .bar .tabs button.on{background:none!important;color:var(--primary)!important;font-weight:600;box-shadow:inset 0 -2px 0 var(--primary)}
+  html.desk .bar .tabs .ic-fa{color:var(--primary)}
+  html.desk .bar select{width:auto;min-width:120px}
+  html.desk .bar>:not(.tabs):not(.sp){margin:6px 0}
+  html.desk #banner:not(:empty),html.desk #latebar:not(:empty){margin-top:10px}
+  /* khung, thẻ: góc 4px, viền rõ, không bóng */
+  html.desk .card,html.desk .sec,html.desk .teamchat,html.desk .mailbox,html.desk .review,html.desk .stat,html.desk .odbox{border-radius:4px!important;box-shadow:none!important;border-color:var(--dk-line)!important}
+  html.desk #content.card,html.desk #prof.card{background:var(--dk-pane)}
+  /* đầu mục: dải xám nhạt chữ đậm, như hộp nhóm trên Windows */
+  html.desk .sec h3{background:var(--dk-head)!important;color:var(--ink)!important;border-bottom:1px solid var(--dk-line);font-size:12.5px;font-weight:700;min-height:34px;border-radius:4px 4px 0 0}
+  html.desk .sec h3 .mono{color:var(--muted)!important;opacity:1}
+  html.desk .sec h3 .fa,html.desk .sec h3>.ic-fa{color:var(--primary)}
+  html.desk .sec h3 button{background:var(--dk-pane)!important;border:1px solid var(--dk-line2)!important;color:var(--ink)!important;min-height:24px}
+  html.desk .sec h3 button:hover{background:var(--dk-hover)!important}
+  html.desk .sec h3 button .fa{color:var(--primary)}
+  html.desk .sec h3 button.on{background:var(--dk-sel)!important;border-color:var(--primary)!important;color:var(--primary)!important}
+  html.desk .review summary{background:var(--dk-head)!important;color:var(--ink)!important;border-bottom:1px solid var(--dk-line)}
+  html.desk .review summary .mono{color:var(--muted)!important}
+  /* nút: cao 28px, góc 4px, viền xám; nút chính nền đặc */
+  html.desk button{border-radius:4px;min-height:28px;font-size:12.5px}
+  html.desk button:not(.primary):not(.ghost):not(.x):not(.cpop-x):not(.kb-fab):not(.side-btn):not(.np-i):not(.g){background:var(--dk-pane);border-color:var(--dk-line2);color:var(--ink)}
+  html.desk button:not(.primary):not(.ghost):not(.x):not(.cpop-x):hover:not(:disabled){background:var(--dk-hover)!important;border-color:#aab3bc!important}
+  html.desk button.sm{min-height:24px;font-size:12px}
+  html.desk .top button:not(.primary){background:transparent!important;border-color:rgba(255,255,255,.35)!important;color:#fff!important}
+  html.desk .top button:not(.primary):hover{background:rgba(255,255,255,.14)!important}
+  /* ô nhập: cao 28px, góc 3px, viền rõ, focus viền màu chính */
+  html.desk input,html.desk select,html.desk textarea{border-radius:3px;border-color:var(--dk-line2)}
+  html.desk input:not([type=checkbox]):not([type=radio]),html.desk select{min-height:28px}
+  html.desk input:hover:not(:focus):not(:disabled),html.desk select:hover:not(:focus),html.desk textarea:hover:not(:focus){border-color:#9aa4ae}
+  html.desk input:focus,html.desk select:focus,html.desk textarea:focus{outline:0;border-color:var(--primary)!important;box-shadow:inset 0 0 0 1px var(--primary)!important}
+  /* danh sách job: dòng gọn, chọn = nền xanh nhạt + vạch trái */
+  html.desk .row{border-radius:0}
+  html.desk .row:hover{background:var(--dk-hover)}
+  /* Quy trình: cột và thẻ góc nhỏ, phẳng */
+  html.desk .kb{height:calc(100dvh - var(--dk-top) - var(--dk-sb) - 100px)!important;min-height:360px}
+  html.desk .kb .col{border-radius:4px!important;box-shadow:none!important}
+  html.desk .kb .kc{border-radius:4px!important;box-shadow:0 1px 0 rgba(16,24,40,.06)}
+  html.desk .kb .kc:hover{transform:none;box-shadow:0 2px 6px rgba(16,24,40,.14)}
+  html.desk .kb .col-b .none{border-radius:4px}
+  html.desk .teamchat{height:calc(100dvh - var(--dk-top) - var(--dk-sb) - 66px)!important}
+  html.desk .mailbox{height:calc(100dvh - var(--dk-top) - var(--dk-sb) - 66px)!important}
+  /* menu nổi, hộp thoại: góc 4px, bóng mảnh */
+  html.desk .kmenu,html.desk .npanel,html.desk .tm-sug,html.desk #chatPops .cpop,html.desk .dbbox .sheet,html.desk .modal .sheet,html.desk .stpop,html.desk .qpre{border-radius:4px!important;box-shadow:0 6px 20px rgba(0,0,0,.16),0 0 0 1px var(--dk-line)!important}
+  html.desk .pill{border-radius:3px}
+  /* thanh cuộn mảnh kiểu Windows */
+  html.desk *{scrollbar-width:thin;scrollbar-color:#b9c0c7 transparent}
+  html.desk ::-webkit-scrollbar{width:10px;height:10px}
+  html.desk ::-webkit-scrollbar-thumb{background:#c3c9cf;border-radius:5px;border:2px solid transparent;background-clip:padding-box}
+  html.desk ::-webkit-scrollbar-thumb:hover{background:#9ea6ae;background-clip:padding-box;border:2px solid transparent}
+  html.desk ::-webkit-scrollbar-track{background:transparent}
+  /* thanh trạng thái dưới đáy */
+  html.desk .dk-sb{display:flex;position:fixed;left:0;right:0;bottom:0;height:var(--dk-sb);z-index:6;align-items:center;gap:16px;padding:0 12px;background:var(--dk-side);border-top:1px solid var(--dk-line);font-size:11.5px;color:var(--muted);user-select:none;white-space:nowrap;overflow:hidden}
+  html.desk .dk-sb i.dot{width:7px;height:7px;border-radius:50%;background:#13a10e;display:inline-block;margin-right:5px}
+  html.desk .dk-sb i.dot.off{background:#c50f1f}
+  html.desk .dk-sb .sp{flex:1}
+  html.desk .dk-sb b{color:var(--ink);font-weight:600}
+  html.desk .dk-sb .bad{color:var(--bad);font-weight:600}
+}
 </style>
 
 <header class="top">
@@ -1108,6 +1207,7 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
   </main>
   <section id="detail" class="card" aria-label="Chi tiết job"></section>
 </div>
+<div class="dk-sb" id="dkSb" aria-hidden="true"></div>
 
 <div id="modal" class="modal" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
@@ -1132,8 +1232,6 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 <button class="kb-fab" id="kbFab" aria-label="Tạo job nhập tay" title="Tạo job nhập tay">+</button>
 <div id="toast" hidden></div>
 
-<script src="firebase-config.js?v=483007a3c3"></script>
-<script src="static-shim.js?v=bb3a17dce6"></script>
 <script>
 const TYPES=["Báo giá","Khai HQ nhập","Khai HQ xuất","Vận chuyển","Chứng từ / C/O","Kiểm tra chuyên ngành","Khác"];
 const MODES=["","Sea FCL","Sea LCL","Air","Road","Express"];
@@ -1871,7 +1969,17 @@ function lateNotify(){
   toast(fresh.length===1?`⚠ ${fresh[0].code} vừa ${lateState(fresh[0])==="pend"?"có lý do chờ duyệt":"quá hạn ở “"+fresh[0].status+"”"}.`:`⚠ ${fresh.length} job vừa quá hạn / chờ duyệt.`);
 }
 setInterval(()=>{if(S.loaded){renderAll(false)}},5*60*1000); // cập nhật đồng hồ quá hạn
-function renderAll(forceDetail){renderLateBar();lateNotify();chatNotify();renderSide();renderMain();renderDetail(forceDetail);nbellPaint();try{todayBadge()}catch(e){}}
+function renderAll(forceDetail){renderLateBar();lateNotify();chatNotify();renderSide();renderMain();renderDetail(forceDetail);nbellPaint();try{todayBadge()}catch(e){}try{dkSbPaint()}catch(e){}}
+/* thanh trạng thái (màn rộng): kết nối, sổ đang xem, số job đang mở / quá hạn, người dùng, phiên bản */
+let dkSync=0;
+function dkSbPaint(){const el=$("#dkSb");if(!el)return;
+  if(S.jobsServer&&navigator.onLine)dkSync=Date.now();
+  const on=navigator.onLine,hm=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
+  const open=(S.jobs||[]).filter(j=>isOpen(j.status)),late=open.filter(j=>isOverdue(j)||["none","pend"].includes(lateState(j))).length;
+  el.innerHTML=`<span><i class="dot ${on?"":"off"}"></i>${on?(dkSync?"Đã đồng bộ lúc "+hm(dkSync):"Đang kết nối…"):"Mất mạng: thay đổi sẽ gửi khi có mạng lại"}</span>`+
+    `<span>${mineOn()?"🔒 Việc riêng":"Sổ chung"}</span><span><b>${open.length}</b> job đang mở${late?` · <span class="bad">${late} quá hạn</span>`:""}</span>`+
+    `<span class="sp"></span><span>${esc(window.SOJOB_USER||"")}</span><span>Bản ${APP_VER}</span>`}
+addEventListener("online",()=>{try{dkSbPaint()}catch(e){}});addEventListener("offline",()=>{try{dkSbPaint()}catch(e){}});
 
 /* ---------- text exports ---------- */
 function quoteText(j){
@@ -3408,7 +3516,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26b";
+const APP_VER="2026-11-26c";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
