@@ -1953,6 +1953,30 @@ document.addEventListener("click",e=>{
   else if(a==="reopen")moveAndRender(j,STAGES[0]);
   else if(a==="copy"){openJob(j.id);copy(briefText(j))}
 });
+/* Quay lại từ phiếu job: nút Back / vuốt quay lại của trình duyệt (iPhone Safari, Android) và vuốt từ trái qua phải trên phiếu (cả khi mở bằng app cài trên màn hình chính) */
+let detSkip=false;
+const detOverlay=()=>{const d=$("#detail");return !!d&&getComputedStyle(d).position==="fixed"};
+function detNav(open){try{const st=history.state&&history.state.sj;
+  if(open&&!st&&detOverlay())history.pushState({...(history.state||{}),sj:1},"");
+  else if(!open&&st){detSkip=true;history.back()}}catch(e){}}
+addEventListener("popstate",()=>{if(detSkip){detSkip=false;return}
+  if(S.sel&&!(history.state&&history.state.sj)){S.sel=null;renderAll(true)}});
+function detClose(){const d=$("#detail");d.style.transition="";d.style.transform="";d.style.opacity="";if(history.state&&history.state.sj){history.back()}else{S.sel=null;renderAll(true)}}
+(function(){let x0=0,y0=0,t0=0,on=0,dx=0,dragging=false;const EDGE=90;
+  const d=()=>$("#detail");
+  document.addEventListener("touchstart",e=>{const el=d();if(!el||!S.sel||e.touches.length!==1||!el.contains(e.target)||!detOverlay())return;
+    const t=e.touches[0],r=el.getBoundingClientRect();if(t.clientX-r.left>EDGE)return;
+    if(e.target.closest("input,textarea,select,[contenteditable]"))return;
+    x0=t.clientX;y0=t.clientY;t0=Date.now();on=1;dx=0;dragging=false},{passive:true});
+  document.addEventListener("touchmove",e=>{if(!on)return;const t=e.touches[0],mx=t.clientX-x0,my=t.clientY-y0;
+    if(!dragging){if(Math.abs(my)>12&&Math.abs(my)>Math.abs(mx)){on=0;return}
+      if(mx>10&&mx>Math.abs(my)*1.2){dragging=true;const el=d();el.style.transition="none";el.style.willChange="transform"}else return}
+    e.preventDefault();dx=Math.max(0,mx);const el=d();el.style.transform=`translateX(${dx}px)`;el.style.boxShadow=`-12px 0 32px rgba(0,0,0,${.22*(1-dx/innerWidth)})`},{passive:false});
+  const end=()=>{if(!on)return;on=0;if(!dragging)return;const el=d(),w=el.getBoundingClientRect().width||innerWidth,v=dx/Math.max(1,Date.now()-t0);
+    el.style.transition="transform .3s cubic-bezier(.32,.72,0,1)";
+    if(dx>w*.33||v>.5){el.style.transform="translateX(100%)";setTimeout(()=>{el.style.willChange="";el.style.boxShadow="";detClose()},280)}
+    else{el.style.transform="translateX(0)";setTimeout(()=>{el.style.transition="";el.style.transform="";el.style.willChange="";el.style.boxShadow=""},320)}};
+  document.addEventListener("touchend",end,{passive:true});document.addEventListener("touchcancel",end,{passive:true})})();
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(kmenu){closeKmenu();return}if(S.view==="board"&&S.sel&&!document.querySelector(".modal:not([hidden])")){S.sel=null;renderAll(true)}}});
 addEventListener("resize",closeKmenu);
 document.addEventListener("scroll",closeKmenu,true);
@@ -2100,7 +2124,7 @@ function renderDetail(force){
   if(!force&&j&&el.dataset.id===j.id&&el.contains(document.activeElement))return;
   if(j&&el.dataset.id!==j.id&&iosOn()&&!iosCalm()){el.classList.remove("ios-in");void el.offsetWidth;el.classList.add("ios-in");clearTimeout(el._iosT);el._iosT=setTimeout(()=>el.classList.remove("ios-in"),600)}
   el.dataset.id=j?j.id:"";
-  document.body.classList.toggle("has-detail",!!j);
+  document.body.classList.toggle("has-detail",!!j);detNav(!!j);
   if(!j){el.innerHTML=`<div class="empty-detail">Chọn một job để xem thông tin, trao đổi và báo giá.</div>`;return}
   const tasks=j.tasks||[],done=tasks.filter(t=>t.done).length,si=stIdx(j.status);
   const knownNames=[...new Set(S.jobs.flatMap(x=>[x.fwd,x.company]).filter(Boolean))];
@@ -2489,7 +2513,7 @@ D.addEventListener("click",e=>{
   const st=e.target.closest("[data-st]");
   if(st&&j){moveAndRender(j,st.dataset.st);return}
   const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
-  if(a==="close"){S.sel=null;renderAll(true);return}
+  if(a==="close"){detClose();return}
   if(a==="remind"){remAdd(j);return}
   if(a==="remDel"){remDel(j,b.dataset.rid);return}
   if(a==="aiChatSum"){aiChatSum(cur());return}
@@ -3778,7 +3802,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26i";
+const APP_VER="2026-11-26j";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
