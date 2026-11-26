@@ -3,12 +3,12 @@
 <link rel="manifest" href="manifest.webmanifest">
 <script src="firebase-config.js?v=483007a3c3"></script>
 <script src="static-shim.js?v=bb3a17dce6"></script>
-<script>/* giao diện kiểu iOS (thử): ?ios=1 bật, ?ios=0 tắt (nhớ trên máy) */
-(function(){try{var q=location.search.match(/[?&]ios=([01])/);if(q)localStorage.setItem("sojob.ios",q[1]);if(localStorage.getItem("sojob.ios")==="1")document.documentElement.classList.add("ios")}catch(e){}})();</script>
+<script>/* giao diện kiểu iOS: mặc định cho mọi người; ?ios=0 tắt, ?ios=1 bật lại (nhớ trên máy) */
+(function(){var on=true;try{var q=location.search.match(/[?&]ios=([01])/);if(q)localStorage.setItem("sojob.ios2",q[1]);on=localStorage.getItem("sojob.ios2")!=="0"}catch(e){}if(on)document.documentElement.classList.add("ios")})();</script>
 <script>/* giao diện app máy tính: bật khi mở bằng app đã cài (cửa sổ riêng); ?desk=1 bật, ?desk=0 tắt (nhớ trên máy) */
 (function(){try{var q=location.search.match(/[?&]desk=([01])/);if(q)localStorage.setItem("sojob.desk",q[1]);var v=localStorage.getItem("sojob.desk");
-if(v==="1"||(v!=="0"&&matchMedia("(display-mode: standalone)").matches))document.documentElement.classList.add("desk")}catch(e){}})();</script>
-<meta name="theme-color" content="#1E6B45">
+if(!document.documentElement.classList.contains("ios")&&(v==="1"||(v!=="0"&&matchMedia("(display-mode: standalone)").matches)))document.documentElement.classList.add("desk")}catch(e){}})();</script>
+<meta name="theme-color" content="#F2F2F7" media="(prefers-color-scheme: light)"><meta name="theme-color" content="#000000" media="(prefers-color-scheme: dark)">
 <link rel="apple-touch-icon" href="icon-192.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
@@ -1130,7 +1130,7 @@ button.ghost{border-radius:6px}
 input:not([type=checkbox]):not([type=radio]),select,textarea{border-radius:6px;box-shadow:inset 0 1px 2px rgba(16,32,48,.05)}
 .pill{border-radius:999px}
 @media (prefers-reduced-motion:reduce){button:hover{transform:none!important}}
-/* ===== Giao diện kiểu iOS (thử): bật ?ios=1, tắt ?ios=0. Nền xám #F2F2F7, thẻ trắng bo 14px, kính mờ, màu hệ thống, nút dạng viên, icon nét mảnh (Lucide, ISC) ===== */
+/* ===== Giao diện kiểu iOS (mặc định; ?ios=0 tắt). Nền xám #F2F2F7, thẻ trắng bo 14px, kính mờ, màu hệ thống, nút dạng viên, icon nét mảnh (Lucide, ISC) ===== */
 html.ios{--ios-fill:rgba(118,118,128,.12);--ios-fill2:rgba(118,118,128,.20);--ios-glass:rgba(255,255,255,.70);--ios-glass-bd:rgba(255,255,255,.75);--ios-sel:#fff;--ios-pop:rgba(255,255,255,.86);
   --bg:#F2F2F7;--surface:#fff;--surface-2:#F2F2F7;--ink:#1C1C1E;--muted:#8A8A8E;--line:rgba(60,60,67,.13);--line-2:rgba(60,60,67,.18);
   --accent:#007AFF;--accent-ink:#fff;--accent-soft:rgba(0,122,255,.11);--primary:#007AFF;--info:#007AFF;--info-soft:rgba(0,122,255,.11);--nav:#007AFF;--row-sel:#007AFF;
@@ -3778,7 +3778,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26h";
+const APP_VER="2026-11-26i";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
