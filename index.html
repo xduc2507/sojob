@@ -2105,13 +2105,97 @@ function genie(src,target,dir,done){
   const an=w.animate(fr,{duration:DUR,easing:"linear",fill:"forwards"});
   an.finished.catch(()=>{}).then(()=>{w.remove();done&&done()})}
 const genieCard=id=>[...document.querySelectorAll(`[data-open="${CSS.escape(id)}"]`)].find(e=>e.offsetParent)||null;
+/* ===== Thần đèn thật (WebGL) — máy tính, giao diện iOS =====
+   1) Lúc máy rảnh sau khi mở phiếu: chụp phiếu thành ảnh (html-to-image, MIT); nội dung đổi thì chụp lại.
+   2) Đóng phiếu: card đồ hoạ uốn lưới 64×4 ô theo phễu → nội dung bị bẻ cong thật như macOS, mượt 60 khung/giây.
+   3) Không có WebGL / chụp lỗi: thu nhỏ bay vào thẻ (chỉ dùng transform, luôn mượt). Mở phiếu: phóng ra từ thẻ. */
+let H2I=null;
+function h2iLoad(){return H2I||(H2I=new Promise((res,rej)=>{if(window.htmlToImage)return res(window.htmlToImage);const sc=document.createElement("script");sc.src="html-to-image.js?v=1.11.11";sc.onload=()=>window.htmlToImage?res(window.htmlToImage):rej(new Error("h2i"));sc.onerror=()=>{H2I=null;rej(new Error("h2i"))};document.head.appendChild(sc)}))}
+const GS={ver:0,snap:null,busy:null,t:0,mo:null,fontCSS:""}; // không nhúng font web (stylesheet khác tên miền không đọc được): ảnh chụp dùng font hệ thống, đủ cho 0,6 giây hiệu ứng
+const gsEl=()=>$("#detail");
+async function gsCapture(){const el=gsEl();if(!el||!S.sel||!genieOk()||!detOverlay())return null;
+  const lib=await h2iLoad(),ver=GS.ver,id=S.sel,w=el.clientWidth,h=el.scrollHeight,dpr=Math.min(2,devicePixelRatio||1);
+  if(GS.fontCSS==null){try{GS.fontCSS=await lib.getFontEmbedCSS(el)}catch(e){GS.fontCSS=""}}
+  const bg=getComputedStyle(el).backgroundColor;
+  const cv=await lib.toCanvas(el,{pixelRatio:dpr,width:w,height:h,cacheBust:false,fontEmbedCSS:GS.fontCSS||undefined,skipFonts:!GS.fontCSS,
+    backgroundColor:bg==="rgba(0, 0, 0, 0)"?getComputedStyle(document.documentElement).getPropertyValue("--surface").trim()||"#fff":bg,
+    imagePlaceholder:"data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+    filter:n=>!(n.classList&&(n.classList.contains("genie")||n.classList.contains("cbadge"))),
+    style:{transform:"none",animation:"none",transition:"none",position:"static",inset:"auto",top:"auto",left:"auto",right:"auto",bottom:"auto",margin:"0",width:w+"px",height:h+"px",maxHeight:"none",overflow:"visible",visibility:"visible",boxShadow:"none",borderRadius:"0"}});
+  if(S.sel!==id)return null;
+  GS.snap={id,ver,cv,w,h,dpr};return GS.snap}
+function gsSchedule(ms){clearTimeout(GS.t);if(!genieOk())return;GS.t=setTimeout(()=>{const go=()=>{if(GS.busy)return gsSchedule(800);GS.busy=gsCapture().catch(()=>null).finally(()=>{GS.busy=null})};window.requestIdleCallback?requestIdleCallback(go,{timeout:2000}):go()},ms||700)}
+function gsWatch(){const el=gsEl();if(!el||GS.mo)return;
+  GS.mo=new MutationObserver(()=>{GS.ver++;if(S.sel)gsSchedule(1500)});GS.mo.observe(el,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["value","class","open","checked"]});
+  el.addEventListener("input",()=>{GS.ver++;gsSchedule(1500)},true);el.addEventListener("change",()=>{GS.ver++;gsSchedule(1500)},true)}
+/* --- WebGL --- */
+let GLX=null;
+function glx(){if(GLX!==null)return GLX;try{const c=document.createElement("canvas");const g=c.getContext("webgl",{alpha:true,premultipliedAlpha:true,antialias:true})||c.getContext("experimental-webgl");if(!g)return GLX=false;
+  const sh=(t,src)=>{const o=g.createShader(t);g.shaderSource(o,src);g.compileShader(o);if(!g.getShaderParameter(o,g.COMPILE_STATUS))throw new Error(g.getShaderInfoLog(o));return o};
+  const pr=g.createProgram();g.attachShader(pr,sh(g.VERTEX_SHADER,"attribute vec2 p;attribute vec2 t;uniform vec2 R;varying vec2 v;void main(){v=t;gl_Position=vec4(p.x/R.x*2.0-1.0,1.0-p.y/R.y*2.0,0.0,1.0);}"));
+  g.attachShader(pr,sh(g.FRAGMENT_SHADER,"precision mediump float;uniform sampler2D s;uniform float op;varying vec2 v;void main(){gl_FragColor=texture2D(s,v)*op;}"));
+  g.linkProgram(pr);if(!g.getProgramParameter(pr,g.LINK_STATUS))return GLX=false;
+  c.className="genie";c.setAttribute("aria-hidden","true");c.style.cssText="position:fixed;left:0;top:0;width:100vw;height:100vh;z-index:70;pointer-events:none";
+  return GLX={c,g,pr,pb:g.createBuffer(),tb:g.createBuffer(),ib:g.createBuffer(),tex:g.createTexture(),uR:g.getUniformLocation(pr,"R"),uO:g.getUniformLocation(pr,"op"),aP:g.getAttribLocation(pr,"p"),aT:g.getAttribLocation(pr,"t")}}catch(e){return GLX=false}}
+/* vẽ thần đèn: src = toạ độ khung phiếu trên màn hình, img = ảnh phiếu đã cắt đúng phần đang nhìn */
+function glGenie(rect,img,target,dir,done){const X0=glx();if(!X0){done&&done(false);return false}
+  const {c,g,pr}=X0,dpr=Math.min(2,devicePixelRatio||1),VW=innerWidth,VH=innerHeight;
+  c.width=Math.round(VW*dpr);c.height=Math.round(VH*dpr);g.viewport(0,0,c.width,c.height);
+  let t=target&&target.getBoundingClientRect?target.getBoundingClientRect():null;
+  if(!t||!t.width||t.bottom<0||t.top>VH||t.right<0||t.left>VW)t={left:VW/2-28,top:VH-10,width:56,height:10};
+  const r=rect,tc={x:t.left+t.width/2,y:t.top+t.height/2},rc={x:r.left+r.width/2,y:r.top+r.height/2};
+  const X=Math.abs(tc.x-rc.x)>Math.abs(tc.y-rc.y),near=X?tc.x<rc.x:tc.y<rc.y;
+  const rS=X?r.left:r.top,rLen=X?r.width:r.height,rC=X?r.top:r.left,rCs=X?r.height:r.width;
+  const tLen=Math.max(10,X?t.width:t.height),tCs=Math.max(10,X?t.height:t.width),tCc=X?tc.y:tc.x,tS=X?t.left:t.top;
+  const edge=near?tS+tLen:tS,gap=near?rS-edge:edge-(rS+rLen),Lf=Math.max(140,Math.abs(gap)+rLen*.6);
+  const cl=x=>x<0?0:x>1?1:x,Lp=(a,b,k)=>a+(b-a)*k,COS=x=>(1-Math.cos(Math.PI*x))/2;
+  const SOFT=x=>{x=cl(x);return x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2},EIN=x=>Math.pow(cl(x),2.2);
+  const NM=72,NC=4,nv=(NM+1)*(NC+1),pos=new Float32Array(nv*2),tex=new Float32Array(nv*2),idx=new Uint16Array(NM*NC*6);
+  for(let i=0;i<=NM;i++)for(let j=0;j<=NC;j++){const k=(i*(NC+1)+j)*2,a=i/NM,b=j/NC;if(X){tex[k]=a;tex[k+1]=b}else{tex[k]=b;tex[k+1]=a}}
+  let q=0;for(let i=0;i<NM;i++)for(let j=0;j<NC;j++){const A=i*(NC+1)+j,B=A+1,C=A+NC+1,D=C+1;idx.set([A,C,B,B,C,D],q);q+=6}
+  g.useProgram(pr);
+  g.bindTexture(g.TEXTURE_2D,X0.tex);g.pixelStorei(g.UNPACK_PREMULTIPLY_ALPHA_WEBGL,true);g.texImage2D(g.TEXTURE_2D,0,g.RGBA,g.RGBA,g.UNSIGNED_BYTE,img);
+  g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MIN_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_MAG_FILTER,g.LINEAR);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_S,g.CLAMP_TO_EDGE);g.texParameteri(g.TEXTURE_2D,g.TEXTURE_WRAP_T,g.CLAMP_TO_EDGE);
+  g.bindBuffer(g.ARRAY_BUFFER,X0.tb);g.bufferData(g.ARRAY_BUFFER,tex,g.STATIC_DRAW);g.enableVertexAttribArray(X0.aT);g.vertexAttribPointer(X0.aT,2,g.FLOAT,false,0,0);
+  g.bindBuffer(g.ELEMENT_ARRAY_BUFFER,X0.ib);g.bufferData(g.ELEMENT_ARRAY_BUFFER,idx,g.STATIC_DRAW);
+  g.uniform2f(X0.uR,VW,VH);g.enable(g.BLEND);g.blendFunc(g.ONE,g.ONE_MINUS_SRC_ALPHA);
+  const frame=p=>{const bend=SOFT(p/.55),sl=dir==="out"?EIN((p-.16)/.84):SOFT((p-.16)/.84);
+    const ms=near?Lp(rS,edge-tLen,sl):Lp(rS,edge,sl),km=Lp(1,tLen/rLen,sl);
+    for(let i=0;i<=NM;i++){const aa=i/NM*rLen,m=ms+aa*km,u=near?m-edge:edge-m,gg=COS(cl(u/Lf));
+      const fs=Lp(tCs,rCs,gg),fc=Lp(tCc,rC+rCs/2,gg),w2=Lp(rCs,fs,bend),cc=Lp(rC+rCs/2,fc,bend),c0=cc-w2/2;
+      for(let j=0;j<=NC;j++){const k=(i*(NC+1)+j)*2,cv=c0+w2*j/NC;if(X){pos[k]=m;pos[k+1]=cv}else{pos[k]=cv;pos[k+1]=m}}}
+    g.clearColor(0,0,0,0);g.clear(g.COLOR_BUFFER_BIT);
+    g.bindBuffer(g.ARRAY_BUFFER,X0.pb);g.bufferData(g.ARRAY_BUFFER,pos,g.DYNAMIC_DRAW);g.enableVertexAttribArray(X0.aP);g.vertexAttribPointer(X0.aP,2,g.FLOAT,false,0,0);
+    g.uniform1f(X0.uO,p>.88?1-COS((p-.88)/.12):1);g.drawElements(g.TRIANGLES,idx.length,g.UNSIGNED_SHORT,0)};
+  const DUR=dir==="out"?640:560;document.body.appendChild(c);
+  const t0=performance.now();frame(dir==="out"?0:1);
+  const tick=now=>{let p=(now-t0)/DUR;if(p>=1){g.clear(g.COLOR_BUFFER_BIT);c.remove();done&&done(true);return}frame(dir==="out"?p:1-p);requestAnimationFrame(tick)};
+  requestAnimationFrame(tick);return true}
+/* dự phòng: thu nhỏ bay vào thẻ / phóng ra từ thẻ (chỉ transform + opacity) */
+function zoomTo(el,target,dir,done){const r=el.getBoundingClientRect();let t=target&&target.getBoundingClientRect?target.getBoundingClientRect():null;
+  if(!t||!t.width||t.bottom<0||t.top>innerHeight)t={left:innerWidth/2-28,top:innerHeight-10,width:56,height:10};
+  const sx=t.width/r.width,sy=t.height/r.height,tx=t.left-r.left,ty=t.top-r.top;
+  const A={transform:"none",opacity:1,borderRadius:"0px"},B={transform:`translate(${tx}px,${ty}px) scale(${sx},${sy})`,opacity:0,borderRadius:`${Math.round(14/Math.min(sx,sy))}px`};
+  const an=el.animate(dir==="out"?[A,{opacity:1,offset:.7},B]:[B,{opacity:1,offset:.3},A],{duration:dir==="out"?420:460,easing:dir==="out"?"cubic-bezier(.4,0,.2,1)":"cubic-bezier(.2,.8,.2,1)",fill:dir==="out"?"forwards":"none"});
+  el.style.transformOrigin="0 0";an.finished.catch(()=>{}).then(()=>{el.style.transformOrigin="";done&&done()});return an}
+/* cắt ảnh chụp đúng phần đang nhìn (theo vị trí cuộn) */
+function gsCrop(sn,el){const st=el.scrollTop||0,w=el.clientWidth,h=el.clientHeight,d=sn.dpr,c=document.createElement("canvas");
+  c.width=Math.round(w*d);c.height=Math.round(h*d);c.getContext("2d").drawImage(sn.cv,0,Math.round(st*d),Math.round(w*d),Math.round(h*d),0,0,c.width,c.height);return c}
+/* đóng phiếu có thần đèn: ảnh sẵn → chạy ngay; ảnh cũ → chụp nhanh (tối đa 260ms); không được → thu nhỏ bay vào thẻ */
+async function genieClose(el,card,after){
+  const box=el.getBoundingClientRect(),rect={left:box.left+el.clientLeft,top:box.top+el.clientTop,width:el.clientWidth,height:el.clientHeight};
+  let sn=GS.snap&&GS.snap.id===S.sel&&GS.snap.ver===GS.ver&&GS.snap.w===el.clientWidth?GS.snap:null;
+  if(!sn&&glx()){try{sn=await Promise.race([GS.busy&&GS.busy.then(x=>x&&x.ver===GS.ver?x:null)||gsCapture(),new Promise(r=>setTimeout(()=>r(null),260))])}catch(e){sn=null}}
+  let ok=false;if(sn){try{ok=glGenie(rect,gsCrop(sn,el),card,"out")}catch(e){ok=false;try{GLX&&GLX.c.remove()}catch(_){}}}
+  if(ok){el.style.visibility="hidden";after();return}
+  zoomTo(el,card,"out",()=>{el.getAnimations().forEach(a=>a.cancel());after()})}
 function iosHide(el,ms){if(!el||el.hidden)return;if(!iosOn()||iosCalm()){el.hidden=true;return}clearTimeout(el._iosH);el.classList.add("ios-out");el._iosH=setTimeout(()=>{el.classList.remove("ios-out");el.hidden=true},ms||300)}
 const detKids=()=>[...document.querySelectorAll("#main>:not(.bar)")];
 function detReset(){const d=$("#detail");d.style.transition=d.style.transform=d.style.boxShadow=d.style.willChange="";detKids().forEach(k=>{k.style.transition=k.style.transform=""});document.body.classList.remove("ios-drag")}
 function detDone(){detReset();if(history.state&&history.state.sj){history.back()}else{S.sel=null;renderAll(true)}}
 /* đóng phiếu: trượt ra phải, trang dưới trôi về chỗ cũ (lò xo mượt), rồi mới đóng */
 function detClose(fromSwipe,v){const d=$("#detail");
-  if(!fromSwipe&&genieOk()&&detOverlay()&&S.sel){genie(d,genieCard(S.sel),"out");d.style.visibility="hidden";detDone();return}
+  if(!fromSwipe&&genieOk()&&detOverlay()&&S.sel){if(d._closing)return;d._closing=1;genieClose(d,genieCard(S.sel),()=>{d._closing=0;detDone()});return}
   if(!iosOn()||iosCalm()||!detOverlay()){detDone();return}
   const w=d.getBoundingClientRect().width||innerWidth,left=fromSwipe?Math.max(0,w-(parseFloat((d.style.transform.match(/-?[\d.]+/)||[0])[0])||0)):w;
   const dur=Math.max(.28,Math.min(.5,left/Math.max(.6,(v||0))/1000*1.6||.45));
@@ -2302,8 +2386,8 @@ function histText(h){
 function renderDetail(force){
   const el=$("#detail"),j=cur();
   if(!force&&j&&el.dataset.id===j.id&&el.contains(document.activeElement))return;
-  if(j&&!el.dataset.id&&genieOk()&&S.view==="board"){const card=genieCard(j.id);el.classList.remove("ios-in");
-    requestAnimationFrame(()=>{if(!detOverlay()||S.sel!==j.id)return;el.style.visibility="hidden";genie(el,card,"in",()=>{el.style.visibility=""})})}
+  if(j&&!el.dataset.id&&genieOk()&&(S.view==="board"||S.view==="archive")){const card=genieCard(j.id);el.classList.remove("ios-in");
+    requestAnimationFrame(()=>{if(!detOverlay()||S.sel!==j.id)return;zoomTo(el,card,"in");gsWatch();GS.ver++;gsSchedule(800)})}
   else if(j&&el.dataset.id!==j.id&&iosOn()&&!iosCalm()){el.classList.remove("ios-in");void el.offsetWidth;el.classList.add("ios-in");clearTimeout(el._iosT);el._iosT=setTimeout(()=>el.classList.remove("ios-in"),600)}
   el.dataset.id=j?j.id:"";
   document.body.classList.toggle("has-detail",!!j);detNav(!!j);
@@ -4021,7 +4105,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26u";
+const APP_VER="2026-11-26v";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4106,8 +4190,8 @@ async function srcDel(j,k,i){
 /* ---------- modal: capture & analyze ---------- */
 let pending=[],ctl=null;
 const M=$("#modal");
-function openModal(){M.hidden=false;if(genieOk()){const sh=M.querySelector(".sheet");M.classList.add("genie-on");requestAnimationFrame(()=>{sh.style.visibility="hidden";genie(sh,$("#btnManual"),"in",()=>{sh.style.visibility="";M.classList.remove("genie-on")})})}note("");renderPending();setTimeout(()=>$("#drop").focus(),30)}
-function closeModal(){if(ctl)ctl.abort();if(genieOk()&&!M.hidden){const sh=M.querySelector(".sheet");genie(sh,$("#btnManual"),"out");sh.style.visibility="hidden";iosHide(M,300);setTimeout(()=>{sh.style.visibility=""},320)}else iosHide(M,300);pending.forEach(p=>URL.revokeObjectURL(p.url));pending=[];$("#rawtext").value=""}
+function openModal(){M.hidden=false;if(genieOk()){const sh=M.querySelector(".sheet");M.classList.add("genie-on");requestAnimationFrame(()=>zoomTo(sh,$("#btnManual"),"in",()=>M.classList.remove("genie-on")))}note("");renderPending();setTimeout(()=>$("#drop").focus(),30)}
+function closeModal(){if(ctl)ctl.abort();if(genieOk()&&!M.hidden){const sh=M.querySelector(".sheet");M.classList.add("genie-on");zoomTo(sh,$("#btnManual"),"out",()=>{sh.getAnimations().forEach(a=>a.cancel());M.classList.remove("genie-on");M.hidden=true})}else iosHide(M,300);pending.forEach(p=>URL.revokeObjectURL(p.url));pending=[];$("#rawtext").value=""}
 function addFiles(files){
   [...files].filter(f=>f&&f.type&&f.type.startsWith("image/")).forEach(f=>pending.push({file:f,url:URL.createObjectURL(f)}));
   if(pending.length>5){pending.slice(5).forEach(p=>URL.revokeObjectURL(p.url));pending=pending.slice(0,5);note("Tối đa 5 ảnh mỗi job.",true)}
