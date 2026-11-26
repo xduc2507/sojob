@@ -2992,10 +2992,10 @@ function lotSec(j){
   const hangRow=`<div class="row1"><b>Hàng</b>${chips2("type",["Khai HQ nhập","Khai HQ xuất"],j.type==="Khai HQ xuất"?"Khai HQ xuất":j.type==="Khai HQ nhập"?"Khai HQ nhập":"",[svi("imp")+"Nhập khẩu",svi("exp")+"Xuất khẩu"])}</div>`;
   const hqBlk=`${vc?`<div class="sub">Hải quan</div>`:""}
     ${OPT_OPEN===j.id&&["Khai HQ nhập","Khai HQ xuất"].includes(j.type)?`<div class="row1"><b>Tuỳ chọn</b><div class="chips2 chk" role="group">${CHECKS.map(([k,l,ic,fee])=>{const on=(j.checks||[]).includes(k);return `<button type="button" class="${on?"on":""}" title="${fee.slice(4)}" data-set="chk" data-v="${k}" aria-pressed="${on}">${on?svi("ok"):svi(ic)}${l}</button>`}).join("")}${j.type==="Khai HQ xuất"||j.coNeed==="Có"?`<button type="button" class="${j.coNeed==="Có"?"on":""}" title="Xin C/O" data-set="coNeed" data-v="Có" aria-pressed="${j.coNeed==="Có"}">${j.coNeed==="Có"?svi("ok"):svi("co")}C/O</button>`:""}</div></div>`:""}
-    <div class="g2">${j.type==="Khai HQ xuất"?LF("bl","Số booking",j.bl,"VD: BKG2411087"):LF("bl","Số B/L",j.bl,"VD: HPH123456789")}${LF("cont",truck?"Số xe / tải trọng":"Số cont",j.cont,truck?"VD: 1 xe 8 tấn":"VD: 2x40HC TGHU1234567")}
+    <div class="g2">${LF("mst","MST khách",j.mst,"10 hoặc 13 số")}${LF("hqCode","Mã Hải quan",j.hqCode,"VD: 02CI")}
       ${LF("tkNo","Số tờ khai",j.tkNo,"12 số")}${LF("tkDate","Ngày tờ khai",j.tkDate,"","","date")}
-      ${LF("hqCode","Mã Hải quan",j.hqCode,"VD: 02CI")}${LF("mst","MST khách",j.mst,"10 hoặc 13 số")}
-      ${LF("hqOfficer","Cán bộ HQ làm tờ khai",j.hqOfficer,"Tên người hải quan")}<label class="fld"><span>Luồng</span><select id="f-lane" data-f="lane" class="lanesel ln-${{Xanh:"g",Vàng:"y",Đỏ:"r"}[j.lane]||"0"}"><option value="">Chọn luồng</option>${["Xanh","Vàng","Đỏ"].map(v=>`<option value="${v}"${j.lane===v?" selected":""}>Luồng ${v.toLowerCase()}</option>`).join("")}</select></label></div>
+      <label class="fld"><span>Luồng</span><select id="f-lane" data-f="lane" class="lanesel ln-${{Xanh:"g",Vàng:"y",Đỏ:"r"}[j.lane]||"0"}"><option value="">Chọn luồng</option>${["Xanh","Vàng","Đỏ"].map(v=>`<option value="${v}"${j.lane===v?" selected":""}>Luồng ${v.toLowerCase()}</option>`).join("")}</select></label>${LF("hqOfficer","Cán bộ HQ làm tờ khai",j.hqOfficer,"Tên người hải quan")}
+      ${j.type==="Khai HQ xuất"?LF("bl","Số booking",j.bl,"VD: BKG2411087"):LF("bl","Số B/L",j.bl,"VD: HPH123456789")}${LF("cont",truck?"Số xe / tải trọng":"Số cont",j.cont,truck?"VD: 1 xe 8 tấn":"VD: 2x40HC TGHU1234567")}</div>
     <div class="g2">${LF("cargo","Hàng hoá / số lượng",j.cargo,"VD: Máy móc, 25 kiện","full")}</div>
     ${tkCheckRow(j)}
     ${j.coNeed==="Có"?`<div class="sub">Xin C/O</div><div class="row1"><b>Form</b>${chips2("coForm",CO_FORMS,j.coForm||"")}</div>
@@ -4105,7 +4105,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26v";
+const APP_VER="2026-11-26w";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
