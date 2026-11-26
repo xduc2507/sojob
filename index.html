@@ -911,6 +911,41 @@ html.ios #chatPops .cpop:hover .cpop-x{opacity:1}
   .bar .tabs>button{position:relative}
   .bar .tabs>button .cbadge,.bar .tabs>button .tbadge{position:absolute!important;top:-7px;left:17px;margin:0!important;height:18px!important;min-width:18px!important;line-height:18px!important;font-size:11px!important;padding:0 5px!important;box-shadow:0 0 0 2px var(--bg)!important;z-index:2;pointer-events:none}
 }
+/* Vận chuyển: ô Nhà xe nằm cùng hàng sau nút chọn Xe cont / Xe tải */
+.row1 .fld.inl{flex:1 1 200px;min-width:160px;margin:0 0 0 10px!important;display:flex!important;flex-direction:row!important;align-items:center;gap:8px}
+.row1 .fld.inl>span{white-space:nowrap;margin:0}
+.row1 .fld.inl>input{flex:1;min-width:0}
+/* Báo giá: bảng cột cố định, thẻ tổng tiền gọn */
+table.q{table-layout:fixed}
+table.q col.c-n{width:26%}table.q col.c-q{width:6%}table.q col.c-u{width:10%}table.q col.c-p{width:12%}table.q col.c-a{width:12%}
+table.q col.c-np{width:11%}table.q col.c-na{width:11%}table.q col.c-h{width:6%}table.q col.c-x{width:28px}
+table.q{min-width:0!important}
+table.q th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+table.q td input{width:100%;min-width:0}
+table.q td.num{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-variant-numeric:tabular-nums;padding-right:6px}
+table.q tr.fvhead td{background:var(--accent-soft)!important;color:var(--accent)!important;border-bottom-color:transparent!important}
+.qnote{display:block;font-size:11.5px;color:var(--muted);margin-top:2px}
+.qsum{display:flex;flex-direction:column;gap:10px;margin-left:auto;width:min(380px,100%)}
+.qs-cur{display:flex;flex-direction:column;gap:2px;background:var(--surface-2);border-radius:12px;padding:10px 14px}
+.qs-h{font-size:12px;font-weight:600;color:var(--muted);margin-bottom:2px}
+.qs-r{display:flex;justify-content:space-between;align-items:center;gap:12px;font-size:13.5px;min-height:28px}
+.qs-r>span{display:flex;align-items:center;gap:8px;color:var(--muted)}
+.qs-r>b{font-weight:600;font-variant-numeric:tabular-nums}
+.qs-r.ch>span,.qs-r.ch>b{color:#8a5a00}
+.qs-vat button{min-height:24px!important;padding:2px 10px!important;font-size:12px!important}
+.qs-tot{border-top:1px solid var(--line);margin-top:4px;padding-top:6px}.qs-tot>span{color:var(--ink)!important;font-weight:600}
+.qs-tot>b{font-size:18px;font-weight:700}.qs-tot small,.qs-gain small{font-size:12px;font-weight:500;color:var(--muted)}
+.qs-net{margin-top:6px;background:#FFF8E6;border-radius:8px;padding:4px 10px}
+.qs-net .qs-r>span{color:#8A5A00}.qs-gain>b{color:var(--ok)}.qs-gain.neg>b{color:var(--bad)}
+@media (prefers-color-scheme: dark){html:not([data-theme="light"]) .qs-net{background:#3a2e12}}
+@media (max-width:600px){.qsum{width:100%}table.q{table-layout:auto}table.q colgroup{display:none}
+  table.q tr.fvhead{display:block;padding:6px 10px;border:0;border-radius:6px}}
+/* tên + địa chỉ theo MST */
+.mstinfo{display:flex;align-items:flex-start;gap:10px;margin:2px 0 6px;padding:9px 12px;border-radius:10px;background:var(--accent-soft);font-size:13px}
+.mstinfo>.svi{width:18px;height:18px;color:var(--accent);margin-top:1px}
+.mstinfo>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.mstinfo b{font-weight:600}.mstinfo span{color:var(--muted)}
+.mstinfo .warn{color:var(--bad)!important;font-weight:600}.mstinfo.bad{background:var(--bad-soft)}
+.mstinfo button{flex:none;align-self:center}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1584,7 +1619,7 @@ const DEPOSIT=["","Chưa hoàn","Đã hoàn","Không có cược"];
 const FAIL_REASONS=["Khách không chốt giá","Khách huỷ lô","Hàng không về / đổi lịch","Khách dùng đơn vị khác","Khác"];
 const DEFAULT_STALL={"Mới nhận":1,"Báo giá":2,"Nhận & kiểm tra chứng từ":1,"Đang khai báo":1,"Đã truyền tờ khai":1,"Trình tờ khai cho Hải quan":1,"Kiểm hóa":1,"Chờ điều xe":1,"Đang vận chuyển":2,"Bảng kê / debit":2,"Nhập Ksmart":1};
 /* trường bắt buộc khi đi vào bước */
-const REQ={"Đã truyền tờ khai":[["tkNo","Số tờ khai"],["tkDate","Ngày tờ khai","date"],["hqCode","Mã Hải quan (VD: 02CI)"]],"Đang vận chuyển":[["truck","Nhà xe / biển số"]],"Nhập Ksmart":[["debitAmount","Số tiền debit"]],"Hoàn thành":[["paidDate","Ngày khách trả","date"]]};
+const REQ={"Đã truyền tờ khai":[["tkNo","Số tờ khai"],["tkDate","Ngày tờ khai","date"],["hqCode","Mã Hải quan (VD: 02CI)"]],"Đang vận chuyển":[["truck","Biển số xe"]],"Nhập Ksmart":[["debitAmount","Số tiền debit"]],"Hoàn thành":[["paidDate","Ngày khách trả","date"]]};
 const LEGACY={"Đang làm":"Làm hàng","Chờ phản hồi":"Báo giá","Đã báo giá":"Báo giá","Hoàn tất":"Đã thu"};
 const PRIOS=["Gấp","Thường","Thấp"];
 const SOURCES=["Email","Zalo","Điện thoại","Khác"];
@@ -1871,7 +1906,7 @@ function visibleJobs(ignoreStatus){
     if(S.group!=="__all"&&groupKey(j)!==S.group)return false;
     if(S.svc&&svcOf(j)!==S.svc)return false;
     if(S.who&&team()&&SPACE!=="mine"&&whoOf(j)!==S.who)return false;
-    if(q){const h=[j.code,j.title,j.fwd,j.company,j.contact,j.refs,j.cargo,j.pol,j.pod,j.summary,j.mst,j.bl,j.cont,j.tkNo,j.truck,j.yard,j.blocker].join(" ").toLowerCase();if(!h.includes(q))return false}
+    if(q){const h=[j.code,j.title,j.fwd,j.company,j.contact,j.refs,j.cargo,j.pol,j.pod,j.summary,j.mst,j.bl,j.cont,j.tkNo,j.truck,j.carrier,j.yard,j.blocker].join(" ").toLowerCase();if(!h.includes(q))return false}
     return true;
   }).sort((a,b)=>{
     const pa=a.priority==="Gấp"?0:1,pb=b.priority==="Gấp"?0:1;
@@ -2425,11 +2460,11 @@ function renderDetail(force){
   ${lotSec(j)}
   <div class="sec"><h3>Báo giá <span class="acts"><button class="ghost sm ai" data-act="aiQuote" title="Claude lập báo giá từ yêu cầu và giá đã báo trước đây">${svi("spark")}Claude soạn</button><button class="ghost sm" data-act="fillPrices">Điền giá lần trước</button><button class="ghost sm${QADD==="fee"?" on":""}" data-act="qadd" aria-expanded="${QADD==="fee"}">+ Thêm phí ▾</button><button class="ghost sm${QADD==="ch"?" on":""}" data-act="qaddch" aria-expanded="${QADD==="ch"}">+ Chi hộ ▾</button></span></h3>
     ${qPresetBox(j)}
-    ${(j.quote||[]).length?`<div class="qwrap"><table class="q"><thead><tr><th style="width:24%">Hạng mục</th><th class="num" style="width:6%">SL</th><th style="width:8%">ĐVT</th><th class="num" style="width:13%">Đơn giá</th><th class="num" style="width:13%">Thành tiền</th><th class="num net" style="width:13%" title="Giá vốn / giá nhập hệ thống công ty – không gửi khách">Giá NET</th><th class="num net" style="width:13%">Thành tiền NET</th><th>Giá lần trước</th><th></th></tr></thead><tbody>
+    ${(j.quote||[]).length?`<div class="qwrap"><table class="q"><colgroup><col class="c-n"><col class="c-q"><col class="c-u"><col class="c-p"><col class="c-a"><col class="c-np"><col class="c-na"><col class="c-h"><col class="c-x"></colgroup><thead><tr><th>Hạng mục</th><th class="num">SL</th><th>ĐVT</th><th class="num">Đơn giá</th><th class="num">Thành tiền</th><th class="num net" title="Giá vốn / giá nhập hệ thống công ty – không gửi khách">Giá NET</th><th class="num net" title="Thành tiền NET – nội bộ">TT NET</th><th title="Giá báo lần trước cho cùng FWD">Lần trước</th><th></th></tr></thead><tbody>
     ${(()=>{const R=(q,i)=>`<tr class="${q.ch?"chrow":""}"><td>${q.ch?'<span class="chtag">Chi hộ</span>':""}<input id="q-${i}-name" data-q="${i}:name" list="${q.ch?"chitems":"items"}" placeholder="Chọn hoặc gõ" value="${esc(q.name)}"></td><td><input class="num mono" id="q-${i}-qty" data-q="${i}:qty" value="${esc(q.qty)}" inputmode="decimal"></td><td><input id="q-${i}-unit" data-q="${i}:unit" value="${esc(q.unit)}"></td><td><input class="num mono" id="q-${i}-price" data-q="${i}:price" value="${num(q.price)?esc(q.price):""}" placeholder="Nhập giá" inputmode="decimal"></td><td class="num mono" data-amt="${i}">${num(q.qty)*num(q.price)?fmt(num(q.qty)*num(q.price),q.currency):""}</td><td><input class="num mono net" id="q-${i}-net" data-q="${i}:net" value="${esc(q.net||"")}" inputmode="decimal" placeholder="NET"></td><td class="num mono netamt" data-namt="${i}">${num(q.net)?fmt(num(q.qty)*num(q.net),q.currency):""}</td><td data-hint="${i}">${hintHtml(q,j,i)}</td><td><button class="x" data-act="qdel" data-i="${i}" aria-label="Xoá dòng">✕</button></td></tr>`;const A=[],B=[];j.quote.forEach((q,i)=>(q.ch?B:A).push(R(q,i)));
-      return A.join("")+(B.length?`<tr class="chhead"><td colspan="9">Chi hộ <span>– thu theo hoá đơn thực tế, không cộng VAT dịch vụ</span></td></tr>`+B.join(""):"")})()}
-    </tbody></table></div><span style="font-size:11.5px;color:var(--muted)">Giá lần trước lấy từ cùng FWD; dấu * là giá báo cho FWD khác.</span>`:`<p style="margin:0;color:var(--muted);font-size:13px">Chưa có hạng mục. Bấm “+ Thêm phí” hoặc “+ Chi hộ”.</p>`}
-    <div class="grid2"><div class="vatbox"><span>VAT</span><div class="chips2">${VAT_OPEN?[8,10].map(v=>`<button type="button" class="${vatRate(j)===v?"on":""}" data-vat="${v}">${v}%</button>`).join(""):`<button type="button" class="on" data-vat="open" title="Bấm để đổi VAT">${vatRate(j)}% ▾</button>`}</div></div><div class="tot" id="qtot"></div></div>
+      return (A.length&&B.length?`<tr class="chhead fvhead"><td colspan="9">Phí dịch vụ <span>– tính VAT ${vatRate(j)}%</span></td></tr>`:"")+A.join("")+(B.length?`<tr class="chhead"><td colspan="9">Chi hộ <span>– thu theo hoá đơn thực tế, không cộng VAT dịch vụ</span></td></tr>`+B.join(""):"")})()}
+    </tbody></table></div><span class="qnote">Lần trước: giá đã báo cho cùng FWD (dấu * là giá báo FWD khác). Cột NET là giá vốn nội bộ, không gửi khách.</span>`:`<p style="margin:0;color:var(--muted);font-size:13px">Chưa có hạng mục. Bấm “+ Thêm phí” hoặc “+ Chi hộ”.</p>`}
+    <div class="qsum" id="qtot"></div>
     <label class="fld"><span>Ghi chú báo giá</span><textarea id="f-quoteNote" data-f="quoteNote" rows="2" placeholder="VD: Giá chưa gồm local charge, kiểm hoá, lưu kho…">${esc(j.quoteNote)}</textarea></label>
     <div class="acts"><button data-act="copyQuote" class="primary">${ic("copy")}Copy báo giá</button>${dbOn(j)?`<button data-act="draftDebit" class="debitbtn">${ic("doc")}${j.debit?"Mở debit":"Soạn debit"}</button>${boss()&&j.debitDate&&!j.paidDate?`<button data-act="debitPaid" class="ghost">${svi("okc")}Đã thu tiền</button>`:""}`:""}<button data-act="copyBrief">${ic("copy")}Copy tóm tắt job</button>${j.quoteSentAt?`<span style="font-size:12px;color:var(--muted)">Đã gửi báo giá ${dmy(j.quoteSentAt)}</span>`:""}</div>
     ${j.debitDate&&dbOn(j)?`<p class="dbstat">${svi("rcpt")}Debit <b>${fmt(j.debitAmount,"VND")}</b> đ · gửi ${dmy(j.debitDate)}${j.paidDate?` · <span class="ok">${svi("okc")}đã thu ${dmy(j.paidDate)}</span>`:` · <span class="wait">chờ thu tiền</span>`}</p>`:""}
@@ -2450,10 +2485,17 @@ function renderDetail(force){
 }
 function renderTotals(j){
   const t=totals(j),vat=vatRate(j),el=$("#qtot");if(!el)return;
-  const ks=Object.keys(t);if(!ks.length&&!Object.keys(chTotals(j)).length){el.innerHTML="";return}
+  const ct=chTotals(j),cs=[...new Set(Object.keys(t).concat(Object.keys(ct)))];if(!cs.length){el.innerHTML="";return}
   const nt={};(j.quote||[]).forEach(q=>{const n=q.ch?(num(q.net)||num(q.price)):num(q.net);if(n>0){const c=q.currency||"VND";nt[c]=(nt[c]||0)+num(q.qty)*n}});
-  const ct=chTotals(j);
-  el.innerHTML=ks.concat(Object.keys(ct).filter(c=>!t[c])).map(c=>{t[c]=t[c]||0;const chs=ct[c]||0;return chs?`<span>Phí dịch vụ ${c}: <span class="mono">${fmt(t[c],c)}</span></span>${vat&&t[c]?`<span>VAT ${vat}%: <span class="mono">${fmt(vatOf(t[c],vat,c),c)}</span></span>`:""}<span class="chsum">Chi hộ: <span class="mono">${fmt(chs,c)}</span></span><span>Tổng thanh toán ${c}: <b>${fmt(grandOf(t[c],vat,c)+chs,c)}</b></span>${nt[c]?`<span class="netsum">NET ${c}: <span class="mono">${fmt(nt[c],c)}</span> · Chênh lệch: <b class="mono">${fmt(t[c]+chs-nt[c],c)}</b></span>`:""}`:`<span>Cộng ${c}: <span class="mono">${fmt(t[c],c)}</span></span>${vat?`<span>VAT ${vat}%: <span class="mono">${fmt(vatOf(t[c],vat,c),c)}</span></span>`:""}<span>Tổng ${c}: <b>${fmt(grandOf(t[c],vat,c),c)}</b></span>${nt[c]?`<span class="netsum">NET ${c}: <span class="mono">${fmt(nt[c],c)}</span> · Chênh lệch: <b class="mono">${fmt(t[c]-nt[c],c)}</b></span>`:""}`}).join("");
+  const vatChips=`<span class="chips2 qs-vat">${VAT_OPEN?[8,10].map(v=>`<button type="button" class="${vat===v?"on":""}" data-vat="${v}">${v}%</button>`).join(""):`<button type="button" class="on" data-vat="open" title="Bấm để đổi VAT">${vat}% ▾</button>`}</span>`;
+  let vDone=false;
+  el.innerHTML=cs.map(c=>{const fee=t[c]||0,chs=ct[c]||0,v=fee&&vat?vatOf(fee,vat,c):0,grand=(fee?grandOf(fee,vat,c):0)+chs,n=nt[c]||0,gain=fee+chs-n;
+    const vr=fee?`<div class="qs-r"><span>VAT ${vDone?vat+"%":vatChips}</span><b class="mono">${fmt(v,c)}</b></div>`:"";if(fee)vDone=true;
+    return `<div class="qs-cur">${cs.length>1?`<div class="qs-h">${esc(c)}</div>`:""}
+      ${fee?`<div class="qs-r"><span>Phí dịch vụ</span><b class="mono">${fmt(fee,c)}</b></div>`:""}${vr}
+      ${chs?`<div class="qs-r ch"><span>Chi hộ</span><b class="mono">${fmt(chs,c)}</b></div>`:""}
+      <div class="qs-r qs-tot"><span>Tổng thanh toán</span><b class="mono">${fmt(grand,c)} <small>${esc(c)}</small></b></div>
+      ${n?`<div class="qs-net"><div class="qs-r"><span>Giá NET (nội bộ)</span><b class="mono">${fmt(n,c)}</b></div><div class="qs-r qs-gain${gain<0?" neg":""}"><span>Lãi gộp</span><b class="mono">${fmt(gain,c)}${fee+chs?` <small>${Math.round(gain/(fee+chs)*100)}%</small>`:""}</b></div></div>`:""}</div>`}).join("");
 }
 function lateBox(j){
   let st=lateState(j);if(!st)return "";const a=j.lateAck||{},nx=nextStage(j)||"bước sau";const editing=S.lateEdit===j.id&&st==="pend";if(editing)st="none";
@@ -2552,7 +2594,7 @@ function quoteText(j){
 }
 function briefText(j){
   const L=[`[${j.code}] ${j.title}`,`FWD/Cty: ${[j.fwd,j.company].filter(Boolean).join(" / ")||"—"}`,`Dịch vụ: ${svcOf(j)} · Giai đoạn: ${j.status}${j.blocker?" (vướng: "+j.blocker+")":""}`,`Loại: ${j.type}${j.mode?" · "+j.mode:""}${j.pol||j.pod?` · ${j.pol||"?"} → ${j.pod||"?"}`:""}`];
-  if(j.cargo)L.push("Hàng: "+j.cargo);const ids=[j.mst&&"MST "+j.mst,j.bl&&"B/L "+j.bl,j.cont&&"Cont "+j.cont,j.tkNo&&"TK "+j.tkNo,j.lane&&"Luồng "+j.lane,j.truck&&"Xe "+j.truck,j.yard&&"Bãi hạ "+j.yard,j.cbm&&j.cbm+" m³"].filter(Boolean);if(ids.length)L.push(ids.join(" · "));if(j.refs)L.push("Số tham chiếu: "+j.refs);if(j.deadline)L.push("Hạn: "+j.deadline.split("-").reverse().join("/"));
+  if(j.cargo)L.push("Hàng: "+j.cargo);const ids=[j.mst&&"MST "+j.mst,j.bl&&"B/L "+j.bl,j.cont&&"Cont "+j.cont,j.tkNo&&"TK "+j.tkNo,j.lane&&"Luồng "+j.lane,j.carrier&&"Nhà xe "+j.carrier,j.truck&&"BKS "+j.truck,j.yard&&"Bãi hạ "+j.yard,j.cbm&&j.cbm+" m³"].filter(Boolean);if(ids.length)L.push(ids.join(" · "));if(j.refs)L.push("Số tham chiếu: "+j.refs);if(j.deadline)L.push("Hạn: "+j.deadline.split("-").reverse().join("/"));
   if(j.summary)L.push("Yêu cầu: "+j.summary);
   if((j.tasks||[]).length){L.push("Việc cần làm:");j.tasks.forEach(t=>L.push(`${t.done?"[x]":"[ ]"} ${t.text}`))}
   if(j.questions)L.push("Cần hỏi lại: "+j.questions);
@@ -2717,9 +2759,25 @@ $("#content").addEventListener("drop",e=>{const c=e.target.closest("[data-col]")
 
 /* ---------- events: detail ---------- */
 const D=$("#detail");
+/* Khách theo MST trên tờ khai: tên + địa chỉ đầy đủ theo đăng ký thuế (VietQR), lưu vào job để ra debit đúng tên */
+function mstInfo(j){const ok=j.custName&&j.custMst&&j.custMst===String(j.mst||"").replace(/[^\d-]/g,"");if(!ok)return "";
+  const bad=/ngừng|đóng|giải thể/i.test(j.custStatus||"");
+  return `<div class="mstinfo${bad?" bad":""}">${svi("fac")}<div><b>${esc(j.custName)}</b>${j.custAddr?`<span>${esc(j.custAddr)}</span>`:""}${bad?`<span class="warn">${svi("warn")}${esc(j.custStatus)}</span>`:""}</div>
+    ${slug(j.company||"")!==slug(j.custName)?`<button type="button" class="ghost sm" data-act="mstUseName" title="Đổi ô Công ty / chủ hàng thành tên đầy đủ này">Dùng làm tên công ty</button>`:""}</div>`}
+async function mstFindJob(j,force,btn){const m=String(j.mst||"").replace(/[^\d-]/g,"");
+  if(!mstOk(m)){if(force)toast("MST chưa đúng (10 hoặc 13 số) hoặc là cá nhân không có MST.");return}
+  if(!force&&j.custMst===m&&j.custName)return;
+  if(btn){btn.disabled=true;btn.innerHTML=svi("load","spin")+"Đang tra…"}
+  try{const x=await mstLookup(m);const ch=j.custName!==x.name||j.custAddr!==x.addr||j.custMst!==m;
+    j.custName=x.name;j.custAddr=x.addr;j.custStatus=x.status||"";j.custMst=m;if(ch)queueSave(j);
+    if(cur()===j)renderDetail(true);
+    if(force)toast(`Đã lấy theo MST ${m}: ${x.name}${/ngừng|đóng|giải thể/i.test(x.status||"")?" · ⚠ "+x.status:""}`)}
+  catch(er){if(force)toast("Chưa tra được MST: "+(er.message||er))}
+  finally{if(btn&&btn.isConnected){btn.disabled=false;btn.innerHTML=svi("search")+"Tra MST"}}}
+D.addEventListener("change",e=>{if(e.target.dataset.f!=="mst")return;const j=cur();if(j)setTimeout(()=>mstFindJob(j,false),300)});
 D.addEventListener("change",e=>{const t=e.target;if(t.dataset.f!=="tkNo")return;const j=cur();if(!j)return;
   const v=String(t.value).replace(/\D/g,"");if(/^\d{11}$/.test(v)){t.value=v+"0";j.tkNo=v+"0";queueSave(j);toast("Số tờ khai 11 số: đã thêm số 0 ở cuối (bản gốc). Bấm Kiểm tra trạng thái để dò lần sửa mới nhất.")}});
-const LISTF=["vehicle","yard","cbm","title","fwd","company","deadline","priority","type","mode","pol","pod","debitAmount","debitCurrency","service","blocker","bl","cont","lane","deposit","tkNo","truck","cargo"];
+const LISTF=["vehicle","yard","cbm","title","fwd","company","deadline","priority","type","mode","pol","pod","debitAmount","debitCurrency","service","blocker","bl","cont","lane","deposit","tkNo","truck","carrier","cargo"];
 function syncStages(j){const b=D.querySelector("#stagebar");if(b)b.innerHTML=stagesHtml(j)}
 D.addEventListener("input",e=>{
   if(e.target.id==="chatTxt"){const j=cur();if(j)S.chatDraft[j.id]=e.target.value;return}
@@ -2797,6 +2855,8 @@ D.addEventListener("click",e=>{
   if(a==="useprice"){const q=j.quote[+b.dataset.i];const h=lastPrice(q.name,groupKey(j),j.id);if(h){q.price=h.price;q.currency=h.currency;if(!q.unit)q.unit=h.unit;queueSave(j);renderDetail(true)}}
   if(a==="fillPrices"){let n=0;(j.quote||[]).forEach(q=>{if(num(q.price)>0)return;const h=lastPrice(q.name,groupKey(j),j.id);if(h){q.price=h.price;q.currency=h.currency;if(!q.unit)q.unit=h.unit;n++}});
     if(n){queueSave(j);renderDetail(true)}toast(n?`Đã điền giá cũ cho ${n} dòng. Kiểm tra lại trước khi gửi.`:"Không có dòng nào (đơn giá = 0) tìm được giá cũ cùng tên.")}
+  if(a==="mstFind"){mstFindJob(j,true,b);return}
+  if(a==="mstUseName"){if(j.custName){j.company=j.custName;queueSave(j);renderAll(true);toast("Đã đổi tên công ty theo đăng ký thuế.")}return}
   if(a==="copyQuote"){copy(quoteText(j));if(!j.quoteSentAt){j.quoteSentAt=TODAY();if(j.status===STAGES[0])setStatus(j,"Báo giá","auto","Copy báo giá");queueSave(j);renderSide();renderMain();syncStages(j)}}
   if(a==="copyBrief")copy(briefText(j));
   if(a==="draftDebit"){debitOpen(j);return}
@@ -2992,20 +3052,21 @@ function lotSec(j){
   const hangRow=`<div class="row1"><b>Hàng</b>${chips2("type",["Khai HQ nhập","Khai HQ xuất"],j.type==="Khai HQ xuất"?"Khai HQ xuất":j.type==="Khai HQ nhập"?"Khai HQ nhập":"",[svi("imp")+"Nhập khẩu",svi("exp")+"Xuất khẩu"])}</div>`;
   const hqBlk=`${vc?`<div class="sub">Hải quan</div>`:""}
     ${OPT_OPEN===j.id&&["Khai HQ nhập","Khai HQ xuất"].includes(j.type)?`<div class="row1"><b>Tuỳ chọn</b><div class="chips2 chk" role="group">${CHECKS.map(([k,l,ic,fee])=>{const on=(j.checks||[]).includes(k);return `<button type="button" class="${on?"on":""}" title="${fee.slice(4)}" data-set="chk" data-v="${k}" aria-pressed="${on}">${on?svi("ok"):svi(ic)}${l}</button>`}).join("")}${j.type==="Khai HQ xuất"||j.coNeed==="Có"?`<button type="button" class="${j.coNeed==="Có"?"on":""}" title="Xin C/O" data-set="coNeed" data-v="Có" aria-pressed="${j.coNeed==="Có"}">${j.coNeed==="Có"?svi("ok"):svi("co")}C/O</button>`:""}</div></div>`:""}
-    <div class="g2">${LF("mst","MST khách",j.mst,"10 hoặc 13 số")}${LF("hqCode","Mã Hải quan",j.hqCode,"VD: 02CI")}
+    <div class="g2"><div class="dbmst">${LF("mst","MST khách",j.mst,"10 hoặc 13 số")}<button type="button" class="ghost sm" data-act="mstFind" title="Lấy tên, địa chỉ đầy đủ theo đăng ký thuế (dùng khi ra debit)">${svi("search")}Tra MST</button></div>${LF("hqCode","Mã Hải quan",j.hqCode,"VD: 02CI")}
       ${LF("tkNo","Số tờ khai",j.tkNo,"12 số")}${LF("tkDate","Ngày tờ khai",j.tkDate,"","","date")}
       <label class="fld"><span>Luồng</span><select id="f-lane" data-f="lane" class="lanesel ln-${{Xanh:"g",Vàng:"y",Đỏ:"r"}[j.lane]||"0"}"><option value="">Chọn luồng</option>${["Xanh","Vàng","Đỏ"].map(v=>`<option value="${v}"${j.lane===v?" selected":""}>Luồng ${v.toLowerCase()}</option>`).join("")}</select></label>${LF("hqOfficer","Cán bộ HQ làm tờ khai",j.hqOfficer,"Tên người hải quan")}
       ${j.type==="Khai HQ xuất"?LF("bl","Số booking",j.bl,"VD: BKG2411087"):LF("bl","Số B/L",j.bl,"VD: HPH123456789")}${LF("cont",truck?"Số xe / tải trọng":"Số cont",j.cont,truck?"VD: 1 xe 8 tấn":"VD: 2x40HC TGHU1234567")}</div>
+    ${mstInfo(j)}
     <div class="g2">${LF("cargo","Hàng hoá / số lượng",j.cargo,"VD: Máy móc, 25 kiện","full")}</div>
     ${tkCheckRow(j)}
     ${j.coNeed==="Có"?`<div class="sub">Xin C/O</div><div class="row1"><b>Form</b>${chips2("coForm",CO_FORMS,j.coForm||"")}</div>
     <div class="g2">${LF("coNo","Số C/O",j.coNo,"Số trên C/O")}${LF("coDate","Ngày cấp C/O",j.coDate,"","","date")}</div>
     <div class="row1"><b>Tình trạng</b>${chips2("coStatus",["Đang làm hồ sơ","Đã nộp","Đã cấp"],j.coStatus||"")}</div>`:""}`;
   const vcBlk=`${hq?`<div class="sub">Vận chuyển</div>`:""}
-    <div class="row1"><b>Loại xe</b>${chips2("vehicle",VEHICLES,j.vehicle||"Xe cont")}</div>
+    <div class="row1"><b>Loại xe</b>${chips2("vehicle",VEHICLES,j.vehicle||"Xe cont")}${LF("carrier","Nhà xe",j.carrier,"VD: Tân Cảng","inl")}</div>
     <div class="g2">${hq?"":LF("cont",truck?"Số xe / tải trọng":"Số cont",j.cont,truck?"VD: 1 xe 8 tấn":"VD: 2x40HC")}
       ${LF("pol","Nơi đi (lấy hàng)",j.pol,"VD: Cảng Tiên Sa")}${LF("pod","Nơi đến (giao hàng)",j.pod,"VD: KCN Hoà Khánh")}
-      ${LF("truck","Nhà xe – biển số",j.truck,"VD: Tân Cảng 51C-123.45")}
+      ${LF("truck","Biển số xe",j.truck,"VD: 51C-123.45")}
       ${truck?LF("cbm","Số khối (m³)",j.cbm,"VD: 12,5"):LF("yard","Bãi hạ cont",j.yard,"VD: Phước Long")}</div>
     ${truck?"":`<div class="row1"><b>Hoàn cược</b>${chips2("deposit",["Chưa hoàn","Đã hoàn","Không có cược"],j.deposit||"",["Chưa hoàn","Đã hoàn","Không cược"])}</div>`}`;
   const mineBlk=spaceOn()&&isMine(j)?`<div class="sub">Việc riêng · thu chi</div>
@@ -4105,7 +4166,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26w";
+const APP_VER="2026-11-26z";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4527,7 +4588,7 @@ const dbConts=j=>[...new Set((String(j.cont||"").toUpperCase().match(/[A-Z]{4}\s
 const dbQty=j=>{const m=String(j.cont||"").match(/\d+\s*[x×]\s*(?:20|40|45)(?:\s?(?:HC|GP|DC|RF|OT|FR|HQ)\b)?/gi);return m?m.map(x=>x.replace(/\s/g,"").replace("×","x")).join(", "):""};
 function dbName(j,q){
   if(q.name===FEE_HQ)return `Phí dịch vụ hải quan tk số: ${j.tkNo||""}`.trim();
-  if(q.name===FEE_VC)return `Cước vận chuyển nội địa ${j.pol||"[điểm đi]"} - ${j.pod||"[điểm đến]"}${j.truck?", BKS "+j.truck:""}`;
+  if(q.name===FEE_VC)return `Cước vận chuyển nội địa ${j.pol||"[điểm đi]"} - ${j.pod||"[điểm đến]"}${j.carrier?", nhà xe "+j.carrier:""}${j.truck?", BKS "+j.truck:""}`;
   return q.name}
 /* Tra MST: tên + địa chỉ đăng ký thuế (VietQR, dữ liệu Cục Thuế). masothue.com chặn tra tự động nên không dùng. */
 const mstOk=m=>/^\d{10}(-?\d{3})?$/.test(m)&&!/^9{10}/.test(m); // 9999999999998 = cá nhân / không có MST
@@ -4546,7 +4607,9 @@ function dbFwdInfo(j){ // thông tin xuất debit của FWD: hồ sơ FWD → de
   return prev?{...prev.debit.cust}:{name:j.fwd,addr:"",mst:"",email:p.email||""}}
 function dbOwnerInfo(j){
   const prev=S.all.filter(x=>x.id!==j.id&&x.debit&&x.company&&x.company===j.company&&(x.debit.to||"cust")==="cust").sort((a,b)=>(b.debit.at||0)-(a.debit.at||0))[0];
-  const c=prev?{...prev.debit.cust}:{name:j.company||"",addr:"",mst:j.mst||"",email:""};if(!c.mst&&j.mst)c.mst=j.mst;return c}
+  const c=prev?{...prev.debit.cust}:{name:j.company||"",addr:"",mst:j.mst||"",email:""};if(!c.mst&&j.mst)c.mst=j.mst;
+  const m=String(j.mst||"").replace(/[^\d-]/g,"");if(j.custName&&j.custMst===m){c.name=j.custName;if(j.custAddr)c.addr=j.custAddr;c.mst=m}
+  return c}
 function dbDefaultTo(j){
   if(!dbFwdOk(j))return "cust";
   const prev=S.all.filter(x=>x.id!==j.id&&x.debit&&x.fwd&&slug(x.fwd)===slug(j.fwd)).sort((a,b)=>(b.debit.at||0)-(a.debit.at||0))[0];
