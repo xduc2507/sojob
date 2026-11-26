@@ -62,7 +62,7 @@ body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset
 .brand{display:flex;align-items:center;gap:8px;font-weight:700;font-size:16px;white-space:nowrap}
 .brand i{width:18px;height:18px;border-radius:0 70% 0 70%;background:linear-gradient(135deg,var(--accent),var(--info));display:inline-block;transform:rotate(-8deg)}
 .top input{max-width:340px;margin-left:auto}
-.app{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,680px);gap:16px;align-items:start;
+.app{display:grid;grid-template-columns:220px minmax(0,1fr) minmax(0,740px);gap:16px;align-items:start;
   padding-block:16px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
 
 #side{display:flex;flex-direction:column;gap:2px;position:sticky;top:72px;max-height:calc(100vh - 90px);overflow:auto}
@@ -143,7 +143,7 @@ body.view-board .app{grid-template-columns:minmax(0,1fr)}
 body.view-board #side{display:none}
 body.view-board #content{background:transparent;border:0}
 body.view-board #detail{display:none}
-body.view-board.has-detail #detail{display:block;position:fixed;top:0;right:0;bottom:0;width:min(700px,100vw);max-height:none;z-index:20;border-radius:0;
+body.view-board.has-detail #detail{display:block;position:fixed;top:0;right:0;bottom:0;width:min(780px,100vw);max-height:none;z-index:20;border-radius:0;
   box-shadow:-12px 0 32px rgba(10,16,22,.22);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 body.view-board .back{display:inline-block}
 .kb-bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:10px}
@@ -430,7 +430,7 @@ table.q .num{text-align:right}
 .copybox{width:100%;min-height:160px;font-family:var(--f-mono);font-size:12px}
 
 @media (max-width:1180px){
-  .app{grid-template-columns:minmax(0,1fr) minmax(0,420px)}
+  .app{grid-template-columns:minmax(0,1fr) minmax(0,460px)}
   #side{grid-column:1/-1;flex-direction:row;overflow-x:auto;position:static;gap:6px;max-height:none}
   .side-h{display:none}
   .g{width:auto;flex:none;border:1px solid var(--line);background:var(--surface)}
@@ -836,6 +836,16 @@ body.view-report #side,body.view-report #detail{display:none}
   .app>.bar{grid-column:1/-1}
   .app:has(>.bar) #side,.app:has(>.bar) #detail{top:calc(var(--topH,58px) + var(--barH,47px) + 10px);max-height:calc(100vh - var(--topH,58px) - var(--barH,47px) - 26px)}
 }
+/* icon nét mảnh trong Thông tin lô hàng */
+.svi{width:15px;height:15px;flex:none;vertical-align:-3px;margin-right:5px}
+.svi2{display:inline-flex;gap:2px;margin-right:5px}.svi2 .svi{margin:0}
+.chips2 button{display:inline-flex;align-items:center}
+.chips2 button .svi{color:var(--accent);opacity:.9}.chips2 button.on .svi{color:currentColor;opacity:1}
+html body .svcpick button{gap:8px!important;font-weight:600;font-size:14.5px;min-height:84px!important;border:1px solid var(--line)!important;border-radius:14px!important;background:var(--surface)!important;color:var(--ink)!important}
+html body .svcpick button:hover{border-color:var(--accent)!important;background:var(--accent-soft)!important}
+.svcpick .ics{display:inline-flex;gap:6px;align-items:center;justify-content:center;padding:8px 12px;border-radius:12px;background:var(--accent-soft);color:var(--accent)}
+.svcpick .ics .svi{width:22px;height:22px;margin:0}
+.sec h3 button .svi{margin-right:5px}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1298,6 +1308,8 @@ html.ios #toast:not([hidden]){animation:ios-drop .65s var(--sp-bounce) both}
 html.ios #toast.ios-out{animation:ios-lift .32s var(--ease-in) both}
 @keyframes ios-drop{from{opacity:0;transform:translateX(-50%) translateY(-140%) scale(.9)}to{transform:translateX(-50%)}}
 @keyframes ios-lift{from{transform:translateX(-50%)}to{opacity:0;transform:translateX(-50%) translateY(-140%) scale(.92)}}
+html.ios .modal.genie-on .sheet{animation:none!important}
+html.ios .modal.ios-out:has(.sheet[style*="hidden"]) .sheet{animation:none!important}
 @media (prefers-reduced-motion:reduce){html.ios *,html.ios *::before{animation:none!important;transition:none!important}::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 /* icon nét mảnh (thay Font Awesome) */
 html.ios .fa-archive::before,html.ios .fa-arrow-right::before,html.ios .fa-ban::before,html.ios .fa-bar-chart::before,html.ios .fa-barcode::before,html.ios .fa-bell::before,html.ios .fa-bell-slash::before,html.ios .fa-building::before,html.ios .fa-calendar::before,html.ios .fa-check::before,html.ios .fa-columns::before,html.ios .fa-comments::before,html.ios .fa-copy::before,html.ios .fa-download::before,html.ios .fa-ellipsis-h::before,html.ios .fa-envelope::before,html.ios .fa-file-excel-o::before,html.ios .fa-file-text-o::before,html.ios .fa-filter::before,html.ios .fa-folder-open::before,html.ios .fa-inbox::before,html.ios .fa-list::before,html.ios .fa-lock::before,html.ios .fa-paper-plane-o::before,html.ios .fa-paperclip::before,html.ios .fa-plus::before,html.ios .fa-print::before,html.ios .fa-refresh::before,html.ios .fa-remove::before,html.ios .fa-search::before,html.ios .fa-send::before,html.ios .fa-sun-o::before,html.ios .fa-times::before,html.ios .fa-trash-o::before,html.ios .fa-upload::before{content:""!important;display:inline-block;width:1.2em;height:1.2em;vertical-align:-.22em;background-color:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
@@ -1984,12 +1996,59 @@ function detNav(open){try{const st=history.state&&history.state.sj;
   else if(!open&&st){detSkip=true;history.back()}}catch(e){}}
 addEventListener("popstate",()=>{if(detSkip){detSkip=false;return}
   if(S.sel&&!(history.state&&history.state.sj)){S.sel=null;renderAll(true)}});
+/* ===== Hiệu ứng thần đèn (Genie, như macOS) — máy tính, giao diện iOS =====
+   Cắt phiếu thành 18 lát theo hướng tới đích; mỗi lát co hẹp + trượt về đích với độ trễ khác nhau (lát gần đích đi trước)
+   → mép phiếu uốn cong, thắt lại rồi bị hút vào thẻ job (không thấy thẻ thì hút xuống giữa đáy màn hình như Dock). Mở phiếu = chạy ngược. */
+const genieOk=()=>iosOn()&&!iosCalm()&&matchMedia("(min-width:781px)").matches&&!!Element.prototype.animate;
+function genie(src,target,dir,done){
+  const r=src.getBoundingClientRect();if(!r.width||!r.height){done&&done();return}
+  let t=target&&target.getBoundingClientRect?target.getBoundingClientRect():null;
+  if(!t||!t.width||t.bottom<0||t.top>innerHeight||t.right<0||t.left>innerWidth)t={left:innerWidth/2-28,top:innerHeight-10,width:56,height:10};
+  const tc={x:t.left+t.width/2,y:t.top+t.height/2},rc={x:r.left+r.width/2,y:r.top+r.height/2};
+  const ax=Math.abs(tc.x-rc.x)>Math.abs(tc.y-rc.y)?"x":"y"; // đích nằm ngang → lát dọc; đích nằm dưới/trên → lát ngang
+  const N=28,cs=getComputedStyle(src),st=src.scrollTop||0;
+  const base=src.cloneNode(true);base.removeAttribute("id");base.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));base.classList.remove("ios-in");
+  base.style.cssText=`position:absolute;left:0;top:${-st}px;width:${r.width}px;min-height:${r.height+st}px;height:auto;margin:0;max-height:none;overflow:visible;transform:none;animation:none;transition:none;box-shadow:none;border-radius:0;visibility:visible;background:${cs.backgroundColor==="rgba(0, 0, 0, 0)"?"var(--surface)":cs.backgroundColor}`;
+  const box=document.createElement("div");box.className="genie";box.setAttribute("aria-hidden","true");
+  box.style.cssText="position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden;contain:strict";
+  /* mô hình phễu: cả khối trượt dọc trục chính vào đích; bề ngang (trục phụ) của mỗi lát = bề ngang phễu tại vị trí lát đó
+     → các lát luôn liền nhau, mép cong mượt. Pha đầu: phễu uốn dần (bend); pha sau: khối trượt và co vào đích (slide). */
+  const X=ax==="x",near=X?tc.x<rc.x:tc.y<rc.y;
+  const rS=X?r.left:r.top,rLen=X?r.width:r.height,rC=X?r.top:r.left,rCs=X?r.height:r.width;
+  const tS=X?t.left:t.top,tLen=Math.max(8,X?t.width:t.height),tCs=Math.max(8,X?t.height:t.width),tCc=(X?t.top+t.height/2:t.left+t.width/2);
+  const edge=near?tS+tLen:tS,gap=near?rS-edge:edge-(rS+rLen),Lf=Math.max(120,Math.abs(gap)+rLen*.55);
+  const E=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,EO=x=>1-Math.pow(1-x,3),SM=x=>x*x*(3-2*x),cl=x=>x<0?0:x>1?1:x,L=(a,b,k)=>a+(b-a)*k;
+  const DUR=dir==="out"?680:600,K=20,anims=[],w0=rLen/N;
+  for(let i=0;i<N;i++){
+    const s=document.createElement("div"),c=base.cloneNode(true),m0=rS+i*w0;
+    let x0,y0,sw,sh;
+    if(X){x0=m0;y0=r.top;sw=w0;sh=r.height;c.style.left=`${-i*w0}px`}else{x0=r.left;y0=m0;sw=r.width;sh=w0;c.style.top=`${-st-i*w0}px`}
+    s.style.cssText=`position:absolute;left:${x0}px;top:${y0}px;width:${sw+.8}px;height:${sh+.8}px;overflow:hidden;transform-origin:0 0;will-change:transform,opacity;background:var(--surface)`;
+    s.appendChild(c);box.appendChild(s);
+    const fr=[];
+    for(let k=0;k<=K;k++){const p=k/K,bend=EO(cl(p/.42)),sl=E(cl((p-.2)/.8));
+      // vị trí trục chính: trượt về đích, bề dài khối co còn bằng đích
+      const tm=near?edge-tLen+i*tLen/N:edge+i*tLen/N,mm=L(m0,tm,sl),mw=L(w0,tLen/N,sl);
+      const u=near?(mm+mw/2)-edge:edge-(mm+mw/2),g=SM(cl(u/Lf));
+      const fs=L(tCs,rCs,g),fc=L(tCc,rC+rCs/2,g); // phễu tại u
+      const cs2=L(rCs,fs,bend),cc=L(rC+rCs/2,fc,bend);
+      const op=p>.86?1-(p-.86)/.14:1;
+      let tx,ty,sx,sy;
+      if(X){tx=mm-x0;ty=cc-cs2/2-y0;sx=mw/sw;sy=cs2/sh}else{ty=mm-y0;tx=cc-cs2/2-x0;sy=mw/sh;sx=cs2/sw}
+      fr.push({transform:`translate(${tx.toFixed(2)}px,${ty.toFixed(2)}px) scale(${sx.toFixed(4)},${sy.toFixed(4)})`,opacity:op.toFixed(3)})}
+    if(dir!=="out")fr.reverse();
+    anims.push(s.animate(fr,{duration:DUR,easing:"linear",fill:"forwards"}))}
+  document.body.appendChild(box);
+  Promise.all(anims.map(a=>a.finished)).catch(()=>{}).then(()=>{box.remove();done&&done()})}
+const genieCard=id=>[...document.querySelectorAll(`[data-open="${CSS.escape(id)}"]`)].find(e=>e.offsetParent)||null;
 function iosHide(el,ms){if(!el||el.hidden)return;if(!iosOn()||iosCalm()){el.hidden=true;return}clearTimeout(el._iosH);el.classList.add("ios-out");el._iosH=setTimeout(()=>{el.classList.remove("ios-out");el.hidden=true},ms||300)}
 const detKids=()=>[...document.querySelectorAll("#main>:not(.bar)")];
 function detReset(){const d=$("#detail");d.style.transition=d.style.transform=d.style.boxShadow=d.style.willChange="";detKids().forEach(k=>{k.style.transition=k.style.transform=""});document.body.classList.remove("ios-drag")}
 function detDone(){detReset();if(history.state&&history.state.sj){history.back()}else{S.sel=null;renderAll(true)}}
 /* đóng phiếu: trượt ra phải, trang dưới trôi về chỗ cũ (lò xo mượt), rồi mới đóng */
-function detClose(fromSwipe,v){const d=$("#detail");if(!iosOn()||iosCalm()||!detOverlay()){detDone();return}
+function detClose(fromSwipe,v){const d=$("#detail");
+  if(!fromSwipe&&genieOk()&&detOverlay()&&S.sel){genie(d,genieCard(S.sel),"out");d.style.visibility="hidden";detDone();return}
+  if(!iosOn()||iosCalm()||!detOverlay()){detDone();return}
   const w=d.getBoundingClientRect().width||innerWidth,left=fromSwipe?Math.max(0,w-(parseFloat((d.style.transform.match(/-?[\d.]+/)||[0])[0])||0)):w;
   const dur=Math.max(.28,Math.min(.5,left/Math.max(.6,(v||0))/1000*1.6||.45));
   document.body.classList.remove("ios-drag");const tr=`transform ${dur}s var(--sp-smooth),box-shadow ${dur}s ease`;
@@ -2018,7 +2077,7 @@ function detClose(fromSwipe,v){const d=$("#detail");if(!iosOn()||iosCalm()||!det
     if(mob())detKids().forEach(k=>{k.style.transition="transform .5s var(--sp-gentle)";k.style.transform=""});
     setTimeout(()=>{el.style.transition=el.style.transform=el.style.willChange="";detKids().forEach(k=>k.style.transition="")},520)};
   document.addEventListener("touchend",end,{passive:true});document.addEventListener("touchcancel",end,{passive:true})})();
-document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(kmenu){closeKmenu();return}if(S.view==="board"&&S.sel&&!document.querySelector(".modal:not([hidden])")){S.sel=null;renderAll(true)}}});
+document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(kmenu){closeKmenu();return}if(S.view==="board"&&S.sel&&!document.querySelector(".modal:not([hidden])")){detClose(false)}}});
 addEventListener("resize",closeKmenu);
 document.addEventListener("scroll",closeKmenu,true);
 /* chuyển động kiểu iOS: viên trượt của công tắc phân đoạn, đổi tab trượt ngang, mở job trượt vào */
@@ -2163,10 +2222,12 @@ function histText(h){
 function renderDetail(force){
   const el=$("#detail"),j=cur();
   if(!force&&j&&el.dataset.id===j.id&&el.contains(document.activeElement))return;
-  if(j&&el.dataset.id!==j.id&&iosOn()&&!iosCalm()){el.classList.remove("ios-in");void el.offsetWidth;el.classList.add("ios-in");clearTimeout(el._iosT);el._iosT=setTimeout(()=>el.classList.remove("ios-in"),600)}
+  if(j&&!el.dataset.id&&genieOk()&&S.view==="board"){const card=genieCard(j.id);el.classList.remove("ios-in");
+    requestAnimationFrame(()=>{if(!detOverlay()||S.sel!==j.id)return;el.style.visibility="hidden";genie(el,card,"in",()=>{el.style.visibility=""})})}
+  else if(j&&el.dataset.id!==j.id&&iosOn()&&!iosCalm()){el.classList.remove("ios-in");void el.offsetWidth;el.classList.add("ios-in");clearTimeout(el._iosT);el._iosT=setTimeout(()=>el.classList.remove("ios-in"),600)}
   el.dataset.id=j?j.id:"";
   document.body.classList.toggle("has-detail",!!j);detNav(!!j);
-  if(!j){el.innerHTML=`<div class="empty-detail">Chọn một job để xem thông tin, trao đổi và báo giá.</div>`;return}
+  if(!j){el.style.visibility="";el.innerHTML=`<div class="empty-detail">Chọn một job để xem thông tin, trao đổi và báo giá.</div>`;return}
   const tasks=j.tasks||[],done=tasks.filter(t=>t.done).length,si=stIdx(j.status);
   const knownNames=[...new Set(S.jobs.flatMap(x=>[x.fwd,x.company]).filter(Boolean))];
   const itemNames=[...new Set(S.jobs.flatMap(x=>(x.quote||[]).map(q=>q.name)).filter(Boolean))];
@@ -2431,7 +2492,7 @@ async function manualJob(status){
   const f=d.querySelector("form");
   if(pre){const known1=S.jobs.some(j=>j.fwd===pre);f.querySelector(`[name="${known1?"fwd":"company"}"]`).value=pre}
   const chips=()=>{const hq=st.service&&st.service!=="VC",vc=st.service&&st.service!=="HQ";
-    d.querySelector("#mj-chips").innerHTML=`<div class="row1"><b>Dịch vụ</b>${chips2("service",SERVICES,st.service,["🛃 HQ","🚚 VC","🛃🚚 HQ+VC"])}</div>
+    d.querySelector("#mj-chips").innerHTML=`<div class="row1"><b>Dịch vụ</b>${chips2("service",SERVICES,st.service,SVC_LB)}</div>
       ${hq?`<div class="row1"><b>Hàng</b>${chips2("hang",["Nhập khẩu","Xuất khẩu"],st.hang)}</div>`:""}
       ${vc?`<div class="row1"><b>Loại xe</b>${chips2("vehicle",VEHICLES,st.vehicle)}</div>`:""}`};
   chips();dmWire(d);
@@ -2717,7 +2778,11 @@ ${text.slice(0,12000)||"(không có, chỉ có ảnh)"}`,{images:files,maxImages
 
 /* ---------- Thông tin lô hàng: chọn dịch vụ rồi mới hiện ô tương ứng ---------- */
 const chips2=(f,opts,val,labels,cls)=>`<div class="chips2" role="group">${opts.map((o,i)=>`<button type="button" class="${cls?cls[i]:""}${val===o?" on":""}" data-set="${f}" data-v="${esc(o)}" aria-pressed="${val===o}">${labels?labels[i]:esc(o)}</button>`).join("")}</div>`;
-const CHECKS=[["kh","Kiểm hoá","🔍","Phí kiểm hoá"],["tv","KDTV","🌿","Phí kiểm dịch thực vật"],["dv","KDĐV","🐄","Phí kiểm dịch động vật"],["attp","ATTP","🥫","Phí kiểm tra ATTP"],["cl","KTCL","🧪","Phí kiểm tra chất lượng"]];
+/* icon nét mảnh (Lucide, ISC) cho khung Thông tin lô hàng */
+const SVI={co:`<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>`,hq:`<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>`,vc:`<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>`,paste:`<path d="M15 2H9a1 1 0 0 0-1 1v2c0 .6.4 1 1 1h6c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1Z"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2M16 4h2a2 2 0 0 1 2 2v2M11 14h10"/><path d="m17 10 4 4-4 4"/>`,imp:`<path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/>`,exp:`<path d="m18 9-6-6-6 6"/><path d="M12 3v14"/><path d="M5 21h14"/>`,kh:`<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="m16 16-1.9-1.9"/>`,tv:`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`,dv:`<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>`,attp:`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>`,cl:`<path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>`,ok:`<path d="M20 6 9 17l-5-5"/>`};
+const svi=(n,c)=>SVI[n]?`<svg class="svi${c?" "+c:""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVI[n]}</svg>`:"";
+const SVC_LB=[svi("hq")+"Hải quan",svi("vc")+"Vận chuyển",`<span class="svi2">${svi("hq")}${svi("vc")}</span>Hải quan + Vận chuyển`];
+const CHECKS=[["kh","Kiểm hoá","kh","Phí kiểm hoá"],["tv","KDTV","tv","Phí kiểm dịch thực vật"],["dv","KDĐV","dv","Phí kiểm dịch động vật"],["attp","ATTP","attp","Phí kiểm tra ATTP"],["cl","KTCL","cl","Phí kiểm tra chất lượng"]];
 let OPT_OPEN="";
 const FEE_HQ="Phí khai báo hải quan",FEE_VC="Phí vận chuyển";
 function addFee(j,name,unit="lô",first=false){j.quote=j.quote||[];if(j.quote.some(q=>q.name===name))return;const h=lastPrice(name,groupKey(j),j.id);
@@ -2738,7 +2803,7 @@ const CO_FORMS=["E","D","AK","AJ","VJ","RCEP","CPTPP","EUR.1","B","Khác"];
 const LF=(f,label,val,ph="",cls="",type="text")=>`<label class="fld ${cls}"><span>${label}</span><input id="f-${f}" data-f="${f}" type="${type}" value="${esc(val||"")}" placeholder="${esc(ph)}"></label>`;
 const MORE=["pol","pod","incoterm","refs","contact","summary","questions"];
 function lotSec(j){
-  const head=`<h3>Thông tin lô hàng<button class="ghost sm" data-act="lotFill" style="margin-left:auto">📋 Dán chữ / ảnh để tự điền</button></h3>`;
+  const head=`<h3>Thông tin lô hàng<button class="ghost sm" data-act="lotFill" style="margin-left:auto">${svi("paste")}Dán chữ / ảnh để tự điền</button></h3>`;
   const vcOn=svcOf(j)!=="HQ";
   const filled=MORE.filter(f=>!(vcOn&&(f==="pol"||f==="pod"))&&String(j[f]||"").trim()).length;
   const more=`<details ${S.lotMore?"open":""} id="lotMore"><summary>Thêm chi tiết${filled?` (${filled} ô đã điền)`:" (cảng, incoterm, liên hệ…)"}</summary>
@@ -2750,17 +2815,17 @@ function lotSec(j){
       <label class="fld full"><span>Loại việc (chọn mẫu checklist)</span><select id="f-type" data-f="type">${opt(TYPES,j.type)}</select></label></div></details>`;
   if(j.svcPending)return `<div class="sec lot">${head}
     <p style="margin:6px 0 0;font-size:15px">Job này làm gì?</p>
-    <div class="svcpick"><button data-set="service" data-v="HQ">🛃 Hải quan<small>HQ</small></button><button data-set="service" data-v="VC">🚚 Vận chuyển<small>VC</small></button><button data-set="service" data-v="HQ+VC">🛃🚚 Hải quan + Vận chuyển<small>HQ+VC</small></button></div>
+    <div class="svcpick"><button data-set="service" data-v="HQ"><span class="ics">${svi("hq")}</span>Hải quan</button><button data-set="service" data-v="VC"><span class="ics">${svi("vc")}</span>Vận chuyển</button><button data-set="service" data-v="HQ+VC"><span class="ics">${svi("hq")}${svi("vc")}</span>Hải quan + Vận chuyển</button></div>
     ${more}</div>`;
   const sv=svcOf(j),hq=sv!=="VC",vc=sv!=="HQ",truck=isTruck(j);
-  const svcRow=`<div class="row1"><b>Dịch vụ</b>${chips2("service",SERVICES,sv,["🛃 HQ","🚚 VC","🛃🚚 HQ+VC"])}</div>`;
-  const hangRow=`<div class="row1"><b>Hàng</b>${chips2("type",["Khai HQ nhập","Khai HQ xuất"],j.type==="Khai HQ xuất"?"Khai HQ xuất":j.type==="Khai HQ nhập"?"Khai HQ nhập":"",["Nhập khẩu","Xuất khẩu"])}</div>`;
+  const svcRow=`<div class="row1"><b>Dịch vụ</b>${chips2("service",SERVICES,sv,SVC_LB)}</div>`;
+  const hangRow=`<div class="row1"><b>Hàng</b>${chips2("type",["Khai HQ nhập","Khai HQ xuất"],j.type==="Khai HQ xuất"?"Khai HQ xuất":j.type==="Khai HQ nhập"?"Khai HQ nhập":"",[svi("imp")+"Nhập khẩu",svi("exp")+"Xuất khẩu"])}</div>`;
   const hqBlk=`${vc?`<div class="sub">Hải quan</div>`:""}
-    ${OPT_OPEN===j.id&&["Khai HQ nhập","Khai HQ xuất"].includes(j.type)?`<div class="row1"><b>Tuỳ chọn</b><div class="chips2 chk" role="group">${CHECKS.map(([k,l,ic,fee])=>{const on=(j.checks||[]).includes(k);return `<button type="button" class="${on?"on":""}" title="${fee.slice(4)}" data-set="chk" data-v="${k}" aria-pressed="${on}">${on?"✓":ic} ${l}</button>`}).join("")}${j.type==="Khai HQ xuất"||j.coNeed==="Có"?`<button type="button" class="${j.coNeed==="Có"?"on":""}" title="Xin C/O" data-set="coNeed" data-v="Có" aria-pressed="${j.coNeed==="Có"}">${j.coNeed==="Có"?"✓":"📜"} C/O</button>`:""}</div></div>`:""}
+    ${OPT_OPEN===j.id&&["Khai HQ nhập","Khai HQ xuất"].includes(j.type)?`<div class="row1"><b>Tuỳ chọn</b><div class="chips2 chk" role="group">${CHECKS.map(([k,l,ic,fee])=>{const on=(j.checks||[]).includes(k);return `<button type="button" class="${on?"on":""}" title="${fee.slice(4)}" data-set="chk" data-v="${k}" aria-pressed="${on}">${on?svi("ok"):svi(ic)}${l}</button>`}).join("")}${j.type==="Khai HQ xuất"||j.coNeed==="Có"?`<button type="button" class="${j.coNeed==="Có"?"on":""}" title="Xin C/O" data-set="coNeed" data-v="Có" aria-pressed="${j.coNeed==="Có"}">${j.coNeed==="Có"?svi("ok"):svi("co")}C/O</button>`:""}</div></div>`:""}
     <div class="g2">${j.type==="Khai HQ xuất"?LF("bl","Số booking",j.bl,"VD: BKG2411087"):LF("bl","Số B/L",j.bl,"VD: HPH123456789")}${LF("cont",truck?"Số xe / tải trọng":"Số cont",j.cont,truck?"VD: 1 xe 8 tấn":"VD: 2x40HC TGHU1234567")}
       ${LF("tkNo","Số tờ khai",j.tkNo,"12 số")}${LF("tkDate","Ngày tờ khai",j.tkDate,"","","date")}
       ${LF("hqCode","Mã Hải quan",j.hqCode,"VD: 02CI")}${LF("mst","MST khách",j.mst,"10 hoặc 13 số")}
-      ${LF("hqOfficer","Cán bộ HQ làm tờ khai",j.hqOfficer,"Tên người hải quan")}<label class="fld"><span>Luồng</span><select id="f-lane" data-f="lane" class="lanesel ln-${{Xanh:"g",Vàng:"y",Đỏ:"r"}[j.lane]||"0"}"><option value="">Chọn luồng</option>${[["Xanh","🟢"],["Vàng","🟡"],["Đỏ","🔴"]].map(([v,i])=>`<option value="${v}"${j.lane===v?" selected":""}>${i} ${v}</option>`).join("")}</select></label></div>
+      ${LF("hqOfficer","Cán bộ HQ làm tờ khai",j.hqOfficer,"Tên người hải quan")}<label class="fld"><span>Luồng</span><select id="f-lane" data-f="lane" class="lanesel ln-${{Xanh:"g",Vàng:"y",Đỏ:"r"}[j.lane]||"0"}"><option value="">Chọn luồng</option>${["Xanh","Vàng","Đỏ"].map(v=>`<option value="${v}"${j.lane===v?" selected":""}>Luồng ${v.toLowerCase()}</option>`).join("")}</select></label></div>
     <div class="g2">${LF("cargo","Hàng hoá / số lượng",j.cargo,"VD: Máy móc, 25 kiện","full")}</div>
     ${tkCheckRow(j)}
     ${j.coNeed==="Có"?`<div class="sub">Xin C/O</div><div class="row1"><b>Form</b>${chips2("coForm",CO_FORMS,j.coForm||"")}</div>
@@ -3843,7 +3908,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26k";
+const APP_VER="2026-11-26l";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -3928,8 +3993,8 @@ async function srcDel(j,k,i){
 /* ---------- modal: capture & analyze ---------- */
 let pending=[],ctl=null;
 const M=$("#modal");
-function openModal(){M.hidden=false;note("");renderPending();setTimeout(()=>$("#drop").focus(),30)}
-function closeModal(){if(ctl)ctl.abort();iosHide(M,300);pending.forEach(p=>URL.revokeObjectURL(p.url));pending=[];$("#rawtext").value=""}
+function openModal(){M.hidden=false;if(genieOk()){const sh=M.querySelector(".sheet");M.classList.add("genie-on");requestAnimationFrame(()=>{sh.style.visibility="hidden";genie(sh,$("#btnManual"),"in",()=>{sh.style.visibility="";M.classList.remove("genie-on")})})}note("");renderPending();setTimeout(()=>$("#drop").focus(),30)}
+function closeModal(){if(ctl)ctl.abort();if(genieOk()&&!M.hidden){const sh=M.querySelector(".sheet");genie(sh,$("#btnManual"),"out");sh.style.visibility="hidden";iosHide(M,300);setTimeout(()=>{sh.style.visibility=""},320)}else iosHide(M,300);pending.forEach(p=>URL.revokeObjectURL(p.url));pending=[];$("#rawtext").value=""}
 function addFiles(files){
   [...files].filter(f=>f&&f.type&&f.type.startsWith("image/")).forEach(f=>pending.push({file:f,url:URL.createObjectURL(f)}));
   if(pending.length>5){pending.slice(5).forEach(p=>URL.revokeObjectURL(p.url));pending=pending.slice(0,5);note("Tối đa 5 ảnh mỗi job.",true)}
