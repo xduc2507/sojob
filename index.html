@@ -825,6 +825,14 @@ body.view-report #side,body.view-report #detail{display:none}
 @media (min-width:781px){
   .bar{position:sticky;top:calc(var(--topH,58px) + env(safe-area-inset-top,0px));z-index:4;background:var(--bg);margin-block:-6px;padding-block:6px;box-shadow:0 1px 0 transparent;transition:box-shadow .15s}
   .bar.stuck{box-shadow:0 6px 8px -8px rgba(0,0,0,.25)}
+  /* tab luôn 1 hàng, không nhảy dòng; thiếu chỗ thì thu gọn, rồi cuộn ngang trong thanh */
+  .bar .tabs{flex-wrap:nowrap;flex:0 1 auto;min-width:0;max-width:100%;overflow-x:auto;overflow-y:hidden;scrollbar-width:none}
+  .bar .tabs::-webkit-scrollbar{display:none}
+  .bar .tabs button{flex:none;white-space:nowrap;padding:5px 9px}
+  .bar .tabs button .ic-fa{margin-right:4px}
+  /* thanh tab là hàng riêng trên cùng, trải hết bề ngang: đổi tab không xê dịch */
+  .app>.bar{grid-column:1/-1}
+  .app:has(>.bar) #side,.app:has(>.bar) #detail{top:calc(var(--topH,58px) + var(--barH,47px) + 10px);max-height:calc(100vh - var(--topH,58px) - var(--barH,47px) - 26px)}
 }
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
@@ -1975,7 +1983,14 @@ function lateNotify(){
 }
 setInterval(()=>{if(S.loaded){renderAll(false)}},5*60*1000); // cập nhật đồng hồ quá hạn
 /* chiều cao thanh trên cùng → thanh tab ghim ngay bên dưới; đổ bóng khi đã ghim */
-(function(){const set=()=>{const t=document.querySelector(".top");if(t)document.documentElement.style.setProperty("--topH",t.offsetHeight+"px")};
+(function(){
+  /* máy tính (không phải app cài): chuyển thanh tab ra hàng riêng đầu .app; điện thoại / app cài: để trong #main như cũ */
+  const place=()=>{const b=document.querySelector(".bar"),app=document.querySelector(".app"),m=$("#main"),pf=$("#prof");if(!b||!app||!m)return;
+    const top=matchMedia("(min-width:781px)").matches&&!document.documentElement.classList.contains("desk");
+    if(top&&b.parentNode!==app)app.insertBefore(b,app.firstChild);
+    else if(!top&&b.parentNode!==m)m.insertBefore(b,pf||m.firstChild)};
+  const set=()=>{place();const t=document.querySelector(".top"),b=document.querySelector(".bar"),r=document.documentElement.style;
+    if(t)r.setProperty("--topH",t.offsetHeight+"px");if(b&&b.offsetHeight)r.setProperty("--barH",b.offsetHeight+"px")};
   addEventListener("resize",set);addEventListener("load",set);setTimeout(set,0);
   addEventListener("scroll",()=>{const b=document.querySelector(".bar");if(!b)return;const top=parseFloat(getComputedStyle(b).top)||0;b.classList.toggle("stuck",getComputedStyle(b).position==="sticky"&&b.getBoundingClientRect().top<=top+1&&scrollY>0)},{passive:true})})();
 function renderAll(forceDetail){renderLateBar();lateNotify();chatNotify();renderSide();renderMain();renderDetail(forceDetail);nbellPaint();try{todayBadge()}catch(e){}try{dkSbPaint()}catch(e){}}
@@ -2035,7 +2050,7 @@ $("#space").addEventListener("click",e=>{const b=e.target.closest("[data-space]"
 $("#latebar").addEventListener("click",e=>{const x=e.target.closest("[data-xl]");if(x){x.dataset.xl==="in"?xlImport():xlExport();return}const b=e.target.closest("[data-late]");if(!b)return;S.fLate=b.dataset.late==="on";if(S.fLate&&S.view!=="board")S.view="list";renderAll(false)});
 $("#q").addEventListener("input",e=>{S.q=e.target.value;renderMain()});
 $("#fStatus").addEventListener("change",e=>{S.fStatus=e.target.value;renderMain()});
-document.querySelectorAll(".tabs button[data-view]").forEach(b=>b.addEventListener("click",()=>{tmenuClose();S.view=b.dataset.view;renderMain()}));
+document.querySelectorAll(".tabs button[data-view]").forEach(b=>b.addEventListener("click",()=>{tmenuClose();S.view=b.dataset.view;renderMain();try{b.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}}));
 /* Điện thoại: thanh tab ở đáy; Danh sách / Báo cáo nằm trong nút Thêm */
 function tmenuClose(){document.getElementById("tmenu")?.remove();document.querySelector(".tmore")?.setAttribute("aria-expanded","false")}
 function tmoreSync(){const m=document.querySelector(".tmore");if(!m)return;const on=S.view==="list"||S.view==="report";m.classList.toggle("on",on);
@@ -3525,7 +3540,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26d";
+const APP_VER="2026-11-26e";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
