@@ -1090,6 +1090,44 @@ table.rp-t td.bad{color:var(--bad);font-weight:700}table.rp-t td.warn{color:var(
 .kb .col.c11 .kc .tg .sv{background:#fff!important;color:var(--ink)!important}
 @media (max-width:780px){.kb{gap:10px}.kb .col-h .nm{font-size:15px}.kb .kc{padding:11px 12px 10px}}
 @media (prefers-reduced-motion:reduce){.kb .kc:hover{transform:none}}
+/* ===== Bóng bẩy: nút nổi nhẹ (chuyển màu + bóng), bo 6px, thẻ có bóng mềm, thanh trên chuyển màu. Giữ nguyên màu, bố cục ===== */
+:root{--gl-hi:rgba(255,255,255,.55);--gl-sh:0 1px 2px rgba(16,32,48,.10),0 1px 1px rgba(16,32,48,.04);--gl-sh2:0 3px 8px rgba(16,32,48,.14),0 1px 2px rgba(16,32,48,.08);--gl-card:0 1px 3px rgba(16,32,48,.06),0 4px 14px rgba(16,32,48,.05)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--gl-hi:rgba(255,255,255,.08);--gl-sh:0 1px 2px rgba(0,0,0,.35);--gl-sh2:0 3px 10px rgba(0,0,0,.45);--gl-card:0 1px 3px rgba(0,0,0,.3)}}
+:root[data-theme="dark"]{--gl-hi:rgba(255,255,255,.08);--gl-sh:0 1px 2px rgba(0,0,0,.35);--gl-sh2:0 3px 10px rgba(0,0,0,.45);--gl-card:0 1px 3px rgba(0,0,0,.3)}
+/* nút phụ: nền trắng → xám rất nhạt, viền mảnh, bóng 1px, sáng mép trên */
+button:not(.primary):not(.ghost):not(.x):not(.cpop-x):not(.kb-fab):not(.side-btn):not(.np-i):not(.g){border-radius:6px;
+  background:linear-gradient(180deg,var(--surface) 0%,color-mix(in oklab,var(--surface) 92%,var(--ink)) 100%);border-color:color-mix(in oklab,var(--line) 70%,var(--ink));
+  box-shadow:inset 0 1px 0 var(--gl-hi),var(--gl-sh);color:var(--ink)}
+button:not(.primary):not(.ghost):not(.x):not(.cpop-x):hover:not(:disabled){background:linear-gradient(180deg,var(--surface) 0%,color-mix(in oklab,var(--surface) 86%,var(--ink)) 100%)!important;box-shadow:inset 0 1px 0 var(--gl-hi),var(--gl-sh2)}
+/* nút màu (chính, debit, tờ khai, tạo job): chuyển màu đậm dần, viền đậm hơn, sáng mép trên */
+button.primary,button.debitbtn,button.go,button.tkbtn,.top #btnManual,button.back,button.primary.bad,button.danger:not(.ghost){border-radius:6px!important;
+  background-image:linear-gradient(180deg,rgba(255,255,255,.18),rgba(0,0,0,.08))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.28),0 1px 2px rgba(0,0,0,.18),0 2px 6px -2px rgba(0,0,0,.22);text-shadow:0 1px 0 rgba(0,0,0,.12)}
+button.primary:hover:not(:disabled),button.debitbtn:hover:not(:disabled),button.go:hover:not(:disabled),button.tkbtn:hover:not(:disabled),.top #btnManual:hover:not(:disabled){
+  background-image:linear-gradient(180deg,rgba(255,255,255,.26),rgba(0,0,0,.04))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.3),0 3px 10px -2px rgba(0,0,0,.3);transform:translateY(-1px)}
+button:active:not(:disabled){transform:translateY(1px)!important;box-shadow:inset 0 1px 3px rgba(0,0,0,.18)!important}
+button.ghost{border-radius:6px}
+/* thanh trên: chuyển màu xanh, đường sáng mảnh ở đáy */
+.top{background:linear-gradient(180deg,color-mix(in oklab,var(--nav) 82%,#4aa3e8) 0%,var(--nav) 100%)!important;box-shadow:0 1px 0 rgba(255,255,255,.08) inset,0 2px 8px rgba(1,40,80,.25)!important}
+.top button:not(.primary):not(#btnManual){background:rgba(255,255,255,.10)!important;border-color:rgba(255,255,255,.32)!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.15)!important;color:#fff!important;border-radius:6px}
+.top .space{border-radius:8px!important;padding:2px;box-shadow:inset 0 1px 2px rgba(0,0,0,.18)}
+.top .space button{border-radius:6px!important}
+.top .space button.on{box-shadow:0 1px 3px rgba(0,0,0,.25)!important}
+.top input{border-radius:8px;box-shadow:inset 0 1px 2px rgba(0,0,0,.12)}
+/* tab: khay lõm, tab đang chọn nổi lên */
+.tabs{border-radius:9px!important;padding:3px!important;background:color-mix(in oklab,var(--surface) 94%,var(--ink))!important;box-shadow:inset 0 1px 2px rgba(16,32,48,.08)}
+.tabs button{border-radius:7px!important;transition:background-color .15s,color .15s,box-shadow .15s}
+.tabs button:hover:not(.on){color:var(--ink)!important;background:color-mix(in oklab,var(--surface) 70%,transparent)!important}
+.tabs button.on{background:linear-gradient(180deg,color-mix(in oklab,var(--primary) 80%,#fff),var(--primary))!important;box-shadow:inset 0 1px 0 rgba(255,255,255,.25),0 1px 3px rgba(0,0,0,.18),0 2px 6px -2px color-mix(in oklab,var(--primary) 60%,transparent)}
+/* thẻ, khung: bo 8px, bóng mềm */
+.card,.sec.lot,.teamchat,.review,.stat,.odbox{border-radius:8px!important;box-shadow:var(--gl-card)}
+.kc{border-radius:7px!important;box-shadow:0 1px 2px rgba(16,32,48,.07)}
+.col{border-radius:8px!important}
+.sec h3{background:linear-gradient(180deg,color-mix(in oklab,var(--primary) 85%,#fff),var(--primary))!important;border-radius:8px 8px 0 0;box-shadow:inset 0 1px 0 rgba(255,255,255,.2)}
+.kmenu,.npanel,.tm-sug,#chatPops .cpop,.dbbox .sheet,.modal .sheet{border-radius:10px!important;box-shadow:0 10px 30px rgba(16,32,48,.18),0 2px 6px rgba(16,32,48,.1)!important}
+/* ô nhập: bo 6px, lõm nhẹ */
+input:not([type=checkbox]):not([type=radio]),select,textarea{border-radius:6px;box-shadow:inset 0 1px 2px rgba(16,32,48,.05)}
+.pill{border-radius:999px}
+@media (prefers-reduced-motion:reduce){button:hover{transform:none!important}}
 /* ===== Giao diện kiểu app máy tính (2026-11-26c): giữ bố cục 3 cột, mỗi khung tự cuộn, thanh tiêu đề + thanh trạng thái,
    chữ Segoe UI, góc vuông 4px, viền rõ, nút/ô nhập cao đều 28px. Chỉ áp cho bản cài trên máy tính (cửa sổ riêng) hoặc thêm ?desk=1; màn rộng ≥1181px. Trình duyệt thường và điện thoại giữ nguyên. ===== */
 :root{--dk-side:#f5f6f7;--dk-pane:#ffffff;--dk-bg:#eceef0;--dk-line:#d9dde1;--dk-line2:#c6ccd2;--dk-hover:#eef1f4;--dk-sel:#e3eefa;--dk-head:#f7f8f9;--dk-top:44px;--dk-sb:24px}
@@ -3540,7 +3578,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26e";
+const APP_VER="2026-11-26f";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
