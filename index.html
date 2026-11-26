@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="firebase-config.js?v=483007a3c3"></script>
-<script src="static-shim.js?v=bb3a17dce6"></script>
+<script src="static-shim.js?v=676aafdffa"></script>
 <script>/* giao diện kiểu iOS: mặc định cho mọi người; ?ios=0 tắt, ?ios=1 bật lại (nhớ trên máy) */
 (function(){var on=true;try{var q=location.search.match(/[?&]ios=([01])/);if(q)localStorage.setItem("sojob.ios2",q[1]);on=localStorage.getItem("sojob.ios2")!=="0"}catch(e){}if(on)document.documentElement.classList.add("ios")})();</script>
 <script>/* giao diện app máy tính: bật khi mở bằng app đã cài (cửa sổ riêng); ?desk=1 bật, ?desk=0 tắt (nhớ trên máy) */
@@ -12,6 +12,8 @@ if(!document.documentElement.classList.contains("ios")&&(v==="1"||(v!=="0"&&matc
 <link rel="apple-touch-icon" href="apple-touch-icon.png?v=2">
 <link rel="icon" type="image/png" sizes="64x64" href="favicon.png?v=2">
 <meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="format-detection" content="telephone=no">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Sổ Job">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -946,6 +948,42 @@ table.q tr.fvhead td{background:var(--accent-soft)!important;color:var(--accent)
 .mstinfo>div{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.mstinfo b{font-weight:600}.mstinfo span{color:var(--muted)}
 .mstinfo .warn{color:var(--bad)!important;font-weight:600}.mstinfo.bad{background:var(--bad-soft)}
 .mstinfo button{flex:none;align-self:center}
+/* ===== Tối ưu cho iPhone / iPad ===== */
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+/* iOS phóng to trang khi gõ vào ô chữ nhỏ hơn 16px: đặt 16px cho ô nhập trên iPhone / iPad (chỉ Safari iOS có -webkit-touch-callout) */
+@supports (-webkit-touch-callout:none){
+  input:not([type=checkbox]):not([type=radio]):not([type=range]),select,textarea{font-size:16px!important}
+  .kc,.row,.td-i,button,.tabs,.g{-webkit-touch-callout:none}
+  button,.tabs button,.kc .mn{-webkit-user-select:none;user-select:none}
+}
+/* máy cảm ứng: bỏ hiệu ứng rê chuột bị "dính" sau khi chạm */
+@media (hover:none){html.ios .kc:hover,html.ios .row:hover{transform:none!important;box-shadow:0 1px 3px rgba(0,0,0,.07)!important}
+  html.ios button:not(.primary):not(.ghost):not(.x):not(.cpop-x):hover:not(:disabled){filter:none}}
+/* app cài trên màn hình chính: không kéo dãn trang lộ nền trắng */
+@media (display-mode: standalone){html,body{overscroll-behavior-y:none}}
+/* điện thoại: bảng Quy trình vuốt ngang dừng đúng từng cột; hộp thoại chừa vùng thanh Home */
+@media (max-width:780px){
+  .kb{scroll-snap-type:x mandatory;scroll-padding-left:12px;-webkit-overflow-scrolling:touch}
+  .kb .col{scroll-snap-align:start}
+  .modal .sheet,.dbbox .sheet{padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))!important}
+  #detail{scroll-padding-bottom:120px}
+}
+/* iPhone: thanh trên cùng gọn 2 dòng — dòng 1: Sổ chung / Việc riêng, nút +, chuông, cài đặt; dòng 2: ô tìm */
+#btnSettings .svi{width:16px;height:16px;margin-right:4px}
+@media (max-width:520px){
+  .top{gap:8px!important;padding-block:8px!important}
+  .top .brand{display:none!important}
+  .top .space{margin-right:auto;min-width:0}
+  .top{gap:6px!important}
+  .top .space button{padding:4px 9px!important;font-size:13px!important;min-height:32px!important}
+  .top .space button .fa{margin-right:3px!important}
+  #btnManual{font-size:0!important;width:36px;min-width:36px;height:36px;min-height:36px!important;padding:0!important;border-radius:50%!important;justify-content:center}
+  #btnManual .fa{font-size:17px!important;margin:0!important}
+  html.ios #btnManual .fa::before{width:18px;height:18px}
+  .nbell,#btnSettings{width:36px;min-width:36px;height:36px;min-height:36px!important;padding:0!important;border-radius:50%!important;display:inline-flex;align-items:center;justify-content:center}
+  #btnSettings .st-lb{display:none}#btnSettings .svi{width:18px;height:18px;margin:0}
+  .top input{order:9;flex:1 1 100%}
+}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -2093,6 +2131,10 @@ document.addEventListener("click",e=>{
   else if(a==="reopen")moveAndRender(j,STAGES[0]);
   else if(a==="copy"){openJob(j.id);copy(briefText(j))}
 });
+/* iPhone: bàn phím bật lên có thể che ô đang gõ (ô chat ở đáy phiếu) → cuộn ô đó vào giữa vùng còn thấy */
+(function(){if(!/iPhone|iPad|iPod/i.test(navigator.userAgent)&&!(navigator.maxTouchPoints>1&&/Mac/.test(navigator.platform)))return;
+  document.addEventListener("focusin",e=>{const t=e.target;if(!t.matches||!t.matches("input:not([type=checkbox]):not([type=radio]),textarea,select"))return;
+    setTimeout(()=>{const vv=window.visualViewport,r=t.getBoundingClientRect(),h=vv?vv.height:innerHeight;if(r.bottom>h-12||r.top<60)try{t.scrollIntoView({block:"center",behavior:"smooth"})}catch(_){}},350)})})();
 /* Quay lại từ phiếu job: nút Back / vuốt quay lại của trình duyệt (iPhone Safari, Android) và vuốt từ trái qua phải trên phiếu (cả khi mở bằng app cài trên màn hình chính) */
 let detSkip=false;
 const detOverlay=()=>{const d=$("#detail");return !!d&&getComputedStyle(d).position==="fixed"};
@@ -4166,7 +4208,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26z";
+const APP_VER="2026-11-27a";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
