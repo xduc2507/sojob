@@ -1009,6 +1009,8 @@ html .tdw .tdw-i.zero{opacity:.5;box-shadow:none!important}
 body.kb-touchdrag{-webkit-user-select:none;user-select:none}
 body.kb-touchdrag .kb .col.over{outline:2px dashed var(--c,var(--accent));outline-offset:-4px}
 @media (hover:none){.kb .kc{-webkit-user-select:none;user-select:none}}
+/* bôi chữ trong phiếu: không lan sang bảng / thanh trên */
+body.sel-in-detail #main,body.sel-in-detail #side,body.sel-in-detail .top{-webkit-user-select:none;user-select:none}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -2730,11 +2732,19 @@ async function copy(text){
 
 /* ---------- events: main ---------- */
 /* Tab Quy trình: bấm ra vùng trống bên ngoài phiếu job thì thu phiếu lại */
+/* Chỉ thu phiếu khi NHẤN và THẢ đều ở vùng trống bên ngoài. Bôi chọn chữ trong phiếu rồi kéo chuột ra ngoài (để copy) thì không đóng. */
+const OUTSIDE_SEL="#detail,.kc,.modal,.kmenu,[data-kmenu],.top,#toast,.lb,input,select,textarea,button,a,label,.genie,#chatPops,.npanel,.tmenu";
+let downOutside=false;
+document.addEventListener("pointerdown",e=>{const t=e.target;downOutside=!!(t&&t.isConnected&&!t.closest(OUTSIDE_SEL));
+  document.body.classList.toggle("sel-in-detail",!!(t&&t.closest&&t.closest("#detail")&&!t.closest("input,textarea,select,button")))},true);
+document.addEventListener("pointerup",()=>setTimeout(()=>document.body.classList.remove("sel-in-detail"),0),true);
 document.addEventListener("click",e=>{
-  if(S.view!=="board"||!S.sel||!document.body.classList.contains("has-detail"))return;
+  if(!["board","archive"].includes(S.view)||!S.sel||!document.body.classList.contains("has-detail"))return;
   const t=e.target;if(!t.isConnected)return;
-  if(t.closest("#detail,.kc,.modal,.kmenu,[data-kmenu],.top,#toast,.lb,input,select,textarea,button,a,label"))return;
-  S.sel=null;renderAll(true);
+  if(!downOutside)return;downOutside=false;                       // nhấn chuột bắt đầu trong phiếu (vd đang bôi chữ) → bỏ qua
+  if(t.closest(OUTSIDE_SEL))return;
+  const sel=window.getSelection&&String(window.getSelection()||"");if(sel.trim())return; // đang có chữ được bôi chọn → không đóng
+  detClose(false);
 });
 ["click","keydown","touchstart"].forEach(ev=>document.addEventListener(ev,()=>{if(mineOn()&&mineOpen())touchMine()},{passive:true,capture:true}));
 setInterval(()=>{if(mineOn()&&!mineOpen()){SPACE="team";try{localStorage.setItem(SPACE_LS,"team")}catch(e){}applySpace();renderAll(true);toast("Đã tự khoá Việc riêng sau 10 phút không dùng.")}},30000);
@@ -4318,7 +4328,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-27d";
+const APP_VER="2026-11-27e";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
