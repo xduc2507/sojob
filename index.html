@@ -1997,55 +1997,43 @@ function detNav(open){try{const st=history.state&&history.state.sj;
 addEventListener("popstate",()=>{if(detSkip){detSkip=false;return}
   if(S.sel&&!(history.state&&history.state.sj)){S.sel=null;renderAll(true)}});
 /* ===== Hiệu ứng thần đèn (Genie, như macOS) — máy tính, giao diện iOS =====
-   Cắt phiếu thành 18 lát theo hướng tới đích; mỗi lát co hẹp + trượt về đích với độ trễ khác nhau (lát gần đích đi trước)
-   → mép phiếu uốn cong, thắt lại rồi bị hút vào thẻ job (không thấy thẻ thì hút xuống giữa đáy màn hình như Dock). Mở phiếu = chạy ngược. */
+   Một bản sao duy nhất của phiếu; mỗi khung hình: co dọc trục chính + co trục phụ, và cắt theo đường viền phễu cong (clip-path 2×61 điểm)
+   → mép cong liền, không răng cưa, không khựng (trước đây 44 lát nhân bản làm khựng 200ms và lộ bậc). Đích: thẻ job; không thấy thẻ thì đáy màn hình. */
 const genieOk=()=>iosOn()&&!iosCalm()&&matchMedia("(min-width:781px)").matches&&!!Element.prototype.animate;
 function genie(src,target,dir,done){
   const r=src.getBoundingClientRect();if(!r.width||!r.height){done&&done();return}
   let t=target&&target.getBoundingClientRect?target.getBoundingClientRect():null;
   if(!t||!t.width||t.bottom<0||t.top>innerHeight||t.right<0||t.left>innerWidth)t={left:innerWidth/2-28,top:innerHeight-10,width:56,height:10};
   const tc={x:t.left+t.width/2,y:t.top+t.height/2},rc={x:r.left+r.width/2,y:r.top+r.height/2};
-  const ax=Math.abs(tc.x-rc.x)>Math.abs(tc.y-rc.y)?"x":"y"; // đích nằm ngang → lát dọc; đích nằm dưới/trên → lát ngang
-  const N=Math.max(24,Math.min(44,Math.round((ax==="x"?r.width:r.height)/18))),cs=getComputedStyle(src),st=src.scrollTop||0;
-  const base=src.cloneNode(true);base.removeAttribute("id");base.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));base.classList.remove("ios-in");
-  base.style.cssText=`position:absolute;left:0;top:${-st}px;width:${r.width}px;min-height:${r.height+st}px;height:auto;margin:0;max-height:none;overflow:visible;transform:none;animation:none;transition:none;box-shadow:none;border-radius:0;visibility:visible;background:${cs.backgroundColor==="rgba(0, 0, 0, 0)"?"var(--surface)":cs.backgroundColor}`;
-  const box=document.createElement("div");box.className="genie";box.setAttribute("aria-hidden","true");
-  box.style.cssText="position:fixed;inset:0;z-index:70;pointer-events:none;overflow:hidden;contain:strict";
-  /* mô hình phễu: cả khối trượt dọc trục chính vào đích; bề ngang (trục phụ) của mỗi lát = bề ngang phễu tại vị trí lát đó
-     → các lát luôn liền nhau, mép cong mượt. Pha đầu: phễu uốn dần (bend); pha sau: khối trượt và co vào đích (slide). */
-  const X=ax==="x",near=X?tc.x<rc.x:tc.y<rc.y;
+  const X=Math.abs(tc.x-rc.x)>Math.abs(tc.y-rc.y),near=X?tc.x<rc.x:tc.y<rc.y;
   const rS=X?r.left:r.top,rLen=X?r.width:r.height,rC=X?r.top:r.left,rCs=X?r.height:r.width;
-  const tS=X?t.left:t.top,tLen=Math.max(8,X?t.width:t.height),tCs=Math.max(8,X?t.height:t.width),tCc=(X?t.top+t.height/2:t.left+t.width/2);
-  const edge=near?tS+tLen:tS,gap=near?rS-edge:edge-(rS+rLen),Lf=Math.max(120,Math.abs(gap)+rLen*.55);
-  /* đường cong mềm: uốn bằng cosin, trượt nhanh dần khi bị hút vào (đóng) / chậm dần khi bung ra (mở), 48 khung mỗi lát */
-  const cl=x=>x<0?0:x>1?1:x,L=(a,b,k)=>a+(b-a)*k,COS=x=>(1-Math.cos(Math.PI*x))/2;
-  const EIN=x=>Math.pow(cl(x),2.3); // nhanh dần (bị hút vào), mượt ở đầu
-  const SOFT=x=>{x=cl(x);return x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2}; // vào/ra rất êm
-  const DUR=dir==="out"?760:660,K=48,anims=[],w0=rLen/N;
-  for(let i=0;i<N;i++){
-    const s=document.createElement("div"),c=base.cloneNode(true),m0=rS+i*w0;
-    let x0,y0,sw,sh;
-    if(X){x0=m0;y0=r.top;sw=w0;sh=r.height;c.style.left=`${-i*w0}px`}else{x0=r.left;y0=m0;sw=r.width;sh=w0;c.style.top=`${-st-i*w0}px`}
-    s.style.cssText=`position:absolute;left:${x0}px;top:${y0}px;width:${sw+(X?1.2:0)}px;height:${sh+(X?0:1.2)}px;overflow:hidden;transform-origin:0 0;will-change:transform,opacity;background:var(--surface);backface-visibility:hidden`;
-    s.appendChild(c);box.appendChild(s);
-    const fr=[];
-    for(let k=0;k<=K;k++){const p=k/K;
-      const bend=SOFT(p/.55),sl=dir==="out"?EIN(cl((p-.18)/.82)):SOFT(cl((p-.18)/.82));
-      const tm=near?edge-tLen+i*tLen/N:edge+i*tLen/N,mm=L(m0,tm,sl),mw=L(w0,tLen/N,sl);
-      const u=near?(mm+mw/2)-edge:edge-(mm+mw/2),g=COS(cl(u/Lf));
-      const fs=L(tCs,rCs,g),fc=L(tCc,rC+rCs/2,g);
-      const cs2=L(rCs,fs,bend),cc=L(rC+rCs/2,fc,bend);
-      const op=p>.9?1-COS((p-.9)/.1):1;
-      let tx,ty,sx,sy;
-      if(X){tx=mm-x0;ty=cc-cs2/2-y0;sx=mw/sw;sy=cs2/sh}else{ty=mm-y0;tx=cc-cs2/2-x0;sy=mw/sh;sx=cs2/sw}
-      fr.push({transform:`translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) scale(${sx.toFixed(4)},${sy.toFixed(4)})`,opacity:op.toFixed(3)})}
-    if(dir!=="out")fr.reverse();
-    anims.push(s.animate(fr,{duration:DUR,easing:"linear",fill:"forwards"}))}
-  /* bóng mờ dưới phễu, nhạt dần theo tiến trình */
-  const sh0=document.createElement("div");sh0.style.cssText=`position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.18)`;
-  box.prepend(sh0);anims.push(sh0.animate(dir==="out"?[{opacity:1},{opacity:0,offset:.45},{opacity:0}]:[{opacity:0},{opacity:0,offset:.55},{opacity:1}],{duration:DUR,fill:"forwards"}));
-  document.body.appendChild(box);
-  Promise.all(anims.map(a=>a.finished)).catch(()=>{}).then(()=>{box.remove();done&&done()})}
+  const tLen=Math.max(10,X?t.width:t.height),tCs=Math.max(10,X?t.height:t.width),tCc=X?tc.y:tc.x,tS=X?t.left:t.top;
+  const edge=near?tS+tLen:tS,gap=near?rS-edge:edge-(rS+rLen),Lf=Math.max(140,Math.abs(gap)+rLen*.6);
+  const cl=x=>x<0?0:x>1?1:x,Lp=(a,b,k)=>a+(b-a)*k,COS=x=>(1-Math.cos(Math.PI*x))/2;
+  const SOFT=x=>{x=cl(x);return x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2},EIN=x=>Math.pow(cl(x),2.2);
+  const st=src.scrollTop||0,cs=getComputedStyle(src);
+  const c=src.cloneNode(true);c.removeAttribute("id");c.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));c.classList.remove("ios-in");
+  c.style.cssText=`position:absolute;left:0;top:${-st}px;width:${r.width}px;min-height:${r.height+st}px;height:auto;margin:0;max-height:none;overflow:visible;transform:none;animation:none;transition:none;box-shadow:none;border-radius:0;visibility:visible;background:${cs.backgroundColor==="rgba(0, 0, 0, 0)"?"var(--surface)":cs.backgroundColor}`;
+  const w=document.createElement("div");w.className="genie";w.setAttribute("aria-hidden","true");
+  w.style.cssText=`position:fixed;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;z-index:70;pointer-events:none;overflow:hidden;background:var(--surface);transform-origin:0 0;will-change:transform,clip-path,opacity;contain:layout paint`;
+  w.appendChild(c);
+  const P=60,K=44,DUR=dir==="out"?720:640,fr=[];
+  for(let k=0;k<=K;k++){const p=k/K,bend=SOFT(p/.55),sl=dir==="out"?EIN((p-.16)/.84):SOFT((p-.16)/.84);
+    const ms=near?Lp(rS,edge-tLen,sl):Lp(rS,edge,sl),km=Lp(1,tLen/rLen,sl);
+    const top=[],bot=[];let mn=1e9,mx=-1e9;
+    for(let j=0;j<=P;j++){const aa=j/P*rLen,m=ms+aa*km,u=near?m-edge:edge-m,g=COS(cl(u/Lf));
+      const fs=Lp(tCs,rCs,g),fc=Lp(tCc,rC+rCs/2,g),w2=Lp(rCs,fs,bend),cc=Lp(rC+rCs/2,fc,bend);
+      top.push([aa,cc-w2/2]);bot.push([aa,cc+w2/2]);mn=Math.min(mn,cc-w2/2);mx=Math.max(mx,cc+w2/2)}
+    const sc=Math.max(.02,(mx-mn)/rCs),c0=mn;
+    const loc=v=>(v-c0)/sc; // toạ độ trục phụ trong bản sao (trước khi co)
+    const pts=top.concat(bot.reverse()).map(([aa,v])=>X?`${aa.toFixed(1)}px ${loc(v).toFixed(1)}px`:`${loc(v).toFixed(1)}px ${aa.toFixed(1)}px`);
+    const tr=X?`translate3d(${(ms-r.left).toFixed(2)}px,${(c0-r.top).toFixed(2)}px,0) scale(${km.toFixed(4)},${sc.toFixed(4)})`
+              :`translate3d(${(c0-r.left).toFixed(2)}px,${(ms-r.top).toFixed(2)}px,0) scale(${sc.toFixed(4)},${km.toFixed(4)})`;
+    fr.push({transform:tr,clipPath:`polygon(${pts.join(",")})`,opacity:p>.9?(1-COS((p-.9)/.1)).toFixed(3):1})}
+  if(dir!=="out")fr.reverse();
+  document.body.appendChild(w);
+  const an=w.animate(fr,{duration:DUR,easing:"linear",fill:"forwards"});
+  an.finished.catch(()=>{}).then(()=>{w.remove();done&&done()})}
 const genieCard=id=>[...document.querySelectorAll(`[data-open="${CSS.escape(id)}"]`)].find(e=>e.offsetParent)||null;
 function iosHide(el,ms){if(!el||el.hidden)return;if(!iosOn()||iosCalm()){el.hidden=true;return}clearTimeout(el._iosH);el.classList.add("ios-out");el._iosH=setTimeout(()=>{el.classList.remove("ios-out");el.hidden=true},ms||300)}
 const detKids=()=>[...document.querySelectorAll("#main>:not(.bar)")];
@@ -3920,7 +3908,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26n";
+const APP_VER="2026-11-26o";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
