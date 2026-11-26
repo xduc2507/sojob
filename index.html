@@ -810,6 +810,12 @@ body.view-report #side,body.view-report #detail{display:none}
 .dung-set{display:flex;flex-direction:column;gap:10px}.dung-set .dung{padding:10px 12px}.dung-set .dg-h{font-size:14px}.dung-set .dg-h b{font-size:15px}.dung-set small{font-size:12.5px}
 @media (max-width:780px){.mb-side #mbDung{margin-top:0;min-width:160px}.mb-side #mbDung .dung{padding:4px 8px}.mb-side #mbDung+small{display:none}}
 .zb-code{font:700 22px/1.2 var(--f-mono,monospace);letter-spacing:.04em;margin:4px 0;padding:8px 12px;background:var(--surface-2);border:1px dashed var(--line);border-radius:8px;display:inline-block;user-select:all}
+.dbmst{display:flex;gap:8px;align-items:flex-end}.dbmst .fld{flex:1;margin:0}.dbmst button{flex:none;min-height:38px;white-space:nowrap}
+.dbto{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:4px 0 12px}.dbto>span{font-weight:600;font-size:13.5px}
+.dbto button{display:flex;flex-direction:column;align-items:flex-start;gap:1px;padding:6px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--surface);min-width:150px;text-align:left;font-weight:600}
+.dbto button small{font-weight:400;font-size:12px;color:var(--muted);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dbto button.on{border-color:var(--primary)!important;background:#E3EEFB!important;color:var(--primary)!important;box-shadow:0 0 0 1px var(--primary)}.dbto button.on small{color:var(--ink)}
+.pdb{margin-top:8px}.pdb summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--info)}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1479,6 +1485,12 @@ function renderProfile(force){
       <label class="fld"><span>Email</span><input id="p-email" data-p="email" value="${esc(p.email)}"></label>
       <label class="fld"><span>Ghi chú (điều khoản, hạn thanh toán…)</span><input id="p-note" data-p="note" value="${esc(p.note)}"></label>
     </div>
+    ${mineOn()?"":`<details class="pdb"${p.dbMst||p.dbName?" open":""}><summary>🧾 Thông tin xuất debit cho FWD này${p.dbMst?` · MST ${esc(p.dbMst)}`:""}</summary><div class="grid3">
+      <label class="fld"><span>Tên xuất hoá đơn</span><input data-p="dbName" value="${esc(p.dbName||"")}" placeholder="Tên đầy đủ theo đăng ký thuế"></label>
+      <label class="fld"><span>Mã số thuế</span><input data-p="dbMst" value="${esc(p.dbMst||"")}"></label>
+      <label class="fld"><span>Email nhận debit</span><input data-p="dbEmail" value="${esc(p.dbEmail||"")}"></label>
+      <label class="fld" style="grid-column:1/-1"><span>Địa chỉ</span><input data-p="dbAddr" value="${esc(p.dbAddr||"")}"></label></div>
+      <p class="note" style="margin:6px 0 0">Tự lưu khi xuất debit cho FWD (bấm 🔎 Tra MST trong khung Debit để lấy tên, địa chỉ theo đăng ký thuế).</p></details>`}
     ${Object.keys(fails).length?`<div class="chips"><span style="color:var(--muted)">Lô thất bại:</span>${Object.entries(fails).map(([r,n])=>`<span class="pill">${esc(r)}: ${n}</span>`).join("")}</div>`:""}
     ${contacts.length||companies.length?`<div class="chips">${contacts.length?`<span style="color:var(--muted)">Liên hệ:</span>${contacts.map(c=>`<span class="pill">${esc(c)}</span>`).join("")}`:""}${companies.length?`<span style="color:var(--muted)">Chủ hàng:</span>${companies.map(c=>`<span class="pill">${esc(c)}</span>`).join("")}`:""}</div>`:""}
     <details ${hist.length&&hist.length<=8?"open":""}><summary>Lịch sử giá đã báo (${hist.length})</summary>
@@ -3396,7 +3408,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-25t";
+const APP_VER="2026-11-26b";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -3820,13 +3832,33 @@ function dbName(j,q){
   if(q.name===FEE_HQ)return `Phí dịch vụ hải quan tk số: ${j.tkNo||""}`.trim();
   if(q.name===FEE_VC)return `Cước vận chuyển nội địa ${j.pol||"[điểm đi]"} - ${j.pod||"[điểm đến]"}${j.truck?", BKS "+j.truck:""}`;
   return q.name}
+/* Tra MST: tên + địa chỉ đăng ký thuế (VietQR, dữ liệu Cục Thuế). masothue.com chặn tra tự động nên không dùng. */
+const mstOk=m=>/^\d{10}(-?\d{3})?$/.test(m)&&!/^9{10}/.test(m); // 9999999999998 = cá nhân / không có MST
+const MST_CACHE={};
+async function mstLookup(mst){mst=String(mst||"").replace(/[^\d-]/g,"");if(!mstOk(mst))throw new Error("MST chưa đúng (10 hoặc 13 số).");
+  if(MST_CACHE[mst])return MST_CACHE[mst];
+  const r=await fetch("https://api.vietqr.io/v2/business/"+encodeURIComponent(mst.replace(/-/g,"")));const o=await r.json();
+  if(o.code!=="00"||!o.data||!o.data.name)throw new Error(o.desc||"Không tìm thấy MST này.");
+  return MST_CACHE[mst]={name:String(o.data.name).trim(),addr:String(o.data.address||"").trim(),status:o.data.status||""}}
+/* Người nhận debit: "cust" = chủ hàng (công ty trên tờ khai), "fwd" = đại lý FWD. d.cust luôn là người nhận đang chọn (in / Excel dùng d.cust); d.rc giữ thông tin của bên kia. */
+const dbFwdOk=j=>!!(j.fwd&&slug(j.fwd)!==slug(j.company||"")&&!/^fdi$/i.test(String(j.fwd).trim()));
+function dbFwdInfo(j){ // thông tin xuất debit của FWD: hồ sơ FWD → debit gần nhất gửi FWD này → tên FWD
+  const p=S.partners[slug(j.fwd)]||{};
+  if(p.dbName||p.dbMst)return {name:p.dbName||j.fwd,addr:p.dbAddr||"",mst:p.dbMst||"",email:p.dbEmail||p.email||""};
+  const prev=S.all.filter(x=>x.id!==j.id&&x.debit&&x.debit.to==="fwd"&&x.fwd&&slug(x.fwd)===slug(j.fwd)).sort((a,b)=>(b.debit.at||0)-(a.debit.at||0))[0];
+  return prev?{...prev.debit.cust}:{name:j.fwd,addr:"",mst:"",email:p.email||""}}
+function dbOwnerInfo(j){
+  const prev=S.all.filter(x=>x.id!==j.id&&x.debit&&x.company&&x.company===j.company&&(x.debit.to||"cust")==="cust").sort((a,b)=>(b.debit.at||0)-(a.debit.at||0))[0];
+  const c=prev?{...prev.debit.cust}:{name:j.company||"",addr:"",mst:j.mst||"",email:""};if(!c.mst&&j.mst)c.mst=j.mst;return c}
+function dbDefaultTo(j){
+  if(!dbFwdOk(j))return "cust";
+  const prev=S.all.filter(x=>x.id!==j.id&&x.debit&&x.fwd&&slug(x.fwd)===slug(j.fwd)).sort((a,b)=>(b.debit.at||0)-(a.debit.at||0))[0];
+  return prev?(prev.debit.to||"cust"):"fwd"}
 function dbInit(j){
-  if(j.debit)return j.debit;
-  const prev=S.all.filter(x=>x.id!==j.id&&x.debit&&x.debit.cust&&x.company&&x.company===j.company).sort((a,b)=>(b.debit.at||0)-(a.debit.at||0))[0];
-  const cust=prev?{...prev.debit.cust}:{name:j.company||"",addr:"",mst:j.mst||"",email:""};
-  if(!cust.mst&&j.mst)cust.mst=j.mst;
+  if(j.debit){const d=j.debit;if(!d.to)d.to="cust";d.rc=d.rc||{};return d}
+  const to=dbDefaultTo(j),cust=to==="fwd"?dbFwdInfo(j):dbOwnerInfo(j);
   const lines=(j.quote||[]).filter(q=>q.name).map((q,i)=>({src:q.name,sec:q.ch?"B":"A",name:dbName(j,q),unit:q.unit||"lô",price:num(q.price),qty:num(q.qty)||1,vat:"8",inv:i===0?"FDI":""}));
-  return {cust,info:{tk:j.tkNo||"",bl:j.bl||"",veh:j.vehicle||"",qty:dbQty(j),cargo:j.cargo||"",conts:dbConts(j)},lines,at:0}}
+  return {to,cust,rc:{},info:{tk:j.tkNo||"",bl:j.bl||"",veh:j.vehicle||"",qty:dbQty(j),cargo:j.cargo||"",conts:dbConts(j)},lines,at:0}}
 // Debit luôn theo Báo giá: dòng nào có trong báo giá thì có trong debit (giá, SL, ĐVT lấy từ báo giá),
 // giữ lại mục A/B, thuế, số HĐ đã chọn; dòng báo giá đã xoá thì bỏ; dòng chi hộ / dòng tự thêm trong debit giữ nguyên.
 function dbSync(j,d){
@@ -3869,7 +3901,8 @@ function debitOpen(j){
     <td><input data-dl="${i}:inv" value="${esc(l.inv||"")}" placeholder="${l.sec==="B"?"Số HĐ":"FDI / Xuất sau"}"></td><td><button class="x" data-dlx="${i}" aria-label="Xoá dòng">✕</button></td></tr>`;
   const draw=()=>{
     box.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h2>🧾 Debit ${esc(j.code)}</h2>
-      <div class="dbgrid"><div><div class="sub">Khách hàng</div>${IN("cust.name","Tên công ty khách hàng","","full")}${IN("cust.addr","Địa chỉ")}${IN("cust.mst","Mã số thuế")}${IN("cust.email","Email nhận","nhiều email cách nhau dấu ;")}</div>
+      <div class="dbto"><span>Xuất debit cho:</span><button type="button" data-dbto="cust" class="${d.to!=="fwd"?"on":""}">🏭 Chủ hàng<small>${esc(j.company||"(chưa có tên)")}</small></button>${dbFwdOk(j)?`<button type="button" data-dbto="fwd" class="${d.to==="fwd"?"on":""}">🚚 FWD<small>${esc(j.fwd)}</small></button>`:`<span class="muted">Job chưa có FWD riêng</span>`}</div>
+      <div class="dbgrid"><div><div class="sub">${d.to==="fwd"?"FWD nhận debit":"Khách hàng (chủ hàng)"}</div>${IN("cust.name",d.to==="fwd"?"Tên FWD (xuất hoá đơn)":"Tên công ty khách hàng","","full")}${IN("cust.addr","Địa chỉ")}<div class="dbmst">${IN("cust.mst","Mã số thuế")}<button type="button" class="ghost sm" data-dbmst title="Lấy tên, địa chỉ đăng ký thuế theo MST">🔎 Tra MST</button></div>${IN("cust.email","Email nhận","nhiều email cách nhau dấu ;")}</div>
       <div><div class="sub">Thông tin lô</div><div class="g2">${IN("info.tk","TKHQ")}${IN("info.qty","Số lượng","VD: 1x20")}${IN("info.bl","Bill")}${IN("info.cargo","Tên hàng")}${IN("info.veh","Loại xe")}${IN("info.conts","Số container")}</div></div></div>
       <div class="sub">Bảng phí <small>A = FDI xuất hoá đơn (tính VAT) · B = chi trả hộ, hoá đơn đứng tên khách (đã gồm VAT)</small></div>
       <div class="qwrap"><table class="q dbt"><thead><tr><th style="width:62px">Mục</th><th>Nội dung</th><th style="width:60px">ĐVT</th><th class="num" style="width:110px">Đơn giá</th><th class="num" style="width:50px">SL</th><th class="num" style="width:110px">Thành tiền</th><th style="width:72px">Thuế</th><th style="width:100px">Số HĐ</th><th style="width:28px"></th></tr></thead>
@@ -3878,8 +3911,22 @@ function debitOpen(j){
       <div id="dbTot">${tot()}</div>
       <div class="ai-acts"><button class="primary" data-dbx="xlsx">${ic("xlsx")}Tải Excel</button><button data-dbx="print">${ic("print")}In / Lưu PDF</button><button data-dbx="close">Đóng</button></div></div>`};
   draw();
+  /* điền tên, địa chỉ theo MST: tự chạy khi thiếu địa chỉ; nút Tra MST thì ghi đè */
+  const mstFill=async(force,btn)=>{const m=String(d.cust.mst||"").replace(/[^\d-]/g,"");if(!mstOk(m)){if(force)toast("MST chưa đúng hoặc là cá nhân không có MST: nhập tay tên, địa chỉ.");return}
+    if(btn){btn.disabled=true;btn.textContent="⏳ Đang tra…"}
+    try{const x=await mstLookup(m),ch=[];
+      if(force||!d.cust.name||d.cust.name===((d.to==="fwd"?j.fwd:j.company)||"")){if(d.cust.name!==x.name){d.cust.name=x.name;ch.push("tên")}}
+      if(force||!d.cust.addr){if(x.addr&&d.cust.addr!==x.addr){d.cust.addr=x.addr;ch.push("địa chỉ")}}
+      if(ch.length){save();fwdKeep();["name","addr"].forEach(k=>{const el=box.querySelector(`[data-db="cust.${k}"]`);if(el&&document.activeElement!==el)el.value=d.cust[k]})}
+      if(force)toast(ch.length?`Đã điền ${ch.join(", ")} theo MST${/ngừng|đóng|giải thể/i.test(x.status)?" · ⚠ "+x.status:""}.`:"Tên, địa chỉ đã khớp với đăng ký thuế.");
+      else if(/ngừng|đóng|giải thể/i.test(x.status))toast("⚠ MST "+m+": "+x.status)}
+    catch(er){if(force)toast("Chưa tra được MST: "+(er.message||er))}
+    finally{if(btn){btn.disabled=false;btn.textContent="🔎 Tra MST"}}};
+  /* debit gửi FWD: lưu tên, MST, địa chỉ, email vào hồ sơ FWD để lô sau tự điền */
+  const fwdKeep=()=>{if(d.to!=="fwd"||!j.fwd||mineOn())return;const p=partnerOf(j.fwd);p.dbName=d.cust.name||"";p.dbAddr=d.cust.addr||"";p.dbMst=d.cust.mst||"";p.dbEmail=d.cust.email||"";savePartner(j.fwd)};
+  if(!d.cust.addr)mstFill(false);
   box.addEventListener("input",e=>{const t=e.target;
-    if(t.dataset.db){const[a,b]=t.dataset.db.split(".");d[a][b]=t.value;save();return}
+    if(t.dataset.db){const[a,b]=t.dataset.db.split(".");d[a][b]=t.value;save();if(a==="cust")fwdKeep();return}
     if(t.dataset.dl){const[i,f]=t.dataset.dl.split(":"),l=d.lines[+i];
       l[f]=f==="price"?num(String(t.value).replace(/[.,\s]/g,"")):f==="qty"?String(t.value).replace(/[^\d.,]/g,"").replace(",","."):t.value;
       if(l.src&&(f==="price"||f==="qty"||f==="unit"))l.numEdited=true;if(l.src&&f==="name")l.nameEdited=true;
@@ -3887,6 +3934,9 @@ function debitOpen(j){
       box.querySelector("#dbTot").innerHTML=tot();save()}});
   box.addEventListener("focusout",e=>{const t=e.target;if(t.dataset.dl&&t.dataset.dl.endsWith(":price")){const l=d.lines[+t.dataset.dl.split(":")[0]];t.value=num(l.price)?fmt(l.price,"VND"):""}});
   box.addEventListener("click",async e=>{const b=e.target.closest("button");if(!b){if(e.target===box)close();return}
+    if(b.hasAttribute("data-dbmst")){mstFill(true,b);return}
+    if(b.dataset.dbto){const to=b.dataset.dbto;if(to===d.to)return;d.rc=d.rc||{};d.rc[d.to]={...d.cust};
+      d.cust=d.rc[to]?{...d.rc[to]}:to==="fwd"?dbFwdInfo(j):dbOwnerInfo(j);d.to=to;save();draw();if(!d.cust.addr)mstFill(false);return}
     if(b.dataset.sec){const[i,s]=b.dataset.sec.split(":");const l=d.lines[+i];l.sec=s;if(s==="B"&&l.inv==="FDI")l.inv="";save();draw();return}
     if(b.dataset.dlx){d.lines.splice(+b.dataset.dlx,1);save();draw();return}
     if(b.dataset.dbadd){d.lines.push({sec:b.dataset.dbadd,name:"",unit:b.dataset.dbadd==="B"?"Cont":"lô",price:0,qty:1,vat:"8",inv:""});save();draw();box.querySelector(`[data-dl="${d.lines.length-1}:name"]`)?.focus();return}
@@ -3926,6 +3976,7 @@ async function debitXlsx(j,d){
   ws.mergeCells("B8:I8");put("B8","Địa chỉ: "+(d.cust.addr||""),{font:{size:12},wrap:true});ws.getRow(8).height=30;
   ws.mergeCells("B9:I9");put("B9","Mã số thuế: "+(d.cust.mst||""));
   if(d.cust.email){ws.mergeCells("B10:I10");put("B10","Email: "+d.cust.email,{wrap:true})}
+  if(d.to==="fwd"&&j.company){ws.mergeCells("B11:I11");put("B11","Lô hàng của chủ hàng: "+j.company+(j.mst?" - MST "+j.mst:""),{font:{italic:true},wrap:true})}
   const info=[["TKHQ : ",d.info.tk,"Số lượng : ",d.info.qty],["Bill : ",d.info.bl,"Tên hàng : ",d.info.cargo],["Loại xe: ",d.info.veh,"Số container :",d.info.conts]];
   info.forEach((x,k)=>{const r=12+k;put("A"+r,x[0]);ws.mergeCells(`B${r}:C${r}`);put("B"+r,x[1]||"",{font:{bold:true}});ws.mergeCells(`D${r}:E${r}`);put("D"+r,x[2]);ws.mergeCells(`F${r}:I${r}`);put("F"+r,x[3]||"",{font:{bold:true},wrap:true});ws.getRow(r).height=20;
     for(let c=1;c<=9;c++){const cl=ws.getRow(r).getCell(c);cl.border={left:c===1?md:c===4?th:undefined,right:c===9?md:undefined,top:k===0?md:undefined,bottom:k===2?md:undefined}}});
@@ -3940,7 +3991,7 @@ async function debitXlsx(j,d){
   sec("A","Xuất hóa đơn trực tiếp");const a0=r+1;R.A.forEach((l,k)=>line(l,k+1,true));const a1=Math.max(r,a0);
   r++;ws.getRow(r).height=22;ws.mergeCells(`B${r}:F${r}`);put("B"+r,"Cộng A",{font:{bold:true},h:"center"});put("G"+r,{formula:`SUM(G${a0}:G${a1})`,result:R.sumA},{nf:NF,h:"right"});put("H"+r,{formula:`SUM(H${a0}:H${a1})`,result:R.vatA},{nf:NF,h:"right"});box(r,1,9,th,hr);
   const ra=r;r++;ws.mergeCells(`B${r}:F${r}`);ws.mergeCells(`G${r}:H${r}`);put("G"+r,{formula:`G${ra}+H${ra}`,result:R.totA},{nf:NF,h:"center",font:{bold:true}});box(r,1,9,hr,th);const rta=r;
-  sec("B","Chi trả hộ");const b0=r+1;R.B.forEach((l,k)=>line(l,k+1,false));const b1=Math.max(r,b0);
+  sec("B",d.to==="fwd"?"Chi trả hộ (hóa đơn đứng tên chủ hàng)":"Chi trả hộ");const b0=r+1;R.B.forEach((l,k)=>line(l,k+1,false));const b1=Math.max(r,b0);
   r++;ws.getRow(r).height=22;ws.mergeCells(`B${r}:F${r}`);put("B"+r,"Cộng B",{font:{bold:true},h:"center"});ws.mergeCells(`G${r}:H${r}`);put("G"+r,{formula:`SUM(G${b0}:G${b1})`,result:R.sumB},{nf:NF,h:"center",font:{bold:true}});box(r,1,9,th,md);const rb=r;
   r+=2;ws.mergeCells(`D${r}:F${r}`);put("D"+r,"Tổng cộng (A+B)",{font:{bold:true,size:12},h:"center"});ws.mergeCells(`G${r}:H${r}`);put("G"+r,{formula:`G${rta}+G${rb}`,result:R.total},{nf:NF,h:"center",font:{bold:true,size:12}});put("I"+r,"VND",{font:{bold:true},h:"center"});
   r+=3;put("H"+r,"FDI DANANG",{font:{bold:true},h:"center"});r++;put("B"+r,"Thông tin chuyển khoản",{font:{bold:true,underline:true}});
@@ -3962,12 +4013,12 @@ function debitPrint(j,d){
   .sec td{font-weight:bold}.sum td{font-weight:bold}.grand{margin-top:12px;text-align:right;font-size:16px;font-weight:bold}
   .sign{text-align:right;margin:30px 60px 0 0;font-weight:bold}.bank{margin-top:30px;line-height:1.5;font-weight:bold}.bank u{display:block;margin-bottom:4px}
   </style></head><body><img class="logo" src="${logo}" alt=""><h1>DEBIT NOTE</h1><div class="no">${esc(j.code)}</div>
-  <div class="cust"><b>${esc(d.cust.name||"")}</b><br>Địa chỉ: ${esc(d.cust.addr||"")}<br>Mã số thuế: ${esc(d.cust.mst||"")}${d.cust.email?`<br>Email: ${esc(d.cust.email)}`:""}</div>
+  <div class="cust"><b>${esc(d.cust.name||"")}</b><br>Địa chỉ: ${esc(d.cust.addr||"")}<br>Mã số thuế: ${esc(d.cust.mst||"")}${d.cust.email?`<br>Email: ${esc(d.cust.email)}`:""}${d.to==="fwd"&&j.company?`<br><i>Lô hàng của chủ hàng: ${esc(j.company)}${j.mst?" - MST "+esc(j.mst):""}</i>`:""}</div>
   <table class="info"><tr><td>TKHQ :</td><td><b>${esc(d.info.tk)}</b></td><td>Số lượng :</td><td><b>${esc(d.info.qty)}</b></td></tr><tr><td>Bill :</td><td><b>${esc(d.info.bl)}</b></td><td>Tên hàng :</td><td><b>${esc(d.info.cargo)}</b></td></tr><tr><td>Loại xe:</td><td><b>${esc(d.info.veh)}</b></td><td>Số container :</td><td><b>${esc(d.info.conts)}</b></td></tr></table>
   <table class="t"><tr><th>STT</th><th>Nội dung</th><th>Đơn vị tính</th><th>Đơn giá</th><th>Số lượng</th><th>Thành tiền</th><th>Thuế GTGT</th><th>Số hóa đơn</th></tr>
   <tr class="sec"><td class="c">A</td><td colspan="7">Xuất hóa đơn trực tiếp</td></tr>${R.A.map((l,k)=>ln(l,k+1,true)).join("")}
   <tr class="sum"><td></td><td colspan="4" class="c">Cộng A</td><td class="r">${f(R.sumA)}</td><td class="r">${f(R.vatA)}</td><td></td></tr><tr class="sum"><td></td><td colspan="4"></td><td colspan="2" class="c">${f(R.totA)}</td><td></td></tr>
-  <tr class="sec"><td class="c">B</td><td colspan="7">Chi trả hộ</td></tr>${R.B.map((l,k)=>ln(l,k+1,false)).join("")}
+  <tr class="sec"><td class="c">B</td><td colspan="7">Chi trả hộ${d.to==="fwd"?" (hóa đơn đứng tên chủ hàng)":""}</td></tr>${R.B.map((l,k)=>ln(l,k+1,false)).join("")}
   <tr class="sum"><td></td><td colspan="4" class="c">Cộng B</td><td colspan="2" class="c">${f(R.sumB)}</td><td></td></tr></table>
   <div class="grand">Tổng cộng (A+B): ${f(R.total)} VND</div><div class="sign">FDI DANANG</div>
   <div class="bank"><u>Thông tin chuyển khoản</u>${DB_BANK.map(esc).join("<br>")}</div>
