@@ -3,6 +3,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <script src="firebase-config.js?v=483007a3c3"></script>
 <script src="static-shim.js?v=bb3a17dce6"></script>
+<script>/* giao diện kiểu iOS (thử): ?ios=1 bật, ?ios=0 tắt (nhớ trên máy) */
+(function(){try{var q=location.search.match(/[?&]ios=([01])/);if(q)localStorage.setItem("sojob.ios",q[1]);if(localStorage.getItem("sojob.ios")==="1")document.documentElement.classList.add("ios")}catch(e){}})();</script>
 <script>/* giao diện app máy tính: bật khi mở bằng app đã cài (cửa sổ riêng); ?desk=1 bật, ?desk=0 tắt (nhớ trên máy) */
 (function(){try{var q=location.search.match(/[?&]desk=([01])/);if(q)localStorage.setItem("sojob.desk",q[1]);var v=localStorage.getItem("sojob.desk");
 if(v==="1"||(v!=="0"&&matchMedia("(display-mode: standalone)").matches))document.documentElement.classList.add("desk")}catch(e){}})();</script>
@@ -12,7 +14,7 @@ if(v==="1"||(v!=="0"&&matchMedia("(display-mode: standalone)").matches))document
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Sổ Job">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&family=Be+Vietnam+Pro:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 <style>
 /* Layout: bàn điều phối 3 cột — nhóm FWD | danh sách / bảng quy trình / kế hoạch | phiếu job */
@@ -1128,6 +1130,142 @@ button.ghost{border-radius:6px}
 input:not([type=checkbox]):not([type=radio]),select,textarea{border-radius:6px;box-shadow:inset 0 1px 2px rgba(16,32,48,.05)}
 .pill{border-radius:999px}
 @media (prefers-reduced-motion:reduce){button:hover{transform:none!important}}
+/* ===== Giao diện kiểu iOS (thử): bật ?ios=1, tắt ?ios=0. Nền xám #F2F2F7, thẻ trắng bo 14px, kính mờ, màu hệ thống, nút dạng viên, icon nét mảnh (Lucide, ISC) ===== */
+html.ios{--ios-fill:rgba(118,118,128,.12);--ios-fill2:rgba(118,118,128,.20);--ios-glass:rgba(255,255,255,.70);--ios-glass-bd:rgba(255,255,255,.75);--ios-sel:#fff;--ios-pop:rgba(255,255,255,.86);
+  --bg:#F2F2F7;--surface:#fff;--surface-2:#F2F2F7;--ink:#1C1C1E;--muted:#8A8A8E;--line:rgba(60,60,67,.13);--line-2:rgba(60,60,67,.18);
+  --accent:#007AFF;--accent-ink:#fff;--accent-soft:rgba(0,122,255,.11);--primary:#007AFF;--info:#007AFF;--info-soft:rgba(0,122,255,.11);--nav:#007AFF;--row-sel:#007AFF;
+  --ok:#34C759;--ok-soft:rgba(52,199,89,.14);--bad:#FF3B30;--bad-soft:rgba(255,59,48,.11);--warn:#FF9500;--warn-soft:rgba(255,149,0,.14);--teal:#34C759;
+  --violet:#AF52DE;--violet-soft:rgba(175,82,222,.12);--step-on:#007AFF;--step-off:#D1D1D6;
+  --f-body:-apple-system,BlinkMacSystemFont,"SF Pro Text","Inter","Segoe UI Variable Text","Segoe UI",sans-serif;--r:14px;--r-sm:10px;--r-md:12px;--r-lg:16px}
+@media (prefers-color-scheme: dark){html.ios:not([data-theme="light"]){--ios-fill:rgba(118,118,128,.24);--ios-fill2:rgba(118,118,128,.34);--ios-glass:rgba(28,28,30,.72);--ios-glass-bd:rgba(255,255,255,.08);--ios-sel:#636366;--ios-pop:rgba(44,44,46,.88);
+  --bg:#000;--surface:#1C1C1E;--surface-2:#2C2C2E;--ink:#F2F2F7;--muted:#98989F;--line:rgba(84,84,88,.55);--line-2:rgba(84,84,88,.7);
+  --accent:#0A84FF;--accent-soft:rgba(10,132,255,.2);--primary:#0A84FF;--info:#0A84FF;--info-soft:rgba(10,132,255,.2);--nav:#0A84FF;--row-sel:#0A84FF;
+  --ok:#30D158;--ok-soft:rgba(48,209,88,.18);--bad:#FF453A;--bad-soft:rgba(255,69,58,.18);--warn:#FF9F0A;--warn-soft:rgba(255,159,10,.18);--teal:#30D158;--step-on:#0A84FF;--step-off:#48484A}}
+html.ios[data-theme="dark"]{--ios-fill:rgba(118,118,128,.24);--ios-fill2:rgba(118,118,128,.34);--ios-glass:rgba(28,28,30,.72);--ios-glass-bd:rgba(255,255,255,.08);--ios-sel:#636366;--ios-pop:rgba(44,44,46,.88);
+  --bg:#000;--surface:#1C1C1E;--surface-2:#2C2C2E;--ink:#F2F2F7;--muted:#98989F;--line:rgba(84,84,88,.55);--accent:#0A84FF;--accent-soft:rgba(10,132,255,.2);--primary:#0A84FF;--nav:#0A84FF;
+  --ok:#30D158;--bad:#FF453A;--warn:#FF9F0A;--teal:#30D158;--step-on:#0A84FF;--step-off:#48484A}
+html.ios body{font-family:var(--f-body);font-size:13.5px;letter-spacing:-.005em;-webkit-font-smoothing:antialiased;background:var(--bg)}
+/* thanh trên: kính mờ trắng, chữ đen, nút viên */
+html.ios .top{background:var(--ios-glass)!important;-webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);color:var(--ink);border-bottom:.5px solid var(--line)!important;box-shadow:none!important}
+html.ios body::before{background:var(--ios-glass)}
+html.ios .top .brand,html.ios .top .brand b,html.ios .top a{color:var(--ink)}
+html.ios .top .brand b{font-size:17px;font-weight:700;letter-spacing:-.02em}
+html.ios .top .brand svg,html.ios .top .brand img{filter:none}
+html.ios .top input{background:var(--ios-fill);border:0;border-radius:10px;color:var(--ink);box-shadow:none;min-height:34px}
+html.ios .top button:not(.primary):not(#btnManual):not(.space button),html.ios .nbell{background:var(--ios-fill)!important;border:0!important;color:var(--accent)!important;box-shadow:none!important;border-radius:999px!important}
+html.ios .top .space{background:var(--ios-fill)!important;border:0!important;border-radius:10px!important;padding:2px;box-shadow:none}
+html.ios .top .space button:not(#btnManual){background:transparent!important;border:0!important;box-shadow:none!important;color:var(--ink)!important;border-radius:8px!important;font-weight:500}
+html.ios .top .space button.on:not(#btnManual){background:var(--ios-sel)!important;color:var(--ink)!important;font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)!important}
+html.ios .nbell .nb{box-shadow:0 0 0 2px var(--surface)}
+html.ios body.space-mine .top .brand b::after{color:var(--violet)}
+/* nút: viên bo 10px, phụ = nền xám trong suốt chữ xanh, chính = xanh đặc; không viền, không bóng */
+html.ios button{font-size:13px;min-height:30px;padding:5px 14px;text-shadow:none!important}
+html.ios button.sm{min-height:26px;padding:3px 10px;font-size:12px}
+html.ios :where(button:not(.primary):not(.ghost):not(.x):not(.cpop-x):not(.kb-fab):not(.side-btn):not(.np-i):not(.g)){background:var(--ios-fill)!important;background-image:none!important;border:0!important;color:var(--accent)!important;box-shadow:none!important;border-radius:10px!important;font-weight:500}
+html.ios button:not(.primary):not(.ghost):not(.x):not(.cpop-x):not(:is(.tabs,.space,.stages,.dbto) button):hover:not(:disabled){background:var(--ios-fill2)!important;background-image:none!important;box-shadow:none!important}
+html.ios button.primary,html.ios button.debitbtn,html.ios button.go,html.ios button.tkbtn,html.ios .top #btnManual,html.ios button.primary.bad,html.ios button.danger:not(.ghost){background:var(--accent)!important;background-image:none!important;border:0!important;border-radius:10px!important;box-shadow:none!important;color:#fff!important;font-weight:600}
+html.ios .top #btnManual{border-radius:999px!important}
+html.ios button.debitbtn,html.ios button.go{background:var(--ok)!important}
+html.ios button.primary.bad,html.ios button.danger:not(.ghost){background:var(--bad)!important}
+html.ios button.primary:hover:not(:disabled),html.ios button.debitbtn:hover:not(:disabled),html.ios button.go:hover:not(:disabled),html.ios button.tkbtn:hover:not(:disabled),html.ios .top #btnManual:hover:not(:disabled){background-image:none!important;filter:brightness(1.08);transform:none;box-shadow:none!important}
+html.ios button:active:not(:disabled){transform:scale(.97)!important;box-shadow:none!important;filter:brightness(.94)}
+html.ios :where(button.ghost){border-radius:10px;color:var(--accent)}
+html.ios :where(button.ghost.danger){color:var(--bad)}
+html.ios button.back{background:transparent!important;color:var(--accent)!important;border:0!important;font-weight:500!important;padding-left:4px!important}
+html.ios .kb-fab{background:var(--accent)!important;box-shadow:0 8px 24px rgba(0,122,255,.35)!important}
+html.ios button.primary .fa,html.ios button.debitbtn .fa,html.ios button.tkbtn .fa,html.ios button.go .fa,html.ios #btnManual .fa{color:#fff}
+/* ô nhập: nền xám nhạt, không viền, bo 10px; khi gõ: nền trắng + viền xanh */
+html.ios input:not([type=checkbox]):not([type=radio]),html.ios select,html.ios textarea{background:rgba(118,118,128,.08);border:1px solid transparent;border-radius:10px;box-shadow:none;min-height:34px;font-size:13.5px;padding:5px 10px}
+html.ios input:focus,html.ios select:focus,html.ios textarea:focus{background:var(--surface);border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+html.ios input[type=checkbox]{accent-color:var(--ok);width:18px;height:18px}
+html.ios .fld>span{color:var(--muted);font-weight:500}
+/* tab: điều khiển phân đoạn (segmented control) */
+html.ios .tabs{background:var(--ios-fill)!important;border:0!important;border-radius:10px!important;padding:2px!important;box-shadow:none!important}
+html.ios .tabs button{border-radius:8px!important;color:var(--ink)!important;background:transparent!important;box-shadow:none!important;font-weight:500;font-size:13px;min-height:30px}
+html.ios .tabs button:hover:not(.on){background:rgba(118,118,128,.10)!important}
+html.ios .tabs button.on{background:var(--ios-sel)!important;color:var(--ink)!important;font-weight:600;box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04)!important}
+html.ios .tabs button .ic-fa{color:var(--accent)}
+html.ios .app>.bar{background:color-mix(in srgb,var(--bg) 78%,transparent);-webkit-backdrop-filter:saturate(180%) blur(20px);backdrop-filter:saturate(180%) blur(20px)}
+html.ios .bar.stuck{box-shadow:0 .5px 0 var(--line)}
+/* thẻ, khung: trắng, bo 14px, không viền */
+html.ios .card,html.ios .sec.lot,html.ios .teamchat,html.ios .review,html.ios .stat,html.ios .odbox{border:0!important;border-radius:14px!important;box-shadow:0 1px 2px rgba(0,0,0,.04)!important}
+html.ios .sec{border-bottom:.5px solid var(--line)}
+html.ios .sec h3{background:none!important;color:var(--ink)!important;font-size:15px;font-weight:600;letter-spacing:-.01em;margin:0 0 2px!important;padding:0!important;min-height:0;border-radius:0;box-shadow:none!important}
+html.ios .sec h3 .mono{color:var(--muted)!important;opacity:1}
+html.ios .sec h3 .fa{color:var(--accent)!important}
+html.ios .sec h3 button{background:var(--ios-fill)!important;border:0!important;color:var(--accent)!important;min-height:26px;font-size:12px}
+html.ios .review summary{background:none;color:var(--ink);font-weight:600}html.ios .review summary .mono{color:var(--muted)}
+html.ios .pill{border-radius:999px;border:0}
+html.ios .cbadge,html.ios .nbell .nb{background:var(--bad)}
+/* cột trái: danh sách kiểu iOS, chọn = nền xanh chữ trắng */
+html.ios .side-h{text-transform:none;letter-spacing:0;font-size:13px;font-weight:600;color:var(--muted)}
+html.ios .g{border-radius:10px;padding:8px 10px}
+html.ios .g:hover{background:rgba(118,118,128,.10)}
+html.ios .g.on{background:var(--accent)!important;color:#fff!important;box-shadow:none!important;border-color:transparent!important}
+html.ios .g.on .n{color:rgba(255,255,255,.85)}
+/* danh sách job */
+html.ios .row{border-bottom:.5px solid var(--line)}
+html.ios .row.on{background:var(--accent-soft)!important;box-shadow:none!important}
+/* bảng Quy trình: cột xám trong, thẻ trắng bo 12px, dải màu bước ở đỉnh cột */
+html.ios .col{background:rgba(118,118,128,.08)!important;border:0!important;border-radius:16px!important;overflow:hidden}
+html.ios .col-h{background:transparent!important;border-bottom:0!important;box-shadow:inset 0 3px 0 var(--c);border-radius:0!important}
+html.ios .kc{border-radius:12px!important;border-top-color:transparent!important;border-right-color:transparent!important;border-bottom-color:transparent!important;box-shadow:0 1px 3px rgba(0,0,0,.07)!important}
+html.ios .kc:hover{box-shadow:0 6px 18px rgba(0,0,0,.10)!important}
+/* tiến trình: viên bo tròn thay mũi tên */
+html.ios .stages{gap:4px}
+html.ios .stages button{clip-path:none!important;border-radius:999px!important;background:var(--ios-fill)!important;color:var(--muted)!important;padding:4px 11px!important;font-size:11.5px;min-height:24px;border:0!important}
+html.ios .stages button.past{background:var(--accent-soft)!important;color:var(--accent)!important}
+html.ios .stages button.now{background:var(--accent)!important;color:#fff!important}
+/* menu, thông báo, hộp thoại: kính mờ, bo 14px, bóng sâu */
+html.ios .kmenu,html.ios .npanel,html.ios .tm-sug,html.ios #chatPops .cpop,html.ios .dbbox .sheet,html.ios .modal .sheet{border-radius:14px!important;background:var(--ios-pop)!important;-webkit-backdrop-filter:saturate(180%) blur(30px);backdrop-filter:saturate(180%) blur(30px);border:.5px solid var(--line)!important;box-shadow:0 20px 50px rgba(0,0,0,.18),0 2px 8px rgba(0,0,0,.08)!important}
+html.ios .modal .sheet,html.ios .dbbox .sheet{border-radius:18px!important}
+/* điện thoại: thanh tab nổi dạng viên kính mờ */
+@media (max-width:780px){
+  html.ios body{padding-bottom:calc(90px + env(safe-area-inset-bottom,0px))}
+  html.ios .bar .tabs{left:12px!important;right:12px!important;bottom:calc(10px + env(safe-area-inset-bottom,0px))!important;border-radius:30px!important;background:var(--ios-glass)!important;
+    -webkit-backdrop-filter:saturate(180%) blur(24px);backdrop-filter:saturate(180%) blur(24px);border:.5px solid var(--ios-glass-bd)!important;box-shadow:0 10px 30px rgba(0,0,0,.16),0 1px 3px rgba(0,0,0,.08)!important;padding:4px!important}
+  html.ios .bar .tabs button{min-height:54px!important;border-radius:26px!important;color:var(--ink)!important;font-size:10.5px!important;font-weight:500;background:transparent!important;box-shadow:none!important}
+  html.ios .bar .tabs button.on{background:var(--ios-fill)!important;color:var(--accent)!important;box-shadow:none!important}
+  html.ios .bar .tabs button .ic-fa{color:inherit;font-size:22px}
+  html.ios .kb-fab{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
+}
+/* icon nét mảnh (thay Font Awesome) */
+html.ios .fa-archive::before,html.ios .fa-arrow-right::before,html.ios .fa-ban::before,html.ios .fa-bar-chart::before,html.ios .fa-barcode::before,html.ios .fa-bell::before,html.ios .fa-bell-slash::before,html.ios .fa-building::before,html.ios .fa-calendar::before,html.ios .fa-check::before,html.ios .fa-columns::before,html.ios .fa-comments::before,html.ios .fa-copy::before,html.ios .fa-download::before,html.ios .fa-ellipsis-h::before,html.ios .fa-envelope::before,html.ios .fa-file-excel-o::before,html.ios .fa-file-text-o::before,html.ios .fa-filter::before,html.ios .fa-folder-open::before,html.ios .fa-inbox::before,html.ios .fa-list::before,html.ios .fa-lock::before,html.ios .fa-paper-plane-o::before,html.ios .fa-paperclip::before,html.ios .fa-plus::before,html.ios .fa-print::before,html.ios .fa-refresh::before,html.ios .fa-remove::before,html.ios .fa-search::before,html.ios .fa-send::before,html.ios .fa-sun-o::before,html.ios .fa-times::before,html.ios .fa-trash-o::before,html.ios .fa-upload::before{content:""!important;display:inline-block;width:1.2em;height:1.2em;vertical-align:-.22em;background-color:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
+html.ios .fa-archive{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Crect width='20' height='5' x='2' y='3' rx='1'/%3E%3Cpath d='M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8'/%3E%3Cpath d='M10 12h4'/%3E%3C/svg%3E")}
+html.ios .fa-arrow-right{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M5 12h14'/%3E%3Cpath d='m12 5 7 7-7 7'/%3E%3C/svg%3E")}
+html.ios .fa-ban{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Ccircle cx='12' cy='12' r='10'/%3E%3Cpath d='m4.9 4.9 14.2 14.2'/%3E%3C/svg%3E")}
+html.ios .fa-bar-chart{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M3 3v16a2 2 0 0 0 2 2h16'/%3E%3Cpath d='M18 17V9'/%3E%3Cpath d='M13 17V5'/%3E%3Cpath d='M8 17v-3'/%3E%3C/svg%3E")}
+html.ios .fa-barcode{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M3 5v14'/%3E%3Cpath d='M8 5v14'/%3E%3Cpath d='M12 5v14'/%3E%3Cpath d='M17 5v14'/%3E%3Cpath d='M21 5v14'/%3E%3C/svg%3E")}
+html.ios .fa-bell{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9'/%3E%3Cpath d='M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3C/svg%3E")}
+html.ios .fa-bell-slash{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5'/%3E%3Cpath d='M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7'/%3E%3Cpath d='M10.3 21a1.94 1.94 0 0 0 3.4 0'/%3E%3Cpath d='m2 2 20 20'/%3E%3C/svg%3E")}
+html.ios .fa-building{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M6 22V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v18Z'/%3E%3Cpath d='M6 12H4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h2'/%3E%3Cpath d='M18 9h2a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-2'/%3E%3Cpath d='M10 6h4'/%3E%3Cpath d='M10 10h4'/%3E%3Cpath d='M10 14h4'/%3E%3Cpath d='M10 18h4'/%3E%3C/svg%3E")}
+html.ios .fa-calendar{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M8 2v4'/%3E%3Cpath d='M16 2v4'/%3E%3Crect width='18' height='18' x='3' y='4' rx='2'/%3E%3Cpath d='M3 10h18'/%3E%3C/svg%3E")}
+html.ios .fa-check{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E")}
+html.ios .fa-columns{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Crect width='18' height='18' x='3' y='3' rx='2'/%3E%3Cpath d='M8 7v7'/%3E%3Cpath d='M12 7v4'/%3E%3Cpath d='M16 7v9'/%3E%3C/svg%3E")}
+html.ios .fa-comments{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z'/%3E%3Cpath d='M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1'/%3E%3C/svg%3E")}
+html.ios .fa-copy{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Crect width='14' height='14' x='8' y='8' rx='2' ry='2'/%3E%3Cpath d='M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2'/%3E%3C/svg%3E")}
+html.ios .fa-download{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='7 10 12 15 17 10'/%3E%3Cline x1='12' x2='12' y1='15' y2='3'/%3E%3C/svg%3E")}
+html.ios .fa-ellipsis-h{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Ccircle cx='12' cy='12' r='1'/%3E%3Ccircle cx='19' cy='12' r='1'/%3E%3Ccircle cx='5' cy='12' r='1'/%3E%3C/svg%3E")}
+html.ios .fa-envelope{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Crect width='20' height='16' x='2' y='4' rx='2'/%3E%3Cpath d='m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7'/%3E%3C/svg%3E")}
+html.ios .fa-file-excel-o{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z'/%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4'/%3E%3Cpath d='M8 13h2'/%3E%3Cpath d='M14 13h2'/%3E%3Cpath d='M8 17h2'/%3E%3Cpath d='M14 17h2'/%3E%3C/svg%3E")}
+html.ios .fa-file-text-o{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z'/%3E%3Cpath d='M14 2v4a2 2 0 0 0 2 2h4'/%3E%3Cpath d='M10 9H8'/%3E%3Cpath d='M16 13H8'/%3E%3Cpath d='M16 17H8'/%3E%3C/svg%3E")}
+html.ios .fa-filter{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M7 12h10'/%3E%3Cpath d='M10 18h4'/%3E%3C/svg%3E")}
+html.ios .fa-folder-open{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m6 14 1.5-2.9A2 2 0 0 1 9.24 10H20a2 2 0 0 1 1.94 2.5l-1.54 6a2 2 0 0 1-1.95 1.5H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h3.9a2 2 0 0 1 1.69.9l.81 1.2a2 2 0 0 0 1.67.9H18a2 2 0 0 1 2 2v2'/%3E%3C/svg%3E")}
+html.ios .fa-inbox{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpolyline points='22 12 16 12 14 15 10 15 8 12 2 12'/%3E%3Cpath d='M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z'/%3E%3C/svg%3E")}
+html.ios .fa-list{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M3 12h.01'/%3E%3Cpath d='M3 18h.01'/%3E%3Cpath d='M3 6h.01'/%3E%3Cpath d='M8 12h13'/%3E%3Cpath d='M8 18h13'/%3E%3Cpath d='M8 6h13'/%3E%3C/svg%3E")}
+html.ios .fa-lock{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Crect width='18' height='11' x='3' y='11' rx='2' ry='2'/%3E%3Cpath d='M7 11V7a5 5 0 0 1 10 0v4'/%3E%3C/svg%3E")}
+html.ios .fa-paper-plane-o{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z'/%3E%3Cpath d='m21.854 2.147-10.94 10.939'/%3E%3C/svg%3E")}
+html.ios .fa-paperclip{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48'/%3E%3C/svg%3E")}
+html.ios .fa-plus{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M5 12h14'/%3E%3Cpath d='M12 5v14'/%3E%3C/svg%3E")}
+html.ios .fa-print{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2'/%3E%3Cpath d='M6 9V3a1 1 0 0 1 1-1h10a1 1 0 0 1 1 1v6'/%3E%3Crect x='6' y='14' width='12' height='8' rx='1'/%3E%3C/svg%3E")}
+html.ios .fa-refresh{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8'/%3E%3Cpath d='M21 3v5h-5'/%3E%3Cpath d='M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16'/%3E%3Cpath d='M8 16H3v5'/%3E%3C/svg%3E")}
+html.ios .fa-remove{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E")}
+html.ios .fa-search{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Ccircle cx='11' cy='11' r='8'/%3E%3Cpath d='m21 21-4.3-4.3'/%3E%3C/svg%3E")}
+html.ios .fa-send{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z'/%3E%3Cpath d='m21.854 2.147-10.94 10.939'/%3E%3C/svg%3E")}
+html.ios .fa-sun-o{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Ccircle cx='12' cy='12' r='4'/%3E%3Cpath d='M12 2v2'/%3E%3Cpath d='M12 20v2'/%3E%3Cpath d='m4.93 4.93 1.41 1.41'/%3E%3Cpath d='m17.66 17.66 1.41 1.41'/%3E%3Cpath d='M2 12h2'/%3E%3Cpath d='M20 12h2'/%3E%3Cpath d='m6.34 17.66-1.41 1.41'/%3E%3Cpath d='m19.07 4.93-1.41 1.41'/%3E%3C/svg%3E")}
+html.ios .fa-times{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M18 6 6 18'/%3E%3Cpath d='m6 6 12 12'/%3E%3C/svg%3E")}
+html.ios .fa-trash-o{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M3 6h18'/%3E%3Cpath d='M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6'/%3E%3Cpath d='M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2'/%3E%3Cline x1='10' x2='10' y1='11' y2='17'/%3E%3Cline x1='14' x2='14' y1='11' y2='17'/%3E%3C/svg%3E")}
+html.ios .fa-upload{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Cpath d='M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4'/%3E%3Cpolyline points='17 8 12 3 7 8'/%3E%3Cline x1='12' x2='12' y1='3' y2='15'/%3E%3C/svg%3E")}
 /* ===== Giao diện kiểu app máy tính (2026-11-26c): giữ bố cục 3 cột, mỗi khung tự cuộn, thanh tiêu đề + thanh trạng thái,
    chữ Segoe UI, góc vuông 4px, viền rõ, nút/ô nhập cao đều 28px. Chỉ áp cho bản cài trên máy tính (cửa sổ riêng) hoặc thêm ?desk=1; màn rộng ≥1181px. Trình duyệt thường và điện thoại giữ nguyên. ===== */
 :root{--dk-side:#f5f6f7;--dk-pane:#ffffff;--dk-bg:#eceef0;--dk-line:#d9dde1;--dk-line2:#c6ccd2;--dk-hover:#eef1f4;--dk-sel:#e3eefa;--dk-head:#f7f8f9;--dk-top:44px;--dk-sb:24px}
@@ -3578,7 +3716,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26f";
+const APP_VER="2026-11-26g";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
