@@ -1229,52 +1229,75 @@ html.ios .modal .sheet,html.ios .dbbox .sheet{border-radius:18px!important}
   html.ios .bar .tabs button .ic-fa{color:inherit;font-size:22px}
   html.ios .kb-fab{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
 }
-/* ===== Chuyển động kiểu iOS (chỉ khi bật ?ios=1): lò xo, trượt, phóng to từ gốc; tắt khi máy bật "giảm chuyển động" ===== */
-html.ios{--sp:cubic-bezier(.32,.72,0,1);--spb:cubic-bezier(.34,1.56,.64,1)}
-/* nút: nhấn co lại, thả ra bật lò xo */
-html.ios button{transition:transform .38s var(--spb),background-color .2s ease,color .2s ease,filter .2s ease,opacity .2s ease}
-html.ios button:active:not(:disabled){transform:scale(.95)!important;transition-duration:.08s}
-html.ios .kc,html.ios .row,html.ios .g{transition:transform .38s var(--spb),box-shadow .25s ease,background-color .2s ease}
-html.ios .kc:active,html.ios .row:active{transform:scale(.98)!important;transition-duration:.1s}
-/* công tắc phân đoạn: viên trắng trượt sang tab mới */
+/* ===== Chuyển động kiểu iOS: đường cong lò xo thật (spring) — mượt = tắt dần không nảy (đẩy trang), êm = nảy 0,5% (tấm, phiếu), nảy = 4% (nút, menu, viên chọn tab) ===== */
+html.ios{--sp-smooth:cubic-bezier(.25,.8,.25,1);--sp-gentle:cubic-bezier(.22,.9,.3,1);--sp-bounce:cubic-bezier(.34,1.4,.64,1);--ease-in:cubic-bezier(.4,0,.8,.4)}
+@supports (transition-timing-function:linear(0,1)){html.ios{--sp-smooth:linear(0,0.0209,0.0725,0.1419,0.2201,0.3008,0.3801,0.4553,0.5249,0.5883,0.6452,0.6957,0.74,0.7788,0.8123,0.8412,0.8661,0.8873,0.9053,0.9206,0.9336,0.9445,0.9537,0.9615,0.968,0.9734,0.9779,0.9817,0.9848,0.9875,0.9896,0.9914,0.9929,0.9942,0.9952,0.996,0.9967,0.9973,0.9978,0.9982,1);--sp-gentle:linear(0,0.0194,0.0687,0.1372,0.2165,0.3005,0.3847,0.4659,0.5422,0.6121,0.6751,0.731,0.7798,0.8219,0.8579,0.8881,0.9133,0.9341,0.951,0.9646,0.9754,0.9838,0.9903,0.9952,0.9988,1.0013,1.003,1.0041,1.0047,1.005,1.005,1.0048,1.0045,1.0041,1.0037,1.0033,1.0029,1.0025,1.0021,1.0018,1);--sp-bounce:linear(0,0.0165,0.06,0.1227,0.198,0.2806,0.3661,0.4511,0.533,0.61,0.6809,0.7448,0.8015,0.8509,0.8931,0.9286,0.9579,0.9814,1,1.014,1.0243,1.0313,1.0357,1.0379,1.0384,1.0375,1.0357,1.0332,1.0302,1.027,1.0237,1.0205,1.0174,1.0145,1.0118,1.0094,1.0073,1.0054,1.0038,1.0025,1)}}
+/* nút, thẻ: nhấn co nhanh, thả nảy chậm về như lò xo */
+html.ios button{transition:transform .55s var(--sp-bounce),background-color .25s ease,color .25s ease,filter .25s ease,opacity .25s ease}
+html.ios button:active:not(:disabled){transform:scale(.96)!important;filter:brightness(.96);transition:transform .14s cubic-bezier(.3,0,.2,1),filter .14s ease}
+html.ios .kc,html.ios .row,html.ios .g{transition:transform .6s var(--sp-bounce),box-shadow .35s ease,background-color .25s ease}
+html.ios .kc:active,html.ios .row:active{transform:scale(.975)!important;transition:transform .16s cubic-bezier(.3,0,.2,1)}
+@media (hover:hover){html.ios .kc:hover{transform:translateY(-2px)}}
+/* công tắc phân đoạn: viên trượt có nảy nhẹ, nhấn giữ thì viên co lại như iOS */
 html.ios .tabs,html.ios .top .space{position:relative}
-html.ios .tabs>button,html.ios .top .space>button{position:relative;z-index:1}
+html.ios .tabs>button,html.ios .top .space>button{position:relative;z-index:1;transition:color .3s ease,transform .55s var(--sp-bounce)}
 html.ios .ios-ind{position:absolute;z-index:0;pointer-events:none;border-radius:8px;background:var(--ios-sel);box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04);
-  transition:left .45s var(--sp),width .45s var(--sp),top .45s var(--sp),height .45s var(--sp)}
+  transition:left .6s var(--sp-bounce),width .6s var(--sp-bounce),top .6s var(--sp-gentle),height .6s var(--sp-gentle),transform .5s var(--sp-bounce)}
+html.ios .tabs:active>.ios-ind,html.ios .top .space:active>.ios-ind{transform:scale(.95);transition:left .6s var(--sp-bounce),width .6s var(--sp-bounce),transform .2s cubic-bezier(.3,0,.2,1)}
+html.ios .tabs>button:active,html.ios .top .space>button:active{transform:scale(1)!important;filter:none}
 html.ios .tabs:has(>.ios-ind)>button.on,html.ios .top .space:has(>.ios-ind)>button.on:not(#btnManual){background:transparent!important;box-shadow:none!important}
-@media (max-width:780px){html.ios .bar .tabs{position:fixed}html.ios .bar .tabs>.ios-ind{border-radius:26px;background:var(--ios-fill);box-shadow:none}}
-/* đổi tab: nội dung trượt ngang theo hướng tab (View Transitions) */
+@media (max-width:780px){html.ios .bar .tabs{position:fixed}html.ios .bar .tabs>.ios-ind{border-radius:26px;background:var(--ios-fill);box-shadow:none}
+  html.ios .bar .tabs>button:active .ic-fa{transform:scale(.88)}html.ios .bar .tabs>button .ic-fa{display:inline-block;transition:transform .5s var(--sp-bounce)}}
+/* đổi tab: hoà tan mềm + trôi nhẹ 14px theo hướng tab (không giật) */
 html.ios #content{view-transition-name:ios-content}
-::view-transition-old(root),::view-transition-new(root){animation-duration:.25s}
-::view-transition-group(ios-content){animation-duration:.42s;animation-timing-function:var(--sp,cubic-bezier(.32,.72,0,1))}
-html.ios[data-vt="r"]::view-transition-old(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-out-l}
-html.ios[data-vt="r"]::view-transition-new(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-in-r}
-html.ios[data-vt="l"]::view-transition-old(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-out-r}
-html.ios[data-vt="l"]::view-transition-new(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-in-l}
-@keyframes ios-out-l{to{opacity:0;transform:translateX(-40px)}}
-@keyframes ios-out-r{to{opacity:0;transform:translateX(40px)}}
-@keyframes ios-in-r{from{opacity:0;transform:translateX(60px)}}
-@keyframes ios-in-l{from{opacity:0;transform:translateX(-60px)}}
-/* mở job: máy tính trượt nhẹ vào; điện thoại / bảng Quy trình: đẩy vào từ phải như iOS */
-html.ios #detail.ios-in{animation:ios-pane .4s var(--sp) both}
-html.ios body.view-board.has-detail #detail.ios-in{animation:ios-push .5s var(--sp) both}
-@media (max-width:780px){html.ios body.has-detail #detail.ios-in{animation:ios-push .5s var(--sp) both}}
-@keyframes ios-pane{from{opacity:0;transform:translateX(18px)}}
-@keyframes ios-push{from{transform:translateX(100%);box-shadow:-20px 0 40px rgba(0,0,0,0)}to{box-shadow:-20px 0 40px rgba(0,0,0,.12)}}
-/* hộp thoại: nền mờ dần, tấm trồi lên từ dưới */
-html.ios .modal:not([hidden]){animation:ios-fade .3s ease both;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
-html.ios .modal:not([hidden]) .sheet,html.ios .dbbox .sheet{animation:ios-sheet .5s var(--sp) both}
-@keyframes ios-fade{from{opacity:0}}
-@keyframes ios-sheet{from{transform:translateY(60px) scale(.97);opacity:0}}
-/* menu, thông báo, gợi ý: phóng to từ gốc */
-html.ios .kmenu,html.ios .npanel:not([hidden]),html.ios .tm-sug,html.ios #chatPops .cpop{animation:ios-pop .32s var(--spb) both;transform-origin:top right}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.3s;animation-timing-function:ease}
+::view-transition-group(ios-content){animation-duration:.5s}
+html.ios::view-transition-old(ios-content){animation:.22s ease both ios-fade-out}
+html.ios::view-transition-new(ios-content){animation:.55s var(--sp-gentle) both ios-rise}
+html.ios[data-vt="r"]::view-transition-new(ios-content){animation-name:ios-in-r}
+html.ios[data-vt="l"]::view-transition-new(ios-content){animation-name:ios-in-l}
+@keyframes ios-fade-out{to{opacity:0;transform:scale(.99)}}
+@keyframes ios-rise{from{opacity:0;transform:translateY(8px)}}
+@keyframes ios-in-r{from{opacity:0;transform:translateX(14px)}}
+@keyframes ios-in-l{from{opacity:0;transform:translateX(-14px)}}
+/* mở phiếu job — máy tính: trượt nhẹ + hiện dần; điện thoại / bảng Quy trình: đẩy trang vào từ phải, trang dưới lùi 30% và tối đi (thị sai như iOS) */
+html.ios #detail.ios-in{animation:ios-pane .55s var(--sp-gentle) both}
+html.ios body.view-board.has-detail #detail.ios-in{animation:ios-push .6s var(--sp-smooth) both}
+@keyframes ios-pane{from{opacity:0;transform:translateX(16px)}}
+@keyframes ios-push{from{transform:translateX(100%);box-shadow:-1px 0 0 rgba(0,0,0,.04),0 0 0 100vmax rgba(0,0,0,0)}to{box-shadow:-1px 0 0 rgba(0,0,0,.04),0 0 0 100vmax rgba(0,0,0,.12)}}
+@media (max-width:780px){
+  html.ios body.has-detail #detail.ios-in{animation:ios-push .6s var(--sp-smooth) both}
+  html.ios #main>:not(.bar){transition:transform .6s var(--sp-smooth)}
+  html.ios body.has-detail #main>:not(.bar){transform:translateX(-30%)}
+}
+html.ios body.ios-drag #detail,html.ios body.ios-drag #main>*{transition:none!important;animation:none!important}
+/* hộp thoại: nền tối + mờ dần; điện thoại: tấm trồi từ đáy; máy tính: phóng nhẹ từ 94%. Đóng: tấm trôi xuống, nền nhạt đi */
+html.ios .modal:not([hidden]){animation:ios-dim .35s ease both;-webkit-backdrop-filter:blur(8px) saturate(120%);backdrop-filter:blur(8px) saturate(120%)}
+html.ios .modal:not([hidden]) .sheet,html.ios .dbbox .sheet{animation:ios-sheet-c .6s var(--sp-gentle) both}
+html.ios .modal.ios-out{animation:ios-undim .3s ease both}
+html.ios .modal.ios-out .sheet{animation:ios-sheet-out-c .3s var(--ease-in) both}
+@media (max-width:780px){
+  html.ios .modal:not([hidden]) .sheet,html.ios .dbbox .sheet{animation-name:ios-sheet}
+  html.ios .modal.ios-out .sheet{animation-name:ios-sheet-out}
+}
+@keyframes ios-dim{from{opacity:0}}
+@keyframes ios-undim{to{opacity:0}}
+@keyframes ios-sheet{from{transform:translateY(100vh)}}
+@keyframes ios-sheet-out{to{transform:translateY(100vh)}}
+@keyframes ios-sheet-c{from{opacity:0;transform:scale(.94) translateY(12px)}}
+@keyframes ios-sheet-out-c{to{opacity:0;transform:scale(.96) translateY(8px)}}
+/* menu, thông báo, gợi ý: nở ra từ chỗ bấm, nảy nhẹ, hết mờ dần */
+html.ios .kmenu,html.ios .npanel:not([hidden]),html.ios .tm-sug,html.ios #chatPops .cpop,html.ios .tmenu{animation:ios-menu .5s var(--sp-bounce) both;transform-origin:top right}
 html.ios .kmenu{transform-origin:top left}
-html.ios .tmenu{animation:ios-pop .32s var(--spb) both;transform-origin:bottom right}
-@keyframes ios-pop{from{opacity:0;transform:scale(.86)}}
-/* thông báo nhỏ (toast): bật lên dạng viên */
-html.ios #toast{border-radius:999px;padding:10px 18px;box-shadow:0 10px 30px rgba(0,0,0,.2);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);background:color-mix(in srgb,var(--ink) 88%,transparent)}
-html.ios #toast:not([hidden]){animation:ios-toast .5s var(--spb) both}
-@keyframes ios-toast{from{opacity:0;transform:translateX(-50%) translateY(24px) scale(.9)}to{transform:translateX(-50%)}}
+html.ios .tmenu{transform-origin:bottom right}
+@keyframes ios-menu{from{opacity:0;transform:scale(.72);filter:blur(6px)}40%{opacity:1;filter:blur(0)}}
+/* thông báo nhỏ: viên kính mờ rơi xuống từ đỉnh màn hình như thông báo iOS, tự kéo lên khi hết giờ */
+html.ios #toast{top:calc(10px + env(safe-area-inset-top,0px));bottom:auto;border-radius:999px;padding:11px 20px;font-weight:500;box-shadow:0 12px 34px rgba(0,0,0,.18),0 2px 6px rgba(0,0,0,.08);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);backdrop-filter:blur(24px) saturate(180%);background:color-mix(in srgb,var(--surface) 78%,transparent);color:var(--ink);border:.5px solid var(--line)}
+html.ios #toast:not([hidden]){animation:ios-drop .65s var(--sp-bounce) both}
+html.ios #toast.ios-out{animation:ios-lift .32s var(--ease-in) both}
+@keyframes ios-drop{from{opacity:0;transform:translateX(-50%) translateY(-140%) scale(.9)}to{transform:translateX(-50%)}}
+@keyframes ios-lift{from{transform:translateX(-50%)}to{opacity:0;transform:translateX(-50%) translateY(-140%) scale(.92)}}
 @media (prefers-reduced-motion:reduce){html.ios *,html.ios *::before{animation:none!important;transition:none!important}::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 /* icon nét mảnh (thay Font Awesome) */
 html.ios .fa-archive::before,html.ios .fa-arrow-right::before,html.ios .fa-ban::before,html.ios .fa-bar-chart::before,html.ios .fa-barcode::before,html.ios .fa-bell::before,html.ios .fa-bell-slash::before,html.ios .fa-building::before,html.ios .fa-calendar::before,html.ios .fa-check::before,html.ios .fa-columns::before,html.ios .fa-comments::before,html.ios .fa-copy::before,html.ios .fa-download::before,html.ios .fa-ellipsis-h::before,html.ios .fa-envelope::before,html.ios .fa-file-excel-o::before,html.ios .fa-file-text-o::before,html.ios .fa-filter::before,html.ios .fa-folder-open::before,html.ios .fa-inbox::before,html.ios .fa-list::before,html.ios .fa-lock::before,html.ios .fa-paper-plane-o::before,html.ios .fa-paperclip::before,html.ios .fa-plus::before,html.ios .fa-print::before,html.ios .fa-refresh::before,html.ios .fa-remove::before,html.ios .fa-search::before,html.ios .fa-send::before,html.ios .fa-sun-o::before,html.ios .fa-times::before,html.ios .fa-trash-o::before,html.ios .fa-upload::before{content:""!important;display:inline-block;width:1.2em;height:1.2em;vertical-align:-.22em;background-color:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
@@ -1961,21 +1984,39 @@ function detNav(open){try{const st=history.state&&history.state.sj;
   else if(!open&&st){detSkip=true;history.back()}}catch(e){}}
 addEventListener("popstate",()=>{if(detSkip){detSkip=false;return}
   if(S.sel&&!(history.state&&history.state.sj)){S.sel=null;renderAll(true)}});
-function detClose(){const d=$("#detail");d.style.transition="";d.style.transform="";d.style.opacity="";if(history.state&&history.state.sj){history.back()}else{S.sel=null;renderAll(true)}}
-(function(){let x0=0,y0=0,t0=0,on=0,dx=0,dragging=false;const EDGE=90;
-  const d=()=>$("#detail");
+function iosHide(el,ms){if(!el||el.hidden)return;if(!iosOn()||iosCalm()){el.hidden=true;return}clearTimeout(el._iosH);el.classList.add("ios-out");el._iosH=setTimeout(()=>{el.classList.remove("ios-out");el.hidden=true},ms||300)}
+const detKids=()=>[...document.querySelectorAll("#main>:not(.bar)")];
+function detReset(){const d=$("#detail");d.style.transition=d.style.transform=d.style.boxShadow=d.style.willChange="";detKids().forEach(k=>{k.style.transition=k.style.transform=""});document.body.classList.remove("ios-drag")}
+function detDone(){detReset();if(history.state&&history.state.sj){history.back()}else{S.sel=null;renderAll(true)}}
+/* đóng phiếu: trượt ra phải, trang dưới trôi về chỗ cũ (lò xo mượt), rồi mới đóng */
+function detClose(fromSwipe,v){const d=$("#detail");if(!iosOn()||iosCalm()||!detOverlay()){detDone();return}
+  const w=d.getBoundingClientRect().width||innerWidth,left=fromSwipe?Math.max(0,w-(parseFloat((d.style.transform.match(/-?[\d.]+/)||[0])[0])||0)):w;
+  const dur=Math.max(.28,Math.min(.5,left/Math.max(.6,(v||0))/1000*1.6||.45));
+  document.body.classList.remove("ios-drag");const tr=`transform ${dur}s var(--sp-smooth),box-shadow ${dur}s ease`;
+  d.style.transition=tr;d.style.transform="translateX(100%)";d.style.boxShadow="-1px 0 0 rgba(0,0,0,.04),0 0 0 100vmax rgba(0,0,0,0)";
+  if(matchMedia("(max-width:780px)").matches)detKids().forEach(k=>{k.style.transition=`transform ${dur}s var(--sp-smooth)`;k.style.transform="translateX(0)"});
+  setTimeout(detDone,dur*1000-40)}
+(function(){let x0=0,y0=0,on=0,dx=0,dragging=false,hist=[];const EDGE=110;
+  const d=()=>$("#detail"),mob=()=>matchMedia("(max-width:780px)").matches;
+  const paint=()=>{const el=d(),w=el.getBoundingClientRect().width||innerWidth,p=Math.min(1,dx/w);
+    el.style.transform=`translateX(${dx}px)`;el.style.boxShadow=`-1px 0 0 rgba(0,0,0,.05),0 0 0 100vmax rgba(0,0,0,${(.12*(1-p)).toFixed(3)})`;
+    if(mob())detKids().forEach(k=>k.style.transform=`translateX(${(-30*(1-p)).toFixed(2)}%)`)};
   document.addEventListener("touchstart",e=>{const el=d();if(!el||!S.sel||e.touches.length!==1||!el.contains(e.target)||!detOverlay())return;
     const t=e.touches[0],r=el.getBoundingClientRect();if(t.clientX-r.left>EDGE)return;
     if(e.target.closest("input,textarea,select,[contenteditable]"))return;
-    x0=t.clientX;y0=t.clientY;t0=Date.now();on=1;dx=0;dragging=false},{passive:true});
+    x0=t.clientX;y0=t.clientY;on=1;dx=0;dragging=false;hist=[[Date.now(),0]]},{passive:true});
   document.addEventListener("touchmove",e=>{if(!on)return;const t=e.touches[0],mx=t.clientX-x0,my=t.clientY-y0;
     if(!dragging){if(Math.abs(my)>12&&Math.abs(my)>Math.abs(mx)){on=0;return}
-      if(mx>10&&mx>Math.abs(my)*1.2){dragging=true;const el=d();el.style.transition="none";el.style.willChange="transform"}else return}
-    e.preventDefault();dx=Math.max(0,mx);const el=d();el.style.transform=`translateX(${dx}px)`;el.style.boxShadow=`-12px 0 32px rgba(0,0,0,${.22*(1-dx/innerWidth)})`},{passive:false});
-  const end=()=>{if(!on)return;on=0;if(!dragging)return;const el=d(),w=el.getBoundingClientRect().width||innerWidth,v=dx/Math.max(1,Date.now()-t0);
-    el.style.transition="transform .3s cubic-bezier(.32,.72,0,1)";
-    if(dx>w*.33||v>.5){el.style.transform="translateX(100%)";setTimeout(()=>{el.style.willChange="";el.style.boxShadow="";detClose()},280)}
-    else{el.style.transform="translateX(0)";setTimeout(()=>{el.style.transition="";el.style.transform="";el.style.willChange="";el.style.boxShadow=""},320)}};
+      if(mx>8&&mx>Math.abs(my)*1.1){dragging=true;x0+=8;document.body.classList.add("ios-drag");d().classList.remove("ios-in");d().style.willChange="transform"}else return}
+    e.preventDefault();dx=Math.max(0,t.clientX-x0);hist.push([Date.now(),dx]);if(hist.length>6)hist.shift();requestAnimationFrame(paint)},{passive:false});
+  const end=()=>{if(!on)return;on=0;if(!dragging)return;const el=d(),w=el.getBoundingClientRect().width||innerWidth;
+    const a=hist[0],z=hist[hist.length-1],v=(z[1]-a[1])/Math.max(1,z[0]-a[0]); // px/ms
+    if(dx+v*180>w*.4&&v>-.2){detClose(true,v);return}
+    // bật về: lò xo nảy nhẹ
+    document.body.classList.remove("ios-drag");const tr="transform .5s var(--sp-gentle),box-shadow .4s ease";
+    el.style.transition=tr;el.style.transform="translateX(0)";el.style.boxShadow="";
+    if(mob())detKids().forEach(k=>{k.style.transition="transform .5s var(--sp-gentle)";k.style.transform=""});
+    setTimeout(()=>{el.style.transition=el.style.transform=el.style.willChange="";detKids().forEach(k=>k.style.transition="")},520)};
   document.addEventListener("touchend",end,{passive:true});document.addEventListener("touchcancel",end,{passive:true})})();
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(kmenu){closeKmenu();return}if(S.view==="board"&&S.sel&&!document.querySelector(".modal:not([hidden])")){S.sel=null;renderAll(true)}}});
 addEventListener("resize",closeKmenu);
@@ -2513,7 +2554,7 @@ D.addEventListener("click",e=>{
   const st=e.target.closest("[data-st]");
   if(st&&j){moveAndRender(j,st.dataset.st);return}
   const b=e.target.closest("[data-act]");if(!b)return;const a=b.dataset.act;
-  if(a==="close"){detClose();return}
+  if(a==="close"){detClose(false);return}
   if(a==="remind"){remAdd(j);return}
   if(a==="remDel"){remDel(j,b.dataset.rid);return}
   if(a==="aiChatSum"){aiChatSum(cur());return}
@@ -3802,7 +3843,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26j";
+const APP_VER="2026-11-26k";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -3888,7 +3929,7 @@ async function srcDel(j,k,i){
 let pending=[],ctl=null;
 const M=$("#modal");
 function openModal(){M.hidden=false;note("");renderPending();setTimeout(()=>$("#drop").focus(),30)}
-function closeModal(){if(ctl)ctl.abort();M.hidden=true;pending.forEach(p=>URL.revokeObjectURL(p.url));pending=[];$("#rawtext").value=""}
+function closeModal(){if(ctl)ctl.abort();iosHide(M,300);pending.forEach(p=>URL.revokeObjectURL(p.url));pending=[];$("#rawtext").value=""}
 function addFiles(files){
   [...files].filter(f=>f&&f.type&&f.type.startsWith("image/")).forEach(f=>pending.push({file:f,url:URL.createObjectURL(f)}));
   if(pending.length>5){pending.slice(5).forEach(p=>URL.revokeObjectURL(p.url));pending=pending.slice(0,5);note("Tối đa 5 ảnh mỗi job.",true)}
@@ -4419,7 +4460,7 @@ function debitPrint(j,d){
   <script>window.onload=()=>setTimeout(()=>window.print(),300)<\/script></body></html>`;
   const w=window.open("","_blank");if(!w)throw new Error("Trình duyệt chặn cửa sổ in. Cho phép cửa sổ bật lên rồi thử lại.");
   w.document.open();w.document.write(html);w.document.close()}
-let tt;function toast(t){const el=$("#toast");el.textContent=t;el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>el.hidden=true,Math.min(12000,Math.max(3500,String(t).length*55)))}
+let tt;function toast(t){const el=$("#toast");el.textContent=t;clearTimeout(el._iosH);el.classList.remove("ios-out");if(!el.hidden&&iosOn()){el.hidden=true;void el.offsetWidth}el.hidden=false;clearTimeout(tt);tt=setTimeout(()=>iosHide(el,320),Math.min(12000,Math.max(3500,String(t).length*55)))}
 
 /* ---------- boot ---------- */
 const OLDST={"Chờ thu tiền":"Nhập Ksmart","Mới":"Mới nhận","Huỷ":DONE,"Đã thu":DONE,"Chờ thông quan":"Đã truyền tờ khai","Chờ trả rỗng":"Bảng kê / debit",[FAIL]:DONE}; // 2026-11-25: đổi/bỏ bước
