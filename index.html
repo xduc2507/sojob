@@ -861,6 +861,19 @@ body.view-archive .back{display:inline-block}
 .archbtn{margin-top:6px;align-self:flex-start;display:inline-flex;align-items:center;gap:2px;font-size:12px}
 .archpill{margin-left:8px;display:inline-flex;align-items:center;background:var(--surface-2);color:var(--muted)}
 html.ios .arch-m{border:0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
+/* icon nét mảnh dùng chung */
+.svi.in{width:1.05em;height:1.05em;vertical-align:-.16em;margin:0 3px 0 0;color:var(--accent)}
+.svi.lg{width:34px;height:34px;margin:0 0 6px;color:var(--accent);opacity:.8}
+.svi.spin{animation:svispin 1s linear infinite}@keyframes svispin{to{transform:rotate(360deg)}}
+.ldot{display:inline-block;width:9px;height:9px;border-radius:50%;margin:0 5px 0 1px;vertical-align:.05em}.ldot.g{background:#34C759}.ldot.y{background:#FFCC00}.ldot.r{background:#FF3B30}
+.td-g h3 .svi,.td-h h2 .svi{width:17px;height:17px;vertical-align:-3px;margin-right:6px}
+.td-h h2 .svi{width:22px;height:22px;color:#FF9500}
+.td-g.bad h3 .svi{color:var(--bad)}.td-g.warn h3 .svi{color:var(--warn)}.td-g.ok h3 .svi{color:var(--ok)}.td-g h3 .svi{color:var(--accent)}
+.td-g.bad h3 .svi{color:var(--bad)!important}.td-g.warn h3 .svi{color:var(--warn)!important}.td-g.ok h3 .svi{color:var(--ok)!important}
+.np-ic .svi{width:18px;height:18px;margin:0;color:var(--accent)}.np-i.bad .np-ic .svi{color:var(--bad)}
+.kmenu button i .svi{width:16px;height:16px;margin:0;vertical-align:-3px}
+.odbox .svi,.latebar .svi,.dltag .svi,.odmiss .svi,.note-b .svi{color:currentColor}
+.td-i small .svi,.asgchip .svi{width:13px;height:13px;margin-right:3px}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1482,7 +1495,7 @@ html.ios .fa-upload{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org
         <button data-view="list" hidden><i class="fa fa-list ic-fa" aria-hidden="true"></i>Danh sách</button><button data-view="mail" hidden><i class="fa fa-envelope ic-fa" aria-hidden="true"></i>Email<span class="tbadge" id="mailBadge" hidden></span></button><button data-view="report" hidden><i class="fa fa-bar-chart ic-fa" aria-hidden="true"></i>Báo cáo</button><button type="button" class="tmore" data-more aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h ic-fa" aria-hidden="true"></i>Thêm</button>
       </div>
       <span class="sp"></span>
-      <button type="button" id="fMine" class="sm fmine" aria-pressed="false" title="Chỉ hiện job mình phụ trách" hidden>👤 Việc của tôi</button><select id="fWho" class="fwho" aria-label="Lọc theo người phụ trách" hidden></select>
+      <button type="button" id="fMine" class="sm fmine" aria-pressed="false" title="Chỉ hiện job mình phụ trách" hidden><svg class="svi" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Việc của tôi</button><select id="fWho" class="fwho" aria-label="Lọc theo người phụ trách" hidden></select>
       <select id="fStatus" aria-label="Lọc trạng thái">
         <option value="open">Đang mở</option>
         <option value="all">Tất cả</option>
@@ -1873,12 +1886,12 @@ function renderProfile(force){
       <label class="fld"><span>Email</span><input id="p-email" data-p="email" value="${esc(p.email)}"></label>
       <label class="fld"><span>Ghi chú (điều khoản, hạn thanh toán…)</span><input id="p-note" data-p="note" value="${esc(p.note)}"></label>
     </div>
-    ${mineOn()?"":`<details class="pdb"${p.dbMst||p.dbName?" open":""}><summary>🧾 Thông tin xuất debit cho FWD này${p.dbMst?` · MST ${esc(p.dbMst)}`:""}</summary><div class="grid3">
+    ${mineOn()?"":`<details class="pdb"${p.dbMst||p.dbName?" open":""}><summary>${svi("rcpt")}Thông tin xuất debit cho FWD này${p.dbMst?` · MST ${esc(p.dbMst)}`:""}</summary><div class="grid3">
       <label class="fld"><span>Tên xuất hoá đơn</span><input data-p="dbName" value="${esc(p.dbName||"")}" placeholder="Tên đầy đủ theo đăng ký thuế"></label>
       <label class="fld"><span>Mã số thuế</span><input data-p="dbMst" value="${esc(p.dbMst||"")}"></label>
       <label class="fld"><span>Email nhận debit</span><input data-p="dbEmail" value="${esc(p.dbEmail||"")}"></label>
       <label class="fld" style="grid-column:1/-1"><span>Địa chỉ</span><input data-p="dbAddr" value="${esc(p.dbAddr||"")}"></label></div>
-      <p class="note" style="margin:6px 0 0">Tự lưu khi xuất debit cho FWD (bấm 🔎 Tra MST trong khung Debit để lấy tên, địa chỉ theo đăng ký thuế).</p></details>`}
+      <p class="note" style="margin:6px 0 0">Tự lưu khi xuất debit cho FWD (bấm Tra MST trong khung Debit để lấy tên, địa chỉ theo đăng ký thuế).</p></details>`}
     ${Object.keys(fails).length?`<div class="chips"><span style="color:var(--muted)">Lô thất bại:</span>${Object.entries(fails).map(([r,n])=>`<span class="pill">${esc(r)}: ${n}</span>`).join("")}</div>`:""}
     ${contacts.length||companies.length?`<div class="chips">${contacts.length?`<span style="color:var(--muted)">Liên hệ:</span>${contacts.map(c=>`<span class="pill">${esc(c)}</span>`).join("")}`:""}${companies.length?`<span style="color:var(--muted)">Chủ hàng:</span>${companies.map(c=>`<span class="pill">${esc(c)}</span>`).join("")}`:""}</div>`:""}
     <details ${hist.length&&hist.length<=8?"open":""}><summary>Lịch sử giá đã báo (${hist.length})</summary>
@@ -1899,7 +1912,7 @@ function jobRow(j){
   return `<div class="row ${S.sel===j.id?"on":""}${ll&&ll.cls!=="ok"?" late":""}" data-open="${j.id}" tabindex="0">
     <span class="code">${esc(j.code)}</span>
     <span class="t">${j.priority==="Gấp"?'<span class="urgent">GẤP · </span>':""}${esc(j.title||"(chưa có tiêu đề)")}</span>
-    <span class="right">${cbadge(j)}${odState(j)==="none"?`<span class="pill odmiss">⚠ Quá hạn – thiếu lý do</span>`:odState(j)==="pend"?`<span class="pill wait">Lý do quá hạn chờ duyệt</span>`:""}${j.example?'<span class="ex">VÍ DỤ</span>':""}${j.coNeed==="Có"&&j.coStatus!=="Đã cấp"&&isOpen(j.status)?`<span class="pill wait">C/O ${esc(j.coStatus||"chưa xin")}</span>`:""}${j.blocker?`<span class="pill wait" title="${esc(j.blocker)}">Vướng: ${esc(j.blocker.slice(0,28))}</span>`:""}${isStalled(j)&&!isOverdue(j)&&!STRICT.includes(j.status)?`<span class="pill dl-over">Đứng yên ${stageDays(j)} ngày</span>`:""}<span class="pill svc">${svcTag(j)}</span>${dlPill(j.deadline,isOpen(j.status))}${stPill(j.status)}</span>
+    <span class="right">${cbadge(j)}${odState(j)==="none"?`<span class="pill odmiss">${svi("warn")}Quá hạn – thiếu lý do</span>`:odState(j)==="pend"?`<span class="pill wait">Lý do quá hạn chờ duyệt</span>`:""}${j.example?'<span class="ex">VÍ DỤ</span>':""}${j.coNeed==="Có"&&j.coStatus!=="Đã cấp"&&isOpen(j.status)?`<span class="pill wait">C/O ${esc(j.coStatus||"chưa xin")}</span>`:""}${j.blocker?`<span class="pill wait" title="${esc(j.blocker)}">Vướng: ${esc(j.blocker.slice(0,28))}</span>`:""}${isStalled(j)&&!isOverdue(j)&&!STRICT.includes(j.status)?`<span class="pill dl-over">Đứng yên ${stageDays(j)} ngày</span>`:""}<span class="pill svc">${svcTag(j)}</span>${dlPill(j.deadline,isOpen(j.status))}${stPill(j.status)}</span>
     <span class="meta">${who.map((w,i)=>`<span class="pill ${i===0?"fwd":""}">${esc(w)}</span>`).join("")}<span>${esc(j.type)}</span>${j.mode?`<span>· ${esc(j.mode)}</span>`:""}${j.pol||j.pod?`<span>· ${esc(j.pol||"?")} → ${esc(j.pod||"?")}</span>`:""}${all&&!team()?`<span>· việc ${done}/${all}</span>`:""}<span class="cd" title="${esc(cDateFull(j))}">· tạo ${cDate(j)}</span>${asgChip(j)}</span>
     ${ll?`<span class="lr ${ll.cls}" title="${esc(ll.text)}">${ll.cls?"":"<b>"}${esc(ll.text)}${ll.cls?"":"</b>"}</span>`:""}
   </div>`;
@@ -1934,7 +1947,7 @@ function kanbanCard(j){
     <span class="tg">${tags}</span>
     ${j.returnNote&&isOpen(j.status)?`<span class="note-r" title="${esc(j.returnNote)}">↩ Trả về: ${esc(j.returnNote)}</span>`:""}
     ${(ll=>ll?`<span class="note-l ${ll.cls}" title="${esc(ll.text)}">${esc(ll.text)}</span>`:"")(lateLine(j))}
-    ${j.blocker&&isOpen(j.status)&&!(lateState(j)&&j.lateAck&&j.blocker===j.lateAck.reason)?`<span class="note-b" title="${esc(j.blocker)}">⚠ ${esc(j.blocker)}</span>`:""}
+    ${j.blocker&&isOpen(j.status)&&!(lateState(j)&&j.lateAck&&j.blocker===j.lateAck.reason)?`<span class="note-b" title="${esc(j.blocker)}">${svi("warn")}${esc(j.blocker)}</span>`:""}
     ${all&&!team()?`<span class="pg" title="Việc xong ${done}/${all}"><i style="width:${Math.round(done/all*100)}%"></i></span>`:""}
     <span class="ft"><span class="av" style="background:${avColor(who)}" aria-hidden="true">${esc(initials(who))}</span><span class="who" title="${esc([j.fwd,j.company].filter(Boolean).join(" · ")||who)}">${esc(who)}${j.company&&j.company!==who?`<i class="co"> · ${esc(j.company)}</i>`:""}</span></span>
     <span class="asgl">${asgChip(j,true)}${timeTag(j)}</span>
@@ -1963,7 +1976,7 @@ function renderBoard(el){
     <span class="sum">${open.length} job đang mở${late?` · <button type="button" class="sumlink bad" data-kbsum="late" aria-haspopup="true">${late} đứng yên / quá hạn ▾</button>`:""}${blk?` · <button type="button" class="sumlink" data-kbsum="blk" aria-haspopup="true">${blk} có vướng mắc ▾</button>`:""}</span>
     <div class="kb-f"${S.kbF?"":" hidden"}><select id="kbGroup" aria-label="Lọc theo FWD / công ty"><option value="__all">Tất cả FWD / cty (${S.jobs.length})</option>${groups.map(g=>`<option value="${esc(g)}" ${S.group===g?"selected":""}>${esc(g)}</option>`).join("")}</select>
     <select id="kbSvc" aria-label="Lọc theo loại dịch vụ"><option value="">Mọi dịch vụ</option>${SERVICES.map(s=>`<option value="${s}" ${S.svc===s?"selected":""}>${s} · ${SERVICE_NAME[s]}</option>`).join("")}</select>
-    <button type="button" class="sm${S.bulkOn?" on":""}" data-bulk="toggle" title="Chọn nhiều thẻ để chuyển bước / giao việc cùng lúc">☑ Chọn nhiều</button>
+    <button type="button" class="sm${S.bulkOn?" on":""}" data-bulk="toggle" title="Chọn nhiều thẻ để chuyển bước / giao việc cùng lúc">${svi("sqchk")}Chọn nhiều</button>
     <span class="kbw" title="Độ rộng chung các cột (kéo thanh). Kéo mép phải một cột để đổi riêng cột đó, bấm đúp mép để trả về độ rộng chung"><button type="button" class="sm ghost" data-kbw="-" aria-label="Thu hẹp cột">−</button><input type="range" id="kbW" min="150" max="360" step="10" value="${kbColW()}" aria-label="Độ rộng cột"><button type="button" class="sm ghost" data-kbw="+" aria-label="Nới rộng cột">+</button><button type="button" class="sm" data-kbw="fit" title="Chia đều cho vừa màn hình">Vừa màn hình</button></span>${nf?`<button type="button" class="sm ghost" data-kbfx>✕ Bỏ lọc</button>`:""}</div></div>
     <div class="kb" style="--colw:${kbColW()}px">${cols}</div>`;
 }
@@ -1978,12 +1991,12 @@ function openKmenu(btn){
   const j=S.jobs.find(x=>x.id===btn.dataset.kmenu);if(!j)return;
   const open=isOpen(j.status),nx=open?nextStage(j):null,pv=open?prevStage(j):null;
   kmenu=document.createElement("div");kmenu.className="kmenu";kmenu.setAttribute("role","menu");
-  kmenu.innerHTML=`<button data-ka="open" role="menuitem"><i>✎</i>Mở / sửa job</button>
-    <button data-ka="next" class="hi" role="menuitem" ${nx?"":"disabled"}><i>→</i>Chuyển tiếp${nx?`: ${esc(nx)}`:""}</button>
-    <button data-ka="prev" role="menuitem" ${pv?"":"disabled"}><i>←</i>Trả về${pv?`: ${esc(pv)}`:""}</button>
-    <button data-ka="blk" role="menuitem" ${open?"":"disabled"}><i>⚠</i>${j.blocker?"Sửa / bỏ vướng mắc":"Ghi vướng mắc"}</button>
-    <button data-ka="copy" role="menuitem"><i>⧉</i>Copy tóm tắt job</button><hr>
-    ${open?"":`<button data-ka="reopen" role="menuitem"><i>↺</i>Mở lại job</button>`}`;
+  kmenu.innerHTML=`<button data-ka="open" role="menuitem"><i>${svi("pen")}</i>Mở / sửa job</button>
+    <button data-ka="next" class="hi" role="menuitem" ${nx?"":"disabled"}><i>${svi("right")}</i>Chuyển tiếp${nx?`: ${esc(nx)}`:""}</button>
+    <button data-ka="prev" role="menuitem" ${pv?"":"disabled"}><i>${svi("back")}</i>Trả về${pv?`: ${esc(pv)}`:""}</button>
+    <button data-ka="blk" role="menuitem" ${open?"":"disabled"}><i>${svi("warn")}</i>${j.blocker?"Sửa / bỏ vướng mắc":"Ghi vướng mắc"}</button>
+    <button data-ka="copy" role="menuitem"><i>${svi("copy")}</i>Copy tóm tắt job</button><hr>
+    ${open?"":`<button data-ka="reopen" role="menuitem"><i>${svi("refresh")}</i>Mở lại job</button>`}`;
   kmenu.dataset.id=j.id;
   document.body.appendChild(kmenu);
   const r=btn.getBoundingClientRect(),w=kmenu.offsetWidth,h=kmenu.offsetHeight;
@@ -2185,7 +2198,7 @@ function reviewHtml(){
     ["Nhập Ksmart",j=>j.status==="Nhập Ksmart",j=>`${num(j.debitAmount)?fmt(j.debitAmount,j.debitCurrency)+" "+(j.debitCurrency||"VND"):"chưa ghi số tiền"}${j.debitDate?" · gửi debit "+dmy(j.debitDate):""}`]];
   const parts=G.map(([name,f,why])=>{const arr=open.filter(f);if(!arr.length)return"";
     return `<div class="rv-g"><span class="rv-h">${name}<span class="mono">${arr.length}</span></span>${arr.map(j=>`<div class="rv" data-open="${j.id}" tabindex="0"><span class="mono">${esc(j.code)}</span><span class="t">${esc(j.title||"(chưa có tiêu đề)")}<small>${esc(groupKey(j))} · ${esc(j.status)} · ${esc(why(j))}</small></span><span class="pill svc">${svcTag(j)}</span></div>`).join("")}</div>`}).filter(Boolean);
-  const stall=boss()?`<details class="rv-set"><summary>⚙ Ngưỡng tô đỏ: lô đứng yên quá bao nhiêu ngày ở mỗi bước (0 = tắt)</summary><div class="stall-grid">${STAGES.filter(isOpen).map(st=>`<label class="fld"><span>${esc(st)}</span><input type="number" min="0" step="1" inputmode="numeric" data-stall="${esc(st)}" value="${esc(S.stall[st]??"")}"></label>`).join("")}</div></details>`:"";
+  const stall=boss()?`<details class="rv-set"><summary>${svi("gear")}Ngưỡng tô đỏ: lô đứng yên quá bao nhiêu ngày ở mỗi bước (0 = tắt)</summary><div class="stall-grid">${STAGES.filter(isOpen).map(st=>`<label class="fld"><span>${esc(st)}</span><input type="number" min="0" step="1" inputmode="numeric" data-stall="${esc(st)}" value="${esc(S.stall[st]??"")}"></label>`).join("")}</div></details>`:"";
   return `<details class="review" id="rvBox"${rvOpen()?" open":""}><summary>Rà sáng: lô dễ sót <span class="mono">${parts.length?open.filter(j=>G.some(g=>g[1](j))).length:0}</span></summary>${parts.join("")||'<p class="rv-ok">Không có lô nào đứng yên, vướng mắc hay chờ thu tiền. Tốt!</p>'}${stall}</details>`;
 }
 function renderPlan(el){
@@ -2265,7 +2278,7 @@ function renderDetail(force){
   el.innerHTML=`<div class="d">
   <div class="d-head">
     <div class="l1"><button class="back" data-act="close">← ${S.view==="team"?"Chat chung":S.view==="today"?"Hôm nay":S.view==="archive"?"Lưu trữ":"Quy trình"}</button>${isArch(j)?`<span class="pill archpill" title="Mở lại: chuyển lô về một bước đang làm">${svi("arch")}Đã lưu trữ</span>`:""}<span class="acts">${isOpen(j.status)?`<button class="primary go" data-act="stpop" aria-haspopup="true" aria-expanded="false" aria-controls="stpop">Chuyển tiếp ▾</button>`:`<button class="sm" data-st="${esc(STAGES[0])}">Mở lại</button>`}</span></div>
-    <div class="l2"><span class="mono jcode">${esc(j.code)}${j.example?' <span class="ex">VÍ DỤ</span>':""}</span><span class="stnow${j.status===FAIL?" bad":""}" title="Bước hiện tại">${esc(SHORT[j.status]||j.status)}</span>${asgSel(j)}<button class="ghost sm" data-act="remind" title="Hẹn giờ nhắc lô này lên điện thoại">⏰ Nhắc tôi</button><button class="ghost sm urg${j.priority==="Gấp"?" on":""}" data-act="urgent" title="Bật / tắt job gấp">⚡ Gấp</button>${spaceOn()&&isMine(j)?`<button class="ghost sm shr" data-act="share" title="Đưa job này sang Sổ chung: nhân viên thấy và làm cùng">→ Chuyển sang Sổ chung</button>`:""}</div>
+    <div class="l2"><span class="mono jcode">${esc(j.code)}${j.example?' <span class="ex">VÍ DỤ</span>':""}</span><span class="stnow${j.status===FAIL?" bad":""}" title="Bước hiện tại">${esc(SHORT[j.status]||j.status)}</span>${asgSel(j)}<button class="ghost sm" data-act="remind" title="Hẹn giờ nhắc lô này lên điện thoại">${svi("alarm")}Nhắc tôi</button><button class="ghost sm urg${j.priority==="Gấp"?" on":""}" data-act="urgent" title="Bật / tắt job gấp">${svi("zap")}Gấp</button>${spaceOn()&&isMine(j)?`<button class="ghost sm shr" data-act="share" title="Đưa job này sang Sổ chung: nhân viên thấy và làm cùng">→ Chuyển sang Sổ chung</button>`:""}</div>
     ${remList(j)}
     <div id="stpop" class="stpop" hidden role="dialog" aria-label="Chọn bước"><div class="stp-h">${nextStage(j)&&isOpen(j.status)?`<button class="primary go stp-next" data-st="${esc(nextStage(j))}">→ Sang bước tiếp: ${esc(nextStage(j))}</button>`:""}<span class="muted">hoặc chọn bước khác</span></div><div id="stagebar">${stagesHtml(j)}</div></div>
     ${lateBox(j)}
@@ -2289,7 +2302,7 @@ function renderDetail(force){
     <div class="acts">${missing?`<button class="sm" data-act="applyTpl">Thêm ${missing} bước mẫu “${esc(j.type)}”</button>`:""}${tasks.length?`<button class="ghost sm" data-act="saveTpl">Lưu checklist này làm mẫu “${esc(j.type)}”</button>`:""}</div>
   </div>`}
   ${lotSec(j)}
-  <div class="sec"><h3>Báo giá <span class="acts"><button class="ghost sm ai" data-act="aiQuote" title="Claude lập báo giá từ yêu cầu và giá đã báo trước đây">✦ Claude soạn</button><button class="ghost sm" data-act="fillPrices">Điền giá lần trước</button><button class="ghost sm${QADD==="fee"?" on":""}" data-act="qadd" aria-expanded="${QADD==="fee"}">+ Thêm phí ▾</button><button class="ghost sm${QADD==="ch"?" on":""}" data-act="qaddch" aria-expanded="${QADD==="ch"}">+ Chi hộ ▾</button></span></h3>
+  <div class="sec"><h3>Báo giá <span class="acts"><button class="ghost sm ai" data-act="aiQuote" title="Claude lập báo giá từ yêu cầu và giá đã báo trước đây">${svi("spark")}Claude soạn</button><button class="ghost sm" data-act="fillPrices">Điền giá lần trước</button><button class="ghost sm${QADD==="fee"?" on":""}" data-act="qadd" aria-expanded="${QADD==="fee"}">+ Thêm phí ▾</button><button class="ghost sm${QADD==="ch"?" on":""}" data-act="qaddch" aria-expanded="${QADD==="ch"}">+ Chi hộ ▾</button></span></h3>
     ${qPresetBox(j)}
     ${(j.quote||[]).length?`<div class="qwrap"><table class="q"><thead><tr><th style="width:24%">Hạng mục</th><th class="num" style="width:6%">SL</th><th style="width:8%">ĐVT</th><th class="num" style="width:13%">Đơn giá</th><th class="num" style="width:13%">Thành tiền</th><th class="num net" style="width:13%" title="Giá vốn / giá nhập hệ thống công ty – không gửi khách">Giá NET</th><th class="num net" style="width:13%">Thành tiền NET</th><th>Giá lần trước</th><th></th></tr></thead><tbody>
     ${(()=>{const R=(q,i)=>`<tr class="${q.ch?"chrow":""}"><td>${q.ch?'<span class="chtag">Chi hộ</span>':""}<input id="q-${i}-name" data-q="${i}:name" list="${q.ch?"chitems":"items"}" placeholder="Chọn hoặc gõ" value="${esc(q.name)}"></td><td><input class="num mono" id="q-${i}-qty" data-q="${i}:qty" value="${esc(q.qty)}" inputmode="decimal"></td><td><input id="q-${i}-unit" data-q="${i}:unit" value="${esc(q.unit)}"></td><td><input class="num mono" id="q-${i}-price" data-q="${i}:price" value="${num(q.price)?esc(q.price):""}" placeholder="Nhập giá" inputmode="decimal"></td><td class="num mono" data-amt="${i}">${num(q.qty)*num(q.price)?fmt(num(q.qty)*num(q.price),q.currency):""}</td><td><input class="num mono net" id="q-${i}-net" data-q="${i}:net" value="${esc(q.net||"")}" inputmode="decimal" placeholder="NET"></td><td class="num mono netamt" data-namt="${i}">${num(q.net)?fmt(num(q.qty)*num(q.net),q.currency):""}</td><td data-hint="${i}">${hintHtml(q,j,i)}</td><td><button class="x" data-act="qdel" data-i="${i}" aria-label="Xoá dòng">✕</button></td></tr>`;const A=[],B=[];j.quote.forEach((q,i)=>(q.ch?B:A).push(R(q,i)));
@@ -2297,18 +2310,18 @@ function renderDetail(force){
     </tbody></table></div><span style="font-size:11.5px;color:var(--muted)">Giá lần trước lấy từ cùng FWD; dấu * là giá báo cho FWD khác.</span>`:`<p style="margin:0;color:var(--muted);font-size:13px">Chưa có hạng mục. Bấm “+ Thêm phí” hoặc “+ Chi hộ”.</p>`}
     <div class="grid2"><div class="vatbox"><span>VAT</span><div class="chips2">${VAT_OPEN?[8,10].map(v=>`<button type="button" class="${vatRate(j)===v?"on":""}" data-vat="${v}">${v}%</button>`).join(""):`<button type="button" class="on" data-vat="open" title="Bấm để đổi VAT">${vatRate(j)}% ▾</button>`}</div></div><div class="tot" id="qtot"></div></div>
     <label class="fld"><span>Ghi chú báo giá</span><textarea id="f-quoteNote" data-f="quoteNote" rows="2" placeholder="VD: Giá chưa gồm local charge, kiểm hoá, lưu kho…">${esc(j.quoteNote)}</textarea></label>
-    <div class="acts"><button data-act="copyQuote" class="primary">${ic("copy")}Copy báo giá</button>${dbOn(j)?`<button data-act="draftDebit" class="debitbtn">${ic("doc")}${j.debit?"Mở debit":"Soạn debit"}</button>${boss()&&j.debitDate&&!j.paidDate?`<button data-act="debitPaid" class="ghost">✅ Đã thu tiền</button>`:""}`:""}<button data-act="copyBrief">${ic("copy")}Copy tóm tắt job</button>${j.quoteSentAt?`<span style="font-size:12px;color:var(--muted)">Đã gửi báo giá ${dmy(j.quoteSentAt)}</span>`:""}</div>
-    ${j.debitDate&&dbOn(j)?`<p class="dbstat">🧾 Debit <b>${fmt(j.debitAmount,"VND")}</b> đ · gửi ${dmy(j.debitDate)}${j.paidDate?` · <span class="ok">✅ đã thu ${dmy(j.paidDate)}</span>`:` · <span class="wait">chờ thu tiền</span>`}</p>`:""}
+    <div class="acts"><button data-act="copyQuote" class="primary">${ic("copy")}Copy báo giá</button>${dbOn(j)?`<button data-act="draftDebit" class="debitbtn">${ic("doc")}${j.debit?"Mở debit":"Soạn debit"}</button>${boss()&&j.debitDate&&!j.paidDate?`<button data-act="debitPaid" class="ghost">${svi("okc")}Đã thu tiền</button>`:""}`:""}<button data-act="copyBrief">${ic("copy")}Copy tóm tắt job</button>${j.quoteSentAt?`<span style="font-size:12px;color:var(--muted)">Đã gửi báo giá ${dmy(j.quoteSentAt)}</span>`:""}</div>
+    ${j.debitDate&&dbOn(j)?`<p class="dbstat">${svi("rcpt")}Debit <b>${fmt(j.debitAmount,"VND")}</b> đ · gửi ${dmy(j.debitDate)}${j.paidDate?` · <span class="ok">${svi("okc")}đã thu ${dmy(j.paidDate)}</span>`:` · <span class="wait">chờ thu tiền</span>`}</p>`:""}
     <div id="copyFallback"></div>
   </div>
   <div class="sec"><h3>Lịch sử hoạt động <span class="mono">${(j.history||[]).length}</span></h3>
     ${(j.history||[]).length?`<ol class="hist">${[...j.history].reverse().slice(0,40).map(h=>`<li><span class="mono">${new Date(h.at).toLocaleString("vi-VN",{day:"2-digit",month:"2-digit",hour:"2-digit",minute:"2-digit"})}</span><span>${histText(h)}</span></li>`).join("")}</ol>`:`<p style="margin:0;color:var(--muted);font-size:13px">Chưa có. Mỗi lần chuyển bước, trả về, ghi vướng mắc sẽ được ghi lại ở đây.</p>`}
   </div>
-  <div class="sec"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Nguồn gốc & tài liệu<span class="srcadd">${(j.images||[]).length||(j.files||[]).length?`<button class="ghost sm ai" data-act="aiDocs" title="Claude đọc ảnh / PDF chứng từ và tìm chỗ lệch">✦ Claude đối chiếu</button>`:""}<button class="ghost sm" data-act="srcFile">+ Ảnh / tệp</button><button class="ghost sm" data-act="srcLink">+ Link OneDrive</button></span></h3>
+  <div class="sec"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">Nguồn gốc & tài liệu<span class="srcadd">${(j.images||[]).length||(j.files||[]).length?`<button class="ghost sm ai" data-act="aiDocs" title="Claude đọc ảnh / PDF chứng từ và tìm chỗ lệch">${svi("spark")}Claude đối chiếu</button>`:""}<button class="ghost sm" data-act="srcFile">+ Ảnh / tệp</button><button class="ghost sm" data-act="srcLink">+ Link OneDrive</button></span></h3>
     ${(j.images||[]).length?`<div class="thumbs">${j.images.map((id,i)=>`<div class="ti"><a href="${BLOB}${esc(id)}" target="_blank" rel="noopener"><img src="${BLOB}${esc(id)}" alt="Ảnh ${i+1}"></a><button class="x" data-act="srcDel" data-k="images" data-i="${i}" aria-label="Bỏ ảnh ${i+1}">✕</button></div>`).join("")}</div>`:""}
     ${(j.files||[]).length||(j.links||[]).length?`<div class="docs">${(j.files||[]).map((f,i)=>`<div class="doc"><b>${esc(extOf(f.name))}</b><a href="${BLOB}${esc(f.id)}" download="${esc(f.name)}" target="_blank" rel="noopener" title="${esc(f.name)}">${esc(f.name)}</a><button class="x" data-act="srcDel" data-k="files" data-i="${i}" aria-label="Bỏ tệp">✕</button></div>`).join("")}${(j.links||[]).map((l,i)=>`<div class="doc"><b>${esc(linkKind(l.url))}</b><a href="${esc(l.url)}" target="_blank" rel="noopener noreferrer" title="${esc(l.url)}">${esc(l.name||l.url)}</a><button class="x" data-act="srcDel" data-k="links" data-i="${i}" aria-label="Bỏ link">✕</button></div>`).join("")}</div>`:""}
     ${!(j.images||[]).length&&!(j.files||[]).length&&!(j.links||[]).length?`<p style="margin:0;color:var(--muted);font-size:13px">Chưa có ảnh hay tài liệu. Bấm “+ Ảnh / tệp” (hoặc dán ảnh Ctrl+V khi đang mở job), hoặc “+ Link OneDrive” để gắn thư mục / tệp trên OneDrive, Google Drive.</p>`:""}
-    ${j.docCheck?`<div class="dchk"><span class="vd ${/^khớp/i.test(j.docCheck.verdict)?"vd-ok":/lệch/i.test(j.docCheck.verdict)?"vd-bad":"vd-warn"}">✦ ${esc(j.docCheck.verdict)}</span><span style="color:var(--muted)">${(j.docCheck.issues||[]).length} điểm cần xem · ${new Date(j.docCheck.at).toLocaleDateString("vi-VN")}</span><button class="ghost sm" data-act="aiDocsView">Xem kết quả</button></div>`:""}
+    ${j.docCheck?`<div class="dchk"><span class="vd ${/^khớp/i.test(j.docCheck.verdict)?"vd-ok":/lệch/i.test(j.docCheck.verdict)?"vd-bad":"vd-warn"}">${svi("spark")}${esc(j.docCheck.verdict)}</span><span style="color:var(--muted)">${(j.docCheck.issues||[]).length} điểm cần xem · ${new Date(j.docCheck.at).toLocaleDateString("vi-VN")}</span><button class="ghost sm" data-act="aiDocsView">Xem kết quả</button></div>`:""}
     ${j.raw?`<textarea id="f-raw" data-f="raw" rows="3">${esc(j.raw)}</textarea>`:""}${sizeBar(j)}</div>
   <div class="sec"><div class="acts" style="justify-content:space-between"><span style="color:var(--muted);font-size:12px">Tạo ${new Date(j.createdAt||Date.now()).toLocaleString("vi-VN")}${j.createdByName?" · bởi "+esc(j.createdByName):""}</span>${boss()?`<button class="danger" data-act="del">${ic("del")}Xoá job</button>`:""}</div></div>
   </div>`;
@@ -2349,7 +2362,7 @@ function mineSummary(){
   S.jobs.forEach(j=>{if(isOpen(j.status))run++;if(owing(j))add(owe,j.debitAmount,j.debitCurrency);if(j.paidDate&&String(j.paidDate).startsWith(ym))add(paid,j.debitAmount,j.debitCurrency)});
   const show=o=>Object.keys(o).length?Object.entries(o).map(([c,v])=>`<b>${fmt(v,c)}</b> ${esc(c)}`).join(" + "):"<b>0</b>";
   const inM=S.jobs.filter(j=>jobDate(j).startsWith(ym)),lai=inM.reduce((a,j)=>a+num(j.debitAmount)-num(j.cost),0),nT=inM.filter(j=>j.doer==="Tuấn").length;
-  return `<div class="msum"><span>🔒 Việc riêng · đang chạy <b>${run}</b> job</span><span>Công nợ chưa thu: ${show(owe)}</span><span>Đã thu tháng ${ym.slice(5)}: ${show(paid)}</span>
+  return `<div class="msum"><span>${svi("lock")}Việc riêng · đang chạy <b>${run}</b> job</span><span>Công nợ chưa thu: ${show(owe)}</span><span>Đã thu tháng ${ym.slice(5)}: ${show(paid)}</span>
     <span>Lãi tháng ${ym.slice(5)}: <b>${fmt(lai,"VND")}</b> VND</span>${nT?`<span>Trả Tuấn: ${nT} tk × 50k = <b>${fmt(nT*FEE_TUAN,"VND")}</b></span>`:""}
     <span style="margin-left:auto;display:flex;gap:6px"><button class="sm" data-xl="in">${ic("xlsx")}Nhập từ Excel</button><button class="sm" data-xl="out">${ic("xlsx")}Xuất Excel</button></span></div>`;
 }
@@ -2363,7 +2376,7 @@ function renderLateBar(){
   if(S.fLate){el.innerHTML=sum+`<div class="latebar f">Đang lọc job quá hạn ở 3 bước hải quan (${none+pend} job)<button class="ghost sm" data-late="off">Bỏ lọc</button></div>`;return}
   if(!none&&!pend){el.innerHTML=sum;return}
   const parts=[none?`<b>${none} job quá hạn chưa ghi lý do</b>`:"",pend?(boss()?`<b>${pend} lý do chờ bạn duyệt</b>`:`${pend} lý do chờ chủ sổ duyệt`):""].filter(Boolean).join(" · ");
-  el.innerHTML=sum+`<div class="latebar">⚠ ${parts}<button class="sm" data-late="on">Xem</button></div>`;
+  el.innerHTML=sum+`<div class="latebar">${svi("warn")}${parts}<button class="sm" data-late="on">Xem</button></div>`;
 }
 const lateSeen=new Set();let lateFirst=true;
 function lateNotify(){
@@ -2395,7 +2408,7 @@ function dkSbPaint(){const el=$("#dkSb");if(!el)return;
   const on=navigator.onLine,hm=t=>{const d=new Date(t);return String(d.getHours()).padStart(2,"0")+":"+String(d.getMinutes()).padStart(2,"0")};
   const open=(S.jobs||[]).filter(j=>isOpen(j.status)),late=open.filter(j=>isOverdue(j)||["none","pend"].includes(lateState(j))).length;
   el.innerHTML=`<span><i class="dot ${on?"":"off"}"></i>${on?(dkSync?"Đã đồng bộ lúc "+hm(dkSync):"Đang kết nối…"):"Mất mạng: thay đổi sẽ gửi khi có mạng lại"}</span>`+
-    `<span>${mineOn()?"🔒 Việc riêng":"Sổ chung"}</span><span><b>${open.length}</b> job đang mở${late?` · <span class="bad">${late} quá hạn</span>`:""}</span>`+
+    `<span>${mineOn()?svi("lock")+"Việc riêng":"Sổ chung"}</span><span><b>${open.length}</b> job đang mở${late?` · <span class="bad">${late} quá hạn</span>`:""}</span>`+
     `<span class="sp"></span><span>${esc(window.SOJOB_USER||"")}</span><span>Bản ${APP_VER}</span>`}
 addEventListener("online",()=>{try{dkSbPaint()}catch(e){}});addEventListener("offline",()=>{try{dkSbPaint()}catch(e){}});
 
@@ -2506,7 +2519,7 @@ async function manualJob(status){
   const pre=S.group!=="__all"&&S.group!==NOGROUP?S.group:"";
   const IN=(id,label,ph="",type="text",cls="")=>`<label class="fld ${cls}"><span>${label}</span><input name="${id}" type="${type}" placeholder="${esc(ph)}" autocomplete="off" ${id==="fwd"||id==="company"?'list="mj-names"':""}></label>`;
   d.innerHTML=`<div class="sheet lot" role="dialog" aria-modal="true" style="max-width:560px;margin-top:6vh"><h2>Tạo job</h2>
-    <div class="mj-img"><span>📷 Có ảnh chụp email / Zalo / chứng từ? <b>Dán vào đây (Ctrl+V)</b> hoặc</span>
+    <div class="mj-img"><span>${svi("cam")}Có ảnh chụp email / Zalo / chứng từ? <b>Dán vào đây (Ctrl+V)</b> hoặc</span>
       <span class="mj-acts"><button type="button" class="primary" data-mj="img">Chọn ảnh</button><button type="button" class="ghost" data-mj="text">Dán chữ</button></span>
       <input type="file" accept="image/*" multiple hidden data-mj="file"></div>
     <p class="note" style="margin:0">Hoặc gõ tay: chỉ cần tiêu đề. Ô nào biết thì điền, còn lại điền sau trong phiếu job.${status&&status!==STAGES[0]?` Job sẽ nằm ở cột “${esc(status)}”.`:""}</p>
@@ -2811,7 +2824,11 @@ ${text.slice(0,12000)||"(không có, chỉ có ảnh)"}`,{images:files,maxImages
 /* ---------- Thông tin lô hàng: chọn dịch vụ rồi mới hiện ô tương ứng ---------- */
 const chips2=(f,opts,val,labels,cls)=>`<div class="chips2" role="group">${opts.map((o,i)=>`<button type="button" class="${cls?cls[i]:""}${val===o?" on":""}" data-set="${f}" data-v="${esc(o)}" aria-pressed="${val===o}">${labels?labels[i]:esc(o)}</button>`).join("")}</div>`;
 /* icon nét mảnh (Lucide, ISC) cho khung Thông tin lô hàng */
-const SVI={arch:`<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>`,co:`<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>`,hq:`<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>`,vc:`<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>`,paste:`<path d="M15 2H9a1 1 0 0 0-1 1v2c0 .6.4 1 1 1h6c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1Z"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2M16 4h2a2 2 0 0 1 2 2v2M11 14h10"/><path d="m17 10 4 4-4 4"/>`,imp:`<path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/>`,exp:`<path d="m18 9-6-6-6 6"/><path d="M12 3v14"/><path d="M5 21h14"/>`,kh:`<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="m16 16-1.9-1.9"/>`,tv:`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`,dv:`<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>`,attp:`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>`,cl:`<path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>`,ok:`<path d="M20 6 9 17l-5-5"/>`};
+const SVI={warn:`<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>`,alarm:`<circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/>`,zap:`<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>`,hour:`<path d="M5 22h14"/><path d="M5 2h14"/><path d="M17 22v-4.172a2 2 0 0 0-.586-1.414L12 12l-4.414 4.414A2 2 0 0 0 7 17.828V22"/><path d="M7 2v4.172a2 2 0 0 0 .586 1.414L12 12l4.414-4.414A2 2 0 0 0 17 6.172V2"/>`,okc:`<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>`,stop:`<path d="M12 16h.01"/><path d="M12 8v4"/><path d="M15.312 2a2 2 0 0 1 1.414.586l4.688 4.688A2 2 0 0 1 22 8.688v6.624a2 2 0 0 1-.586 1.414l-4.688 4.688a2 2 0 0 1-1.414.586H8.688a2 2 0 0 1-1.414-.586l-4.688-4.688A2 2 0 0 1 2 15.312V8.688a2 2 0 0 1 .586-1.414l4.688-4.688A2 2 0 0 1 8.688 2z"/>`,back:`<path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 5.5 5.5a5.5 5.5 0 0 1-5.5 5.5H11"/>`,rcpt:`<path d="M4 2v20l2-1 2 1 2-1 2 1 2-1 2 1 2-1 2 1V2l-2 1-2-1-2 1-2-1-2 1-2-1-2 1Z"/><path d="M16 8h-6a2 2 0 1 0 0 4h4a2 2 0 1 1 0 4H8"/><path d="M12 17.5v-11"/>`,wallet:`<path d="M19 7V4a1 1 0 0 0-1-1H5a2 2 0 0 0 0 4h15a1 1 0 0 1 1 1v4h-3a2 2 0 0 0 0 4h3a1 1 0 0 0 1-1v-2a1 1 0 0 0-1-1"/><path d="M3 5v14a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-4"/>`,sun:`<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>`,party:`<path d="M5.8 11.3 2 22l10.7-3.79"/><path d="M4 3h.01"/><path d="M22 8h.01"/><path d="M15 2h.01"/><path d="M22 20h.01"/><path d="m22 2-2.24.75a2.9 2.9 0 0 0-1.96 3.12c.1.86-.57 1.63-1.45 1.63h-.38c-.86 0-1.6.6-1.76 1.44L14 10"/><path d="m22 13-.82-.33c-.86-.34-1.82.2-1.98 1.11c-.11.7-.72 1.22-1.43 1.22H17"/><path d="m11 2 .33.82c.34.86-.2 1.82-1.11 1.98C9.52 4.9 9 5.52 9 6.23V7"/><path d="M11 13c1.93 1.93 2.83 4.17 2 5-.83.83-3.07-.07-5-2-1.93-1.93-2.83-4.17-2-5 .83-.83 3.07.07 5 2Z"/>`,user:`<path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/>`,users:`<path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>`,folder:`<path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z"/>`,spark:`<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/><path d="M20 3v4"/><path d="M22 5h-4"/><path d="M4 17v2"/><path d="M5 18H3"/>`,sqchk:`<rect width="18" height="18" x="3" y="3" rx="2"/><path d="m9 12 2 2 4-4"/>`,pen:`<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/><path d="m15 5 4 4"/>`,gear:`<path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/>`,cam:`<path d="M14.5 4h-5L7 7H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2h-3l-2.5-3z"/><circle cx="12" cy="13" r="3"/>`,penl:`<path d="M12 20h9"/><path d="M16.376 3.622a1 1 0 0 1 3.002 3.002L7.368 18.635a2 2 0 0 1-.855.506l-2.872.838a.5.5 0 0 1-.62-.62l.838-2.872a2 2 0 0 1 .506-.854z"/><path d="m15 5 3 3"/>`,mailp:`<path d="M22 13V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v12c0 1.1.9 2 2 2h8"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/><path d="M19 16v6"/><path d="M16 19h6"/>`,mail:`<rect width="20" height="16" x="2" y="4" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/>`,like:`<path d="M7 10v12"/><path d="M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z"/>`,bell:`<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/>`,belloff:`<path d="M8.7 3A6 6 0 0 1 18 8a21.3 21.3 0 0 0 .6 5"/><path d="M17 17H3s3-2 3-9a4.67 4.67 0 0 1 .3-1.7"/><path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"/><path d="m2 2 20 20"/>`,load:`<path d="M12 2v4"/><path d="m16.2 7.8 2.9-2.9"/><path d="M18 12h4"/><path d="m16.2 16.2 2.9 2.9"/><path d="M12 18v4"/><path d="m4.9 19.1 2.9-2.9"/><path d="M2 12h4"/><path d="m4.9 4.9 2.9 2.9"/>`,xc:`<circle cx="12" cy="12" r="10"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/>`,pkg:`<path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73z"/><path d="M12 22V12"/><path d="m3.3 7 7.703 4.734a2 2 0 0 0 1.994 0L20.7 7"/><path d="m7.5 4.27 9 5.15"/>`,fac:`<path d="M2 20a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V8l-7 5V8l-7 5V4a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2Z"/><path d="M17 18h1"/><path d="M12 18h1"/><path d="M7 18h1"/>`,clip:`<path d="m21.44 11.05-9.19 9.19a6 6 0 0 1-8.49-8.49l8.57-8.57A4 4 0 1 1 18 8.84l-8.59 8.57a2 2 0 0 1-2.83-2.83l8.49-8.48"/>`,chat:`<path d="M14 9a2 2 0 0 1-2 2H6l-4 4V4a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2z"/><path d="M18 9h2a2 2 0 0 1 2 2v11l-4-4h-6a2 2 0 0 1-2-2v-1"/>`,lock:`<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>`,search:`<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>`,pin:`<path d="M12 17v5"/><path d="M9 10.76a2 2 0 0 1-1.11 1.79l-1.78.9A2 2 0 0 0 5 15.24V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.76a2 2 0 0 0-1.11-1.79l-1.78-.9A2 2 0 0 1 15 10.76V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/>`,copy:`<rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/>`,right:`<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>`,inbox:`<polyline points="22 12 16 12 14 15 10 15 8 12 2 12"/><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"/>`,leaf:`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`,paw:`<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>`,food:`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>`,flask:`<path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>`,scan:`<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="m16 16-1.9-1.9"/>`,refresh:`<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>`,arch:`<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>`,co:`<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>`,hq:`<line x1="3" x2="21" y1="22" y2="22"/><line x1="6" x2="6" y1="18" y2="11"/><line x1="10" x2="10" y1="18" y2="11"/><line x1="14" x2="14" y1="18" y2="11"/><line x1="18" x2="18" y1="18" y2="11"/><polygon points="12 2 20 7 4 7"/>`,vc:`<path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2"/><path d="M15 18H9"/><path d="M19 18h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/>`,paste:`<path d="M15 2H9a1 1 0 0 0-1 1v2c0 .6.4 1 1 1h6c.6 0 1-.4 1-1V3c0-.6-.4-1-1-1Z"/><path d="M8 4H6a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2M16 4h2a2 2 0 0 1 2 2v2M11 14h10"/><path d="m17 10 4 4-4 4"/>`,imp:`<path d="M12 17V3"/><path d="m6 11 6 6 6-6"/><path d="M19 21H5"/>`,exp:`<path d="m18 9-6-6-6 6"/><path d="M12 3v14"/><path d="M5 21h14"/>`,kh:`<path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><circle cx="12" cy="12" r="3"/><path d="m16 16-1.9-1.9"/>`,tv:`<path d="M11 20A7 7 0 0 1 9.8 6.1C15.5 5 17 4.48 19 2c1 2 2 4.18 2 8 0 5.5-4.78 10-10 10Z"/><path d="M2 21c0-3 1.85-5.36 5.08-6C9.5 14.52 12 13 13 12"/>`,dv:`<circle cx="11" cy="4" r="2"/><circle cx="18" cy="8" r="2"/><circle cx="20" cy="16" r="2"/><path d="M9 10a5 5 0 0 1 5 5v3.5a3.5 3.5 0 0 1-6.84 1.045Q6.52 17.48 4.46 16.84A3.5 3.5 0 0 1 5.5 10Z"/>`,attp:`<path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/><path d="M21 15V2a5 5 0 0 0-5 5v6c0 1.1.9 2 2 2h3Zm0 0v7"/>`,cl:`<path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/>`,ok:`<path d="M20 6 9 17l-5-5"/>`};
+const EMO_IC={"🚚":"vc","📁":"folder","⚠️":"warn","⚠":"warn","⏰":"alarm","✅":"okc","🔍":"scan","🌿":"leaf","🐄":"paw","🥫":"food","🧪":"flask","🧾":"rcpt","📌":"pin","⚡":"zap","💬":"chat","🔔":"bell","📎":"clip","👤":"user"};
+const EMO_RE=new RegExp(Object.keys(EMO_IC).sort((a,b)=>b.length-a.length).join("|"),"g");
+const emoIc=h=>String(h).replace(EMO_RE,e=>svi(EMO_IC[e],"in"))
+  .replace(/🔴/g,'<i class="ldot r"></i>').replace(/🟡/g,'<i class="ldot y"></i>').replace(/🟢/g,'<i class="ldot g"></i>');
 const svi=(n,c)=>SVI[n]?`<svg class="svi${c?" "+c:""}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${SVI[n]}</svg>`:"";
 const SVC_LB=[svi("hq")+"Hải quan",svi("vc")+"Vận chuyển",`<span class="svi2">${svi("hq")}${svi("vc")}</span>Hải quan + Vận chuyển`];
 const CHECKS=[["kh","Kiểm hoá","kh","Phí kiểm hoá"],["tv","KDTV","tv","Phí kiểm dịch thực vật"],["dv","KDĐV","dv","Phí kiểm dịch động vật"],["attp","ATTP","attp","Phí kiểm tra ATTP"],["cl","KTCL","cl","Phí kiểm tra chất lượng"]];
@@ -3007,11 +3024,11 @@ function chatMsgs(id){
   return ms.map((m,i)=>`<div class="m${m.by===me()?" me":""}${mnMine(m)?" tagme":""}" data-mid="${esc(m.id||"")}">${msgReply(m)}<small>${m.by===me()?"":`<b>${esc(msgWho(m))}</b> · `}${hm(m.at)}${mnMine(m)?' · <b class="tagme-l">nhắc bạn</b>':""}${m.editedAt?" · đã sửa":""}</small>${mnText(m)}${msgActs(m)}</div>`+seenRow(sm,m,i===ms.length-1)).join("");
 }
 function dlRow(j){const k=dayDiff(j.deadline),open=isOpen(j.status);
-  const tag=!j.deadline?`<span class="dltag none">Chưa đặt hạn</span>`:!open?"":k<0?`<span class="dltag late">⚠ Quá hạn ${-k} ngày</span>`:k===0?`<span class="dltag today">Hôm nay</span>`:`<span class="dltag ${k<=2?"soon":""}">Còn ${k} ngày</span>`;
-  return `<div class="sec dlrow"><label for="f-deadline">⏰ Thời hạn xử lý</label><input id="f-deadline" data-f="deadline" type="date" value="${esc(j.deadline||"")}">${tag}</div>`}
+  const tag=!j.deadline?`<span class="dltag none">Chưa đặt hạn</span>`:!open?"":k<0?`<span class="dltag late">${svi("warn")}Quá hạn ${-k} ngày</span>`:k===0?`<span class="dltag today">Hôm nay</span>`:`<span class="dltag ${k<=2?"soon":""}">Còn ${k} ngày</span>`;
+  return `<div class="sec dlrow"><label for="f-deadline">${svi("alarm")}Thời hạn xử lý</label><input id="f-deadline" data-f="deadline" type="date" value="${esc(j.deadline||"")}">${tag}</div>`}
 function chatSec(j){
   chatWatch(j);
-  return `<div class="sec"><h3><span>Trao đổi <span class="mono">${(S.chat[j.id]||[]).length||""}</span></span>${mailOn()&&!(boss()&&isMine(j))?`<button class="ghost sm" data-act="mailJob" title="Email của job này (tìm theo mã job) và soạn thư mới có mã job trong tiêu đề">✉ Email</button>`:""}${(S.chat[j.id]||[]).length>=3?`<button class="ghost sm ai" data-act="aiChatSum" title="AI tóm tắt khung trao đổi: lô đang vướng gì, ai đang làm, việc tiếp theo">✦ Tóm tắt</button>`:""}</h3>
+  return `<div class="sec"><h3><span>Trao đổi <span class="mono">${(S.chat[j.id]||[]).length||""}</span></span>${mailOn()&&!(boss()&&isMine(j))?`<button class="ghost sm" data-act="mailJob" title="Email của job này (tìm theo mã job) và soạn thư mới có mã job trong tiêu đề">${svi("mail")}Email</button>`:""}${(S.chat[j.id]||[]).length>=3?`<button class="ghost sm ai" data-act="aiChatSum" title="AI tóm tắt khung trao đổi: lô đang vướng gì, ai đang làm, việc tiếp theo">${svi("spark")}Tóm tắt</button>`:""}</h3>
     <div class="chat" id="chatList">${chatMsgs(j.id)}</div>
     <div class="chatin"><textarea id="chatTxt" rows="1" placeholder="Nhắn cho nhóm…" title="Enter để gửi, Shift+Enter để xuống dòng">${esc(S.chatDraft[j.id]||"")}</textarea><button class="primary" data-act="chatSend">${ic("send")}Gửi</button></div></div>`;
 }
@@ -3064,7 +3081,7 @@ function chatPop(j){
   let box=$("#chatPops");if(!box){box=document.createElement("div");box.id="chatPops";document.body.appendChild(box)}
   box.querySelector(`[data-pop="${j.id}"]`)?.remove();
   const c=document.createElement("div");c.className="cpop";c.dataset.pop=j.id;c.setAttribute("role","status");
-  c.innerHTML=`<button class="cpop-x" aria-label="Đóng">✕</button><b>💬 ${esc(j.chatByName||j.chatBy)} · <span class="mono">${esc(j.code)}</span></b><span class="t">${esc((j.title||"").slice(0,50))}</span><span class="m">${esc(j.chatLast||"")}</span>`;
+  c.innerHTML=`<button class="cpop-x" aria-label="Đóng">✕</button><b>${svi("chat")}${esc(j.chatByName||j.chatBy)} · <span class="mono">${esc(j.code)}</span></b><span class="t">${esc((j.title||"").slice(0,50))}</span><span class="m">${esc(j.chatLast||"")}</span>`;
   c.onclick=e=>{c.remove();if(!e.target.closest(".cpop-x"))openJobAny(j.id)};
   box.prepend(c);while(box.children.length>3)box.lastChild.remove();
   setTimeout(()=>c.remove(),15000);
@@ -3112,7 +3129,7 @@ function mnTags(boxId,text){
   const o={};if(tags.length)o.tags=tags;if(all)o.tagAll=true;if(names.length)o.tagN=names;return o}
 const mnMine=m=>m.by!==me()&&(m.tagAll||(m.tags||[]).includes(me()));
 function mnText(m){ // chữ tin nhắn đã escape, tô xanh các @Tên
-  let h=esc(m.text||"");
+  let h=emoIc(esc(m.text||""));
   (m.tagN||[]).slice().sort((a,b)=>b.length-a.length).forEach(n=>{const k=esc("@"+n);h=h.split(k).join(`<span class="mtag">${k}</span>`)});
   return h}
 // Khung gợi ý
@@ -3169,12 +3186,12 @@ function msgReply(m){const r=m.reply;if(!r)return "";
 function msgActs(m){if(!m.id||String(m.id).startsWith("tmp"))return "";
   const mine=m.by===me()&&Date.now()-(m.at||0)<MSG_EDIT_MS;
   const lk=(m.likes||[]).includes(me());
-  return `${likeBadge(m)}<span class="macts"><button type="button" class="ghost sm${lk?" liked":""}" data-mact="like">👍 ${lk?"Bỏ thích":"Thích"}</button><button type="button" class="ghost sm" data-mact="reply">↩ Trả lời</button>${mine?`<button type="button" class="ghost sm" data-mact="edit">Sửa</button>`:""}${boss()||mine?`<button type="button" class="ghost sm danger" data-mact="del">Xoá</button>`:""}</span>`}
+  return `${likeBadge(m)}<span class="macts"><button type="button" class="ghost sm${lk?" liked":""}" data-mact="like">${svi("like")}${lk?"Bỏ thích":"Thích"}</button><button type="button" class="ghost sm" data-mact="reply">↩ Trả lời</button>${mine?`<button type="button" class="ghost sm" data-mact="edit">Sửa</button>`:""}${boss()||mine?`<button type="button" class="ghost sm danger" data-mact="del">Xoá</button>`:""}</span>`}
 const MSG_EDIT_MS=5*60*1000;
 /* 👍 Thích tin nhắn: mỗi tin giữ danh sách email người thích; bấm lại để bỏ */
 function likeBadge(m){const L=m.likes||[];if(!L.length)return "";
   const names=L.map(x=>x===me()?"Bạn":whoName(x));
-  return `<button type="button" class="mlike${L.includes(me())?" on":""}" data-mact="like" title="${esc(names.join(", ")+" đã thích")}">👍 ${L.length>1?L.length:esc(names[0])}</button>`}
+  return `<button type="button" class="mlike${L.includes(me())?" on":""}" data-mact="like" title="${esc(names.join(", ")+" đã thích")}">${svi("like")}${L.length>1?L.length:esc(names[0])}</button>`}
 async function msgLike(ctx,m){
   const L=(m.likes||[]).slice(),i=L.indexOf(me());if(i>=0)L.splice(i,1);else L.push(me());
   const old=m.likes;m.likes=L;ctx==="job"?chatPaint(cur().id):teamPaint();
@@ -3274,10 +3291,10 @@ const msgWho=m=>{const p=S.people&&S.people[String(m.by||"").toLowerCase()];retu
 const whoOf=j=>String(j.assignee||j.createdBy||"").toLowerCase();
 function whoName(m){m=String(m||"").toLowerCase();if(!m)return "";const p=S.people&&S.people[m];if(p&&p.n)return p.n;if(m===me())return window.SOJOB_USER||"Tôi";return m.split("@")[0]}
 function asgChip(j,short){if(!team()||(boss()&&isMine(j)))return "";const w=whoOf(j);if(!w)return "";const n=whoName(w);
-  return `<span class="asgchip${w===me()?" me":""}" title="Phụ trách: ${esc(n)}">👤 ${esc(n)}</span>`}
+  return `<span class="asgchip${w===me()?" me":""}" title="Phụ trách: ${esc(n)}">${svi("user")}${esc(n)}</span>`}
 function asgSel(j){if(!team()||(boss()&&isMine(j)))return "";const w=whoOf(j),L=[[me(),window.SOJOB_USER||"Tôi"]].concat(Object.entries(S.people||{}).filter(([m,v])=>m!==me()&&v&&v.n).map(([m,v])=>[m,v.n]));
   if(w&&!L.some(x=>x[0]===w))L.push([w,j.assigneeName||whoName(w)]);
-  return `<label class="asgsel" title="Người phụ trách job này">👤<select data-asg="1" aria-label="Người phụ trách"><option value="">Chưa giao</option>${L.map(([m,n])=>`<option value="${esc(m)}"${m===w?" selected":""}>${esc(n)}${m===me()?" (tôi)":""}</option>`).join("")}</select></label>`}
+  return `<label class="asgsel" title="Người phụ trách job này">${svi("user")}<select data-asg="1" aria-label="Người phụ trách"><option value="">Chưa giao</option>${L.map(([m,n])=>`<option value="${esc(m)}"${m===w?" selected":""}>${esc(n)}${m===me()?" (tôi)":""}</option>`).join("")}</select></label>`}
 document.addEventListener("change",e=>{const sel=e.target.closest("[data-asg]");if(!sel)return;const j=cur();if(!j)return;
   const m=sel.value,old=whoOf(j),n=m?whoName(m):"";if(m===old)return;
   j.assignee=m;j.assigneeName=n;logH(j,{kind:"note",note:m?"Giao cho "+n:"Bỏ người phụ trách"});queueSave(j);renderAll(true);
@@ -3288,7 +3305,7 @@ function peopleAll(){const L=[[me(),whoName(me())]];Object.entries(S.people||{})
 function fMinePaint(){const b=document.getElementById("fMine"),sel=document.getElementById("fWho");const show=team()&&["list","board"].includes(S.view)&&SPACE!=="mine";
   if(b){b.hidden=!show;b.classList.toggle("on",S.who===me());b.setAttribute("aria-pressed",S.who===me()?"true":"false")}
   if(sel){sel.hidden=!show;if(document.activeElement!==sel){const L=peopleAll();if(S.who&&!L.some(x=>x[0]===S.who))L.push([S.who,whoName(S.who)]);
-    sel.innerHTML=`<option value="">👥 Mọi người</option>`+L.map(([m,n])=>`<option value="${esc(m)}"${m===S.who?" selected":""}>👤 ${esc(n)}${m===me()?" (tôi)":""}</option>`).join("")}}}
+    sel.innerHTML=`<option value="">Mọi người</option>`+L.map(([m,n])=>`<option value="${esc(m)}"${m===S.who?" selected":""}>${esc(n)}${m===me()?" (tôi)":""}</option>`).join("")}}}
 document.addEventListener("click",e=>{if(!e.target.closest("#fMine"))return;whoSet(S.who===me()?"":me())});
 document.addEventListener("change",e=>{if(e.target.id==="fWho")whoSet(e.target.value)});
 /* ---------- Hôm nay: việc cần làm trước, gom ở một chỗ ---------- */
@@ -3299,30 +3316,30 @@ function todayData(){
   const pool=S.jobs.filter(j=>isOpen(j.status)&&(all||!team()||whoOf(j)===me()));
   const tqDone=j=>HQWAIT.includes(j.status)&&j.tkCheck&&j.tkCheck.ok&&RE_TQ.test(j.tkCheck.status||"");
   const G=[
-    {k:"tq",ic:"✅",t:"Đã thông quan, chờ chuyển bước",d:"Lấy mã vạch, điều xe hoặc làm bảng kê",js:pool.filter(tqDone),cls:"ok"},
-    {k:"od",ic:"⚠",t:"Quá hạn",d:"Ghi lý do hoặc gia hạn",js:pool.filter(j=>isOverdue(j)),cls:"bad"},
-    {k:"due",ic:"⏰",t:"Đến hạn hôm nay",d:"",js:pool.filter(j=>j.deadline===T)},
-    {k:"st",ic:"🐢",t:"Đứng yên quá lâu",d:"Nằm ở một bước quá số ngày cho phép",js:pool.filter(j=>!isOverdue(j)&&isLate(j)),cls:"warn"},
-    {k:"urg",ic:"⚡",t:"Lô gấp",d:"",js:pool.filter(j=>j.priority==="Gấp"&&!isOverdue(j)&&j.deadline!==T)},
-    {k:"blk",ic:"⛔",t:"Đang vướng mắc",d:"",js:pool.filter(j=>!!j.blocker),cls:"warn",why:j=>j.blocker},
-    {k:"ret",ic:"↩",t:"Bị trả về",d:"",js:pool.filter(j=>!!j.returnNote),cls:"bad",why:j=>j.returnNote},
-    {k:"dep",ic:"🧾",t:"Chưa hoàn cược cont",d:"",js:pool.filter(depositPending),why:j=>j.deposit||"chưa ghi"},
-    {k:"ks",ic:"📥",t:"Nhập Ksmart",d:"",js:pool.filter(j=>j.status==="Nhập Ksmart"),why:j=>`${num(j.debitAmount)?fmt(j.debitAmount,j.debitCurrency)+" "+(j.debitCurrency||"VND"):"chưa ghi số tiền"}${j.debitDate?" · gửi debit "+dmy(j.debitDate):""}`},
+    {k:"tq",ic:svi("okc"),t:"Đã thông quan, chờ chuyển bước",d:"Lấy mã vạch, điều xe hoặc làm bảng kê",js:pool.filter(tqDone),cls:"ok"},
+    {k:"od",ic:svi("warn"),t:"Quá hạn",d:"Ghi lý do hoặc gia hạn",js:pool.filter(j=>isOverdue(j)),cls:"bad"},
+    {k:"due",ic:svi("alarm"),t:"Đến hạn hôm nay",d:"",js:pool.filter(j=>j.deadline===T)},
+    {k:"st",ic:svi("hour"),t:"Đứng yên quá lâu",d:"Nằm ở một bước quá số ngày cho phép",js:pool.filter(j=>!isOverdue(j)&&isLate(j)),cls:"warn"},
+    {k:"urg",ic:svi("zap"),t:"Lô gấp",d:"",js:pool.filter(j=>j.priority==="Gấp"&&!isOverdue(j)&&j.deadline!==T)},
+    {k:"blk",ic:svi("stop"),t:"Đang vướng mắc",d:"",js:pool.filter(j=>!!j.blocker),cls:"warn",why:j=>j.blocker},
+    {k:"ret",ic:svi("back"),t:"Bị trả về",d:"",js:pool.filter(j=>!!j.returnNote),cls:"bad",why:j=>j.returnNote},
+    {k:"dep",ic:svi("rcpt"),t:"Chưa hoàn cược cont",d:"",js:pool.filter(depositPending),why:j=>j.deposit||"chưa ghi"},
+    {k:"ks",ic:svi("inbox"),t:"Nhập Ksmart",d:"",js:pool.filter(j=>j.status==="Nhập Ksmart"),why:j=>`${num(j.debitAmount)?fmt(j.debitAmount,j.debitCurrency)+" "+(j.debitCurrency||"VND"):"chưa ghi số tiền"}${j.debitDate?" · gửi debit "+dmy(j.debitDate):""}`},
   ];
-  if(boss())G.push({k:"pay",ic:"💰",t:"Chờ thu tiền",d:"Đã gửi debit, chưa thu",js:S.jobs.filter(j=>j.debitDate&&!j.paidDate).sort((a,b)=>String(a.debitDate).localeCompare(String(b.debitDate)))});
+  if(boss())G.push({k:"pay",ic:svi("wallet"),t:"Chờ thu tiền",d:"Đã gửi debit, chưa thu",js:S.jobs.filter(j=>j.debitDate&&!j.paidDate).sort((a,b)=>String(a.debitDate).localeCompare(String(b.debitDate)))});
   const tags=typeof mnUnread==="function"?mnUnread():[];
   return {all,G,tags,n:G.filter(g=>!["pay","urg","dep","ks"].includes(g.k)).reduce((a,g)=>a+g.js.length,0)+tags.length}}
 function todayBadge(){const b=document.getElementById("todayN");if(!b)return;const n=S.loaded?todayData().n:0;b.hidden=!n;b.textContent=n>99?"99+":n}
 function renderToday(el){
   const D=todayData(),T=TODAY(),dd=new Date().toLocaleDateString("vi-VN",{weekday:"long",day:"2-digit",month:"2-digit"});
-  const line=(j,w)=>`<button type="button" class="td-i" data-tdopen="${esc(j.id)}"><span class="mono">${esc(j.code)}</span><b>${esc(j.title||"(chưa có tiêu đề)")}</b><small>${esc(j.status)}${typeof w==="function"&&w(j)?` · ${esc(String(w(j)).slice(0,120))}`:""}${j.deadline?` · hạn ${esc(dmy(j.deadline))}`:""}${j.debitDate&&!j.paidDate?` · debit ${esc(fmt(j.debitAmount,"VND"))} gửi ${esc(dmy(j.debitDate))}`:""}${team()?` · 👤 ${esc(whoName(whoOf(j)))}`:""}</small></button>`;
+  const line=(j,w)=>`<button type="button" class="td-i" data-tdopen="${esc(j.id)}"><span class="mono">${esc(j.code)}</span><b>${esc(j.title||"(chưa có tiêu đề)")}</b><small>${esc(j.status)}${typeof w==="function"&&w(j)?` · ${esc(String(w(j)).slice(0,120))}`:""}${j.deadline?` · hạn ${esc(dmy(j.deadline))}`:""}${j.debitDate&&!j.paidDate?` · debit ${esc(fmt(j.debitAmount,"VND"))} gửi ${esc(dmy(j.debitDate))}`:""}${team()?` · ${svi("user")}${esc(whoName(whoOf(j)))}`:""}</small></button>`;
   const sec=g=>g.js.length?`<section class="td-g ${g.cls||""}"><h3>${g.ic} ${esc(g.t)} <span class="mono">${g.js.length}</span></h3>${g.d?`<p>${esc(g.d)}</p>`:""}${g.js.slice(0,30).map(j=>line(j,g.why)).join("")}</section>`:"";
-  const tg=D.tags.length?`<section class="td-g tag"><h3>🔔 Nhắc đến bạn <span class="mono">${D.tags.length}</span></h3>${D.tags.slice(0,20).map(m=>`<button type="button" class="td-i" ${m.job?`data-tdopen="${esc(m.job.id)}"`:'data-tdteam="1"'}><span class="mono">${esc(m.job?m.job.code:"Chat chung")}</span><b>${esc(m.byName||m.by)}: ${esc(String(m.text||"").slice(0,90))}</b><small>${esc(tmTime(m.at))}</small></button>`).join("")}</section>`:"";
+  const tg=D.tags.length?`<section class="td-g tag"><h3>${svi("bell")}Nhắc đến bạn <span class="mono">${D.tags.length}</span></h3>${D.tags.slice(0,20).map(m=>`<button type="button" class="td-i" ${m.job?`data-tdopen="${esc(m.job.id)}"`:'data-tdteam="1"'}><span class="mono">${esc(m.job?m.job.code:"Chat chung")}</span><b>${esc(m.byName||m.by)}: ${esc(String(m.text||"").slice(0,90))}</b><small>${esc(tmTime(m.at))}</small></button>`).join("")}</section>`:"";
   const body=tg+D.G.map(sec).join("");
   el.dataset.v="today";
-  el.innerHTML=`<div class="td"><div class="td-h"><div><h2>☀ Hôm nay</h2><span class="muted">${esc(dd)}</span></div>
+  el.innerHTML=`<div class="td"><div class="td-h"><div><h2>${svi("sun")}Hôm nay</h2><span class="muted">${esc(dd)}</span></div>
     ${team()&&SPACE!=="mine"?`<div class="chips2 td-sw"><button type="button" data-tdall="0" class="${D.all?"":"on"}">Của tôi</button><button type="button" data-tdall="1" class="${D.all?"on":""}">Cả nhóm</button></div>`:""}</div>
-    ${body||`<div class="td-empty">Không có việc nào cần làm gấp. 🎉<br><small>Lô quá hạn, đến hạn, vừa thông quan, đứng yên lâu và tin nhắc đến bạn sẽ hiện ở đây.</small></div>`}</div>`;
+    ${body||`<div class="td-empty">${svi("party","lg")}<br>Không có việc nào cần làm gấp.<br><small>Lô quá hạn, đến hạn, vừa thông quan, đứng yên lâu và tin nhắc đến bạn sẽ hiện ở đây.</small></div>`}</div>`;
 }
 document.addEventListener("click",e=>{if(S.view!=="today")return;
   const o=e.target.closest("[data-tdopen]");if(o){S.view="board";openJobAny(o.dataset.tdopen);return}
@@ -3391,7 +3408,7 @@ function kbSumPop(btn){
   const why=j=>{if(k==="blk")return "⚠ "+j.blocker;const ll=lateLine(j);return ll?ll.text:(isOverdue(j)?"Quá hạn "+(-dayDiff(j.deadline))+" ngày":"")};
   const p=document.createElement("div");p.id="kbsumpop";p.className="kbsumpop";p.setAttribute("role","dialog");p.setAttribute("aria-label",btn.textContent);
   p.innerHTML=`<div class="ksp-h"><b>${k==="late"?"Đứng yên / quá hạn":"Có vướng mắc"} (${js.length})</b><button type="button" class="ghost sm" data-ksp-x aria-label="Đóng">✕</button></div>`+
-    js.map(j=>`<button type="button" class="ksp-i" data-ksp="${esc(j.id)}"><span class="mono">${esc(j.code)}</span><b>${esc(j.title||"(chưa có tiêu đề)")}</b><small>${esc(j.status)}${team()?` · 👤 ${esc(whoName(whoOf(j)))}`:""}</small><small class="why">${esc(why(j))}</small></button>`).join("");
+    js.map(j=>`<button type="button" class="ksp-i" data-ksp="${esc(j.id)}"><span class="mono">${esc(j.code)}</span><b>${esc(j.title||"(chưa có tiêu đề)")}</b><small>${esc(j.status)}${team()?` · ${svi("user")}${esc(whoName(whoOf(j)))}`:""}</small><small class="why">${esc(why(j))}</small></button>`).join("");
   document.body.appendChild(p);
   const r=btn.getBoundingClientRect();p.style.top=Math.min(r.bottom+6,innerHeight-80)+"px";p.style.left=Math.max(8,Math.min(r.left,innerWidth-p.offsetWidth-8))+"px";
 }
@@ -3407,7 +3424,7 @@ function rpLoad(){
   const R=Object.values(by).sort((a,b)=>b.n-a.n),mx=Math.max(1,...R.map(r=>r.n));
   return `<div class="rp-load"><h3>Tải việc hiện tại <span class="muted">(${open.length} job đang mở · bấm tên để xem job của người đó)</span></h3>
     <table class="rp-t"><thead><tr><th>Người phụ trách</th><th class="num">Đang giữ</th><th></th><th class="num">Quá hạn</th><th class="num">Đứng yên</th><th class="num">Gấp</th><th class="num">Vướng mắc</th></tr></thead><tbody>
-    ${R.map(r=>`<tr><td><button type="button" class="sumlink" data-rpwho="${esc(r.m)}">👤 ${esc(r.m?whoName(r.m):"Chưa giao")}</button></td><td class="num"><b>${r.n}</b></td><td style="width:30%"><span class="ldbar"><i style="width:${Math.round(r.n/mx*100)}%"></i></span></td><td class="num${r.od?" bad":""}">${r.od||""}</td><td class="num${r.st?" warn":""}">${r.st||""}</td><td class="num">${r.urg||""}</td><td class="num">${r.blk||""}</td></tr>`).join("")}
+    ${R.map(r=>`<tr><td><button type="button" class="sumlink" data-rpwho="${esc(r.m)}">${svi("user")}${esc(r.m?whoName(r.m):"Chưa giao")}</button></td><td class="num"><b>${r.n}</b></td><td style="width:30%"><span class="ldbar"><i style="width:${Math.round(r.n/mx*100)}%"></i></span></td><td class="num${r.od?" bad":""}">${r.od||""}</td><td class="num${r.st?" warn":""}">${r.st||""}</td><td class="num">${r.urg||""}</td><td class="num">${r.blk||""}</td></tr>`).join("")}
     </tbody></table></div>`}
 document.addEventListener("click",e=>{const b=e.target.closest("[data-rpwho]");if(!b)return;S.view="board";whoSet(b.dataset.rpwho)});
 /* ---------- Hẹn giờ nhắc từng job: máy chủ gửi lên điện thoại đúng giờ; app đang mở thì hiện ngay ---------- */
@@ -3426,7 +3443,7 @@ async function remAdd(j){
   queueSave(j);renderAll(true);toast("Đã đặt nhắc lúc "+new Date(at).toLocaleString("vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})+".")}
 function remDel(j,id){j.reminders=(j.reminders||[]).filter(r=>r.id!==id);queueSave(j);renderAll(true)}
 function remList(j){const L=(j.reminders||[]).filter(r=>!r.sent&&r.by===me());if(!L.length)return "";
-  return `<div class="remlist">${L.sort((a,b)=>a.at-b.at).map(r=>`<span class="rem">⏰ ${esc(new Date(r.at).toLocaleString("vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}))}${r.note?" · "+esc(r.note):""}<button type="button" class="x" data-act="remDel" data-rid="${esc(r.id)}" aria-label="Bỏ nhắc">✕</button></span>`).join("")}</div>`}
+  return `<div class="remlist">${L.sort((a,b)=>a.at-b.at).map(r=>`<span class="rem">${svi("alarm")}${esc(new Date(r.at).toLocaleString("vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"}))}${r.note?" · "+esc(r.note):""}<button type="button" class="x" data-act="remDel" data-rid="${esc(r.id)}" aria-label="Bỏ nhắc">✕</button></span>`).join("")}</div>`}
 function remTick(){if(!S.loaded)return;const now=Date.now();
   S.all.forEach(j=>(j.reminders||[]).forEach(r=>{if(r.sent||r.by!==me()||r.at>now)return;r.sent=true;r.sentBy="app";queueSave(j);
     toast(`⏰ ${j.code}: ${r.note||"đến giờ nhắc"}`);try{const pj={id:j.id,code:j.code,title:j.title,chatByName:"⏰ Nhắc việc",chatLast:r.note||"Đến giờ nhắc"};chatPop(pj)}catch(e){}
@@ -3438,8 +3455,8 @@ function bulkBar(){let b=document.getElementById("bulkbar");if(!S.bulkOn||S.view
   if(!b){b=document.createElement("div");b.id="bulkbar";b.className="bulkbar";document.body.appendChild(b)}
   const n=S.bulk.size,P=peopleAll();
   b.innerHTML=`<b>${n} thẻ đã chọn</b>${n?`<select data-bulk="move" aria-label="Chuyển sang bước"><option value="">→ Chuyển sang bước…</option>${STAGES.map(st=>`<option value="${esc(st)}">${esc(st)}</option>`).join("")}</select>
-    ${team()&&SPACE!=="mine"?`<select data-bulk="asg" aria-label="Giao cho"><option value="">👤 Giao cho…</option>${P.map(([m,nm])=>`<option value="${esc(m)}">${esc(nm)}</option>`).join("")}</select>`:""}
-    <button type="button" class="sm" data-bulk="urg">⚡ Đánh dấu gấp</button>`:`<span class="muted">Bấm vào các thẻ để chọn</span>`}
+    ${team()&&SPACE!=="mine"?`<select data-bulk="asg" aria-label="Giao cho"><option value="">Giao cho…</option>${P.map(([m,nm])=>`<option value="${esc(m)}">${esc(nm)}</option>`).join("")}</select>`:""}
+    <button type="button" class="sm" data-bulk="urg">${svi("zap")}Đánh dấu gấp</button>`:`<span class="muted">Bấm vào các thẻ để chọn</span>`}
     <button type="button" class="sm ghost" data-bulk="clear">Bỏ chọn</button><button type="button" class="sm" data-bulk="toggle">Xong</button>`}
 document.addEventListener("click",async e=>{
   const t=e.target.closest("[data-bulk]");
@@ -3583,14 +3600,14 @@ function mailPaint(){
   const side=$("#mbSide"),L=$("#mbList"),R=$("#mbRead"),box=$("#mailbox");if(!L)return;
   box.classList.toggle("open",!!(S.mail.sel||S.mail.compose));
   {const q=$("#mbQ");if(q&&document.activeElement!==q)q.value=S.mail.q}
-  side.innerHTML=`<button class="primary" data-mail="new">✏ Soạn thư</button>`+MAIL_FOLDERS.map(([k,n,i])=>`<button class="mb-f${S.mail.folder===k&&!S.mail.q?" on":""}" data-mfold="${k}"><i class="fa ${i}"></i>${n}${k==="inbox"&&S.mail.unread?`<b>${S.mail.unread}</b>`:""}</button>`).join("")+`<div id="mbDung">${dungMailHtml()}</div><small class="muted">${MAIL_ADDR}<br>Cả nhóm dùng chung hộp thư này.</small>`;
+  side.innerHTML=`<button class="primary" data-mail="new">${svi("penl")}Soạn thư</button>`+MAIL_FOLDERS.map(([k,n,i])=>`<button class="mb-f${S.mail.folder===k&&!S.mail.q?" on":""}" data-mfold="${k}"><i class="fa ${i}"></i>${n}${k==="inbox"&&S.mail.unread?`<b>${S.mail.unread}</b>`:""}</button>`).join("")+`<div id="mbDung">${dungMailHtml()}</div><small class="muted">${MAIL_ADDR}<br>Cả nhóm dùng chung hộp thư này.</small>`;
   const ms=S.mail.list;
   L.innerHTML=(S.mail.q?`<div class="mb-qnote">Kết quả tìm “${esc(S.mail.q)}” <button class="ghost sm" data-mail="clearq">✕ Bỏ tìm</button></div>`:"")+
     (S.mail.err?`<div class="none">${esc(S.mail.err)}</div>`:!ms?`<div class="none"><span class="spin"></span> Đang tải thư…</div>`:!ms.length?`<div class="none">Không có thư nào.</div>`:
     ms.map(m=>{const j=mailJobOf(m.s,m.id),who=S.mail.folder==="sent"?"Tới: "+mailWho(m.to):(m.fromN||m.from);
-      return `<button class="mrow${m.read?"":" unread"}${S.mail.sel===m.id?" on":""}" data-mid="${esc(m.id)}" data-mf="${esc(m.f)}"><span class="mr-top"><b>${esc(who)}</b><time>${mailTime(m.t)}</time></span><span class="mr-s">${m.att?"📎 ":""}${esc(m.s)}</span><span class="mr-sum">${esc(m.sum)}</span>${j?`<span class="jchip" data-mjob="${esc(j.id)}">📁 ${esc(j.code)}</span>`:""}</button>`}).join(""));
+      return `<button class="mrow${m.read?"":" unread"}${S.mail.sel===m.id?" on":""}" data-mid="${esc(m.id)}" data-mf="${esc(m.f)}"><span class="mr-top"><b>${esc(who)}</b><time>${mailTime(m.t)}</time></span><span class="mr-s">${m.att?svi("clip"):""}${esc(m.s)}</span><span class="mr-sum">${esc(m.sum)}</span>${j?`<span class="jchip" data-mjob="${esc(j.id)}">${svi("folder")}${esc(j.code)}</span>`:""}</button>`}).join(""));
   if(S.mail.compose)R.innerHTML=mailComposeHtml();
-  else if(!S.mail.sel)R.innerHTML=`<div class="none mb-empty">Chọn một thư để đọc.<br>Thư đã tạo job hoặc thuộc một job sẽ hiện mã job 📁, bấm vào để mở job.</div>`;
+  else if(!S.mail.sel)R.innerHTML=`<div class="none mb-empty">Chọn một thư để đọc.<br>Thư đã tạo job hoặc thuộc một job sẽ hiện kèm mã job, bấm vào để mở job.</div>`;
   else{const m=S.mail.msg;if(!m||m.id!==S.mail.sel){R.innerHTML=`<div class="none"><span class="spin"></span> Đang mở thư…</div>`}
     else if(m.err)R.innerHTML=`<div class="mb-rh"><button class="ghost sm mb-back" data-mail="back">← Thư</button></div><div class="none">${esc(m.err)}</div>`;
     else if(!R.querySelector(`[data-rid="${CSS.escape(m.id)}"]`)){const j=mailJobOf(m.s,m.id);
@@ -3598,7 +3615,7 @@ function mailPaint(){
         <div class="mb-meta"><b>${esc(m.fromN||m.from)}</b> <span class="muted">&lt;${esc(m.from)}&gt; · ${m.t?new Date(m.t).toLocaleString("vi-VN"):""}</span><br><span class="muted">Tới: ${esc(m.to)}${m.cc&&m.cc!=="Not Provided"?" · Cc: "+esc(m.cc):""}</span></div>
         <div class="mb-acts"><button class="ghost sm" data-mail="reply">↩ Trả lời</button><button class="ghost sm" data-mail="replyall">↩↩ Trả lời tất cả</button><button class="ghost sm" data-mail="forward">↪ Chuyển tiếp</button></div>
         ${j?`<button type="button" class="mb-job" data-mjob="${esc(j.id)}"><i class="fa fa-folder-open" aria-hidden="true"></i><span>Thư này thuộc job <b>${esc(j.code)}</b>${j.company||j.title?` · ${esc(String(j.company||j.title).slice(0,60))}`:""}${j.status?` <em>${esc(j.status)}</em>`:""}</span><b class="mb-jgo">Mở job →</b></button>`:""}
-        ${m.att&&m.att.length?`<div class="mb-att">${m.att.map(a=>`<button class="ghost sm" data-matt="${esc(a.id)}" data-mname="${esc(a.n)}">📎 ${esc(a.n)} <span class="muted">${a.sz?Math.max(1,Math.round(a.sz/1024))+" KB":""}</span></button>`).join("")}</div>`:""}</div>
+        ${m.att&&m.att.length?`<div class="mb-att">${m.att.map(a=>`<button class="ghost sm" data-matt="${esc(a.id)}" data-mname="${esc(a.n)}">${svi("clip")}${esc(a.n)} <span class="muted">${a.sz?Math.max(1,Math.round(a.sz/1024))+" KB":""}</span></button>`).join("")}</div>`:""}</div>
         <iframe class="mb-body" sandbox="allow-popups allow-popups-to-escape-sandbox" referrerpolicy="no-referrer" title="Nội dung thư"></iframe>`;
       R.querySelector("iframe").srcdoc=`<!doctype html><meta charset="utf-8"><base target="_blank"><style>body{font:14px/1.5 system-ui,Segoe UI,Arial,sans-serif;color:#222;margin:12px;word-wrap:break-word}img{max-width:100%;height:auto}blockquote{border-left:3px solid #ccc;margin:6px 0;padding-left:10px;color:#555}</style>`+(m.html||"<p>(Thư trống)</p>");
     }}
@@ -3632,7 +3649,7 @@ function mailComposeHtml(){
   <label>Gắn job<select id="mcJob"><option value="">(không gắn)</option>${jobs.map(j=>`<option value="${esc(j.id)}"${c.job===j.id?" selected":""}>${esc(j.code)} · ${esc(String(j.company||j.title||"").slice(0,40))}</option>`).join("")}</select></label>
   <textarea id="mcBody" rows="10" placeholder="Nội dung thư…">${esc(c.body)}</textarea>
   ${c.quote?`<details class="mc-q"><summary>Thư gốc (sẽ trích dẫn bên dưới)</summary><pre>${esc(c.quote)}</pre></details>`:""}
-  <div class="mc-files">${(c.files||[]).map((f,i)=>`<span class="jchip">📎 ${esc(f.n)} <button data-mcrm="${i}" aria-label="Bỏ tệp">✕</button></span>`).join("")}<label class="ghost sm mc-add">📎 Đính kèm<input type="file" id="mcFile" multiple hidden></label></div>
+  <div class="mc-files">${(c.files||[]).map((f,i)=>`<span class="jchip">${svi("clip")}${esc(f.n)} <button data-mcrm="${i}" aria-label="Bỏ tệp">✕</button></span>`).join("")}<label class="ghost sm mc-add">${svi("clip")}Đính kèm<input type="file" id="mcFile" multiple hidden></label></div>
   <div class="mc-foot"><span class="muted">Gửi từ ${MAIL_ADDR} · ký tên ${esc(window.SOJOB_USER||me())}</span><button class="primary" data-mail="send" id="mcSend">${ic("send")}Gửi</button></div></div>`;
 }
 function mailKeep(){const c=S.mail.compose;if(!c)return;const g=id=>{const e=$(id);return e?e.value:undefined};
@@ -3689,9 +3706,9 @@ function mjWatch(){
 }
 function mjHtml(){
   const L=S.mj||[];if(!L.length||!mailOn())return "";
-  return `<section class="mjbox"><h3>📨 Job từ email · chờ duyệt <span class="mono">${L.length}</span></h3><p class="muted">AI đọc thư gửi tới ${MAIL_ADDR} và nhận ra yêu cầu làm hàng mới. Kiểm tra rồi bấm <b>Tạo job</b>: job vào cột <b>Mới nhận</b> ở Sổ chung.</p>`+
+  return `<section class="mjbox"><h3>${svi("mailp")}Job từ email · chờ duyệt <span class="mono">${L.length}</span></h3><p class="muted">AI đọc thư gửi tới ${MAIL_ADDR} và nhận ra yêu cầu làm hàng mới. Kiểm tra rồi bấm <b>Tạo job</b>: job vào cột <b>Mới nhận</b> ở Sổ chung.</p>`+
     L.map(x=>{const a=x.ai||{},sub=[a.congTy,a.fwd&&a.fwd!==a.congTy?"FWD "+a.fwd:"",a.dichVu,a.hang,a.bl?"B/L "+a.bl:"",a.cont,a.tkNo?"TK "+a.tkNo:""].filter(Boolean).join(" · ");
-      return `<div class="mjc"><b>${esc(a.tieuDe||x.s||"(không tiêu đề)")}</b>${sub?`<span>${esc(sub)}</span>`:""}${a.tomTat?`<span class="mj-sum">${esc(a.tomTat)}</span>`:""}<small class="muted">✉ ${esc(x.fromN||x.from)} · ${esc(x.s||"")} · ${mailTime(x.t||x.at)}</small>
+      return `<div class="mjc"><b>${esc(a.tieuDe||x.s||"(không tiêu đề)")}</b>${sub?`<span>${esc(sub)}</span>`:""}${a.tomTat?`<span class="mj-sum">${esc(a.tomTat)}</span>`:""}<small class="muted">${svi("mail")}${esc(x.fromN||x.from)} · ${esc(x.s||"")} · ${mailTime(x.t||x.at)}</small>
         <div class="mj-acts"><button class="primary sm" data-mjok="${esc(x.id)}">✓ Tạo job</button><button class="ghost sm" data-mjmail="${esc(x.id)}">Xem thư</button><button class="ghost sm" data-mjskip="${esc(x.id)}">Bỏ qua</button></div></div>`}).join("")+`</section>`;
 }
 function mjPaint(){
@@ -3750,7 +3767,7 @@ function teamPop(m,n){
   let box=$("#chatPops");if(!box){box=document.createElement("div");box.id="chatPops";document.body.appendChild(box)}
   box.querySelector('[data-pop="__team"]')?.remove();
   const c=document.createElement("div");c.className="cpop team";c.dataset.pop="__team";
-  c.innerHTML=`<button class="cpop-x" aria-label="Đóng">✕</button><b>💬 ${esc(fake.chatByName)} · Chat chung</b>${fake.title?`<span class="t">${esc(fake.title)}</span>`:""}<span class="m">${esc(m.text||"")}</span>`;
+  c.innerHTML=`<button class="cpop-x" aria-label="Đóng">✕</button><b>${svi("chat")}${esc(fake.chatByName)} · Chat chung</b>${fake.title?`<span class="t">${esc(fake.title)}</span>`:""}<span class="m">${esc(m.text||"")}</span>`;
   c.onclick=e=>{c.remove();if(!e.target.closest(".cpop-x")){if(SPACE==="mine")setSpace("team").then(()=>{S.view="team";renderMain()});else{S.view="team";renderMain()}}};
   box.prepend(c);setTimeout(()=>c.remove(),15000);
   if(document.hidden&&!PUSH_ON&&window.Notification&&Notification.permission==="granted")try{const no=new Notification(`💬 ${fake.chatByName} · Chat chung`,{body:m.text||"",tag:"teamchat",icon:"icon-192.png"});no.onclick=()=>{window.focus();S.view="team";renderMain();no.close()}}catch(e){}
@@ -3759,21 +3776,21 @@ function teamBadge(){try{nbellPaint()}catch(e){}const b=$("#teamBadge"),t=docume
 const tmTime=at=>{const d=new Date(at||0),t=new Date();const hm=d.toLocaleTimeString("vi-VN",{hour:"2-digit",minute:"2-digit"});return d.toDateString()===t.toDateString()?hm:hm+" "+d.toLocaleDateString("vi-VN",{day:"2-digit",month:"2-digit"})};
 function teamMsgs(){
   if(S.teamErr&&!S.team.length)return `<div class="none">Chưa đọc được Chat chung: ${esc(S.teamErr)}</div>`;
-  if(!S.team.length)return `<div class="none">Chưa có tin nào. Nhắn cho cả nhóm ở ô bên dưới, bấm 📎 hoặc gõ # để gắn job.</div>`;
+  if(!S.team.length)return `<div class="none">Chưa có tin nào. Nhắn cho cả nhóm ở ô bên dưới, bấm nút kẹp giấy hoặc gõ # để gắn job.</div>`;
   let day="";const sm=seenMap("team",S.team);
   return (S.team.length>=teamN?`<button class="ghost sm tmore" data-tm="more">Tải thêm tin cũ</button>`:"")+S.team.map((m,i)=>{
     const d=new Date(m.at||0).toLocaleDateString("vi-VN",{weekday:"long",day:"2-digit",month:"2-digit"});const sep=d!==day?`<div class="tday">${esc(d)}</div>`:"";day=d;
     const j=m.job&&S.all.find(x=>x.id===m.job.id);
-    const chip=m.job?`<button class="jchip" data-tmjob="${esc(m.job.id)}" title="Mở job">📁 ${esc(m.job.code||"")}${m.job.label?" · "+esc(m.job.label):""}${m.from==="job"?" · trong job":""}</button>`:"";
+    const chip=m.job?`<button class="jchip" data-tmjob="${esc(m.job.id)}" title="Mở job">${svi("folder")}${esc(m.job.code||"")}${m.job.label?" · "+esc(m.job.label):""}${m.from==="job"?" · trong job":""}</button>`:"";
     return sep+`<div class="m${m.by===me()?" me":""}${mnMine(m)?" tagme":""}" data-mid="${esc(m.id||"")}">${msgReply(m)}<small>${esc(m.by===me()?"Bạn":msgWho(m))} · ${tmTime(m.at)}${mnMine(m)?' · <b class="tagme-l">nhắc bạn</b>':""}${m.editedAt?" · đã sửa":""}</small>${chip}${mnText(m)}${msgActs(m)}</div>`+seenRow(sm,m,i===S.team.length-1)}).join("");
 }
 function renderTeam(el){
   if(el.dataset.v!=="team"||!$("#tmList")){
     el.dataset.v="team";
-    el.innerHTML=`<div class="teamchat"><div class="tm-h"><b>💬 Chat chung</b><span class="muted tm-note">Cả nhóm trao đổi. Tin nhắn trong job ở Sổ chung cũng hiện ở đây, bấm 📁 để mở job.</span></div>
+    el.innerHTML=`<div class="teamchat"><div class="tm-h"><b>${svi("chat")}Chat chung</b><span class="muted tm-note">Cả nhóm trao đổi. Tin nhắn trong job ở Sổ chung cũng hiện ở đây, bấm mã job để mở job.</span></div>
       <div class="chat tm-list" id="tmList"></div>
       <div class="tm-in"><div id="tmJob"></div><div id="tmSug" class="tm-sug" hidden></div>
-        <div class="chatin"><button class="ghost" id="tmPick" title="Gắn job vào tin nhắn">📎</button><textarea id="tmTxt" rows="2" placeholder="Nhắn cho cả nhóm… (gõ # để gắn job)">${esc(S.teamDraft)}</textarea><button class="primary" id="tmSend">${ic("send")}Gửi</button></div></div></div>`;
+        <div class="chatin"><button class="ghost" id="tmPick" title="Gắn job vào tin nhắn">${svi("clip")}</button><textarea id="tmTxt" rows="2" placeholder="Nhắn cho cả nhóm… (gõ # để gắn job)">${esc(S.teamDraft)}</textarea><button class="primary" id="tmSend">${ic("send")}Gửi</button></div></div></div>`;
   }
   teamPaint(true);
 }
@@ -3788,8 +3805,8 @@ function teamPaint(force){
   const L=$("#tmList");if(!L)return;
   const atBottom=force||L.scrollHeight-L.scrollTop-L.clientHeight<80;
   L.innerHTML=teamMsgs();if(atBottom)L.scrollTop=L.scrollHeight;
-  const mb=$("#tmMute");if(mb){mb.textContent=teamMuteOn?"🔕 Đã tắt báo":"🔔 Đang báo";mb.title=teamMuteOn?"Bấm để bật lại thông báo Chat chung":"Bấm để tắt thông báo Chat chung trên mọi máy của bạn"}
-  const jb=$("#tmJob");if(jb){const j=S.teamJob&&S.all.find(x=>x.id===S.teamJob);jb.innerHTML=j?`<span class="jchip on">📁 ${esc(j.code)} · ${esc(jobLabel(j))}<button data-tm="unjob" aria-label="Bỏ gắn job">✕</button></span><span class="muted"> Tin này sẽ lưu cả vào Trao đổi của job.</span>`:""}
+  const mb=$("#tmMute");if(mb){mb.innerHTML=teamMuteOn?svi("belloff")+"Đã tắt báo":svi("bell")+"Đang báo";mb.title=teamMuteOn?"Bấm để bật lại thông báo Chat chung":"Bấm để tắt thông báo Chat chung trên mọi máy của bạn"}
+  const jb=$("#tmJob");if(jb){const j=S.teamJob&&S.all.find(x=>x.id===S.teamJob);jb.innerHTML=j?`<span class="jchip on">${svi("folder")}${esc(j.code)} · ${esc(jobLabel(j))}<button data-tm="unjob" aria-label="Bỏ gắn job">✕</button></span><span class="muted"> Tin này sẽ lưu cả vào Trao đổi của job.</span>`:""}
   if(!document.hidden&&S.team.length){const last=Math.max(...S.team.map(m=>m.at||0));seenPush("team",last);if(last>teamSeen){teamSeen=last;teamSeenSave();teamBadge()}}
 }
 function teamSug(q){
@@ -3846,10 +3863,10 @@ function odState(j){const a=j.odAck;
   return "none"}
 const odDays=j=>Math.max(1,-(dayDiff(j.deadline)||0));
 function odBox(j){const st=odState(j);if(!st)return "";const a=j.odAck||{};
-  if(st==="ok")return `<div class="odbox ok">✅ Quá hạn ${odDays(j)} ngày · lý do đã duyệt: <b>${esc(a.reason)}</b> (${esc(a.byName||"")})</div>`;
-  if(st==="pend")return `<div class="odbox pend"><b>⏳ Lý do quá hạn chờ duyệt</b><div>Lý do: <b>${esc(a.reason)}</b>${a.newDeadline?` · gia hạn tới <b>${dmy(a.newDeadline)}</b>`:""} · ${esc(a.byName||"")} ghi ${hm(a.at)}</div>
+  if(st==="ok")return `<div class="odbox ok">${svi("okc")}Quá hạn ${odDays(j)} ngày · lý do đã duyệt: <b>${esc(a.reason)}</b> (${esc(a.byName||"")})</div>`;
+  if(st==="pend")return `<div class="odbox pend"><b>${svi("hour")}Lý do quá hạn chờ duyệt</b><div>Lý do: <b>${esc(a.reason)}</b>${a.newDeadline?` · gia hạn tới <b>${dmy(a.newDeadline)}</b>`:""} · ${esc(a.byName||"")} ghi ${hm(a.at)}</div>
     <div class="lrow">${boss()?`<button class="primary" data-act="odOk">Duyệt</button><button class="ghost danger" data-act="odNo">Không duyệt</button>`:`<span class="muted">Chủ sổ duyệt xong là hết cảnh báo.</span>`}</div></div>`;
-  return `<div class="odbox none"><b>⚠ Quá hạn ${odDays(j)} ngày (hạn ${dmy(j.deadline)}) – ghi lý do để tiếp tục</b>
+  return `<div class="odbox none"><b>${svi("warn")}Quá hạn ${odDays(j)} ngày (hạn ${dmy(j.deadline)}) – ghi lý do để tiếp tục</b>
     ${a.rejected&&a.deadline===j.deadline?`<div>Lý do “${esc(a.reason)}” bị trả về${a.rejectNote?": <b>"+esc(a.rejectNote)+"</b>":""}.</div>`:""}
     <div class="chips odchips">${OD_REASONS.map(r=>`<button type="button" class="sm" data-act="odChip" data-r="${esc(r)}">${esc(r)}</button>`).join("")}</div>
     <div class="odrow"><input id="odTxt" placeholder="Lý do quá hạn (bắt buộc)" aria-label="Lý do quá hạn">
@@ -3890,15 +3907,15 @@ function notifItems(){
   if(!team()||!S.loaded)return [];
   const pool=S.all.filter(j=>!(boss()&&isMine(j))),out=[];
   const tu=typeof teamUnread==="function"?teamUnread():0;
-  mnUnread().slice(0,10).forEach(m=>out.push({k:"t"+(m.id||m.at),ic:"🔔",cls:"tag",t:`${m.byName||m.by} nhắc đến bạn${m.job?" · "+m.job.code:" · Chat chung"}`,s:m.text||"",
+  mnUnread().slice(0,10).forEach(m=>out.push({k:"t"+(m.id||m.at),ic:svi("bell"),cls:"tag",t:`${m.byName||m.by} nhắc đến bạn${m.job?" · "+m.job.code:" · Chat chung"}`,s:m.text||"",
     go:m.job?()=>openJobAny(m.job.id):()=>{S.view="team";if(SPACE==="mine")setSpace("team").then(renderMain);else renderMain()}}));
-  if(tu)out.push({k:"team",ic:"💬",t:"Chat chung",s:`${tu} tin mới`,go:()=>{S.view="team";if(SPACE==="mine")setSpace("team").then(renderMain);else renderMain()}});
-  pool.filter(j=>chatUnread(j)&&j.id!==cur()?.id).sort((a,b)=>(b.chatAt||0)-(a.chatAt||0)).forEach(j=>out.push({k:"c"+j.id,ic:"💬",t:`${j.code} · ${j.title||""}`,s:`${chatUnread(j)} tin mới · ${j.chatByName||j.chatBy||""}: ${j.chatLast||""}`,id:j.id}));
-  pool.filter(j=>odState(j)==="none").forEach(j=>out.push({k:"o"+j.id,ic:"⚠",cls:"bad",t:`${j.code} · ${j.title||""}`,s:`Quá hạn ${odDays(j)} ngày – chưa ghi lý do`,id:j.id}));
-  pool.filter(j=>lateState(j)==="none").forEach(j=>out.push({k:"l"+j.id,ic:"🔴",cls:"bad",t:`${j.code} · ${j.title||""}`,s:`Trễ ${lateDays(j)} ngày ở “${j.status}” – chưa ghi lý do`,id:j.id}));
+  if(tu)out.push({k:"team",ic:svi("chat"),t:"Chat chung",s:`${tu} tin mới`,go:()=>{S.view="team";if(SPACE==="mine")setSpace("team").then(renderMain);else renderMain()}});
+  pool.filter(j=>chatUnread(j)&&j.id!==cur()?.id).sort((a,b)=>(b.chatAt||0)-(a.chatAt||0)).forEach(j=>out.push({k:"c"+j.id,ic:svi("chat"),t:`${j.code} · ${j.title||""}`,s:`${chatUnread(j)} tin mới · ${j.chatByName||j.chatBy||""}: ${j.chatLast||""}`,id:j.id}));
+  pool.filter(j=>odState(j)==="none").forEach(j=>out.push({k:"o"+j.id,ic:svi("warn"),cls:"bad",t:`${j.code} · ${j.title||""}`,s:`Quá hạn ${odDays(j)} ngày – chưa ghi lý do`,id:j.id}));
+  pool.filter(j=>lateState(j)==="none").forEach(j=>out.push({k:"l"+j.id,ic:svi("hour"),cls:"bad",t:`${j.code} · ${j.title||""}`,s:`Trễ ${lateDays(j)} ngày ở “${j.status}” – chưa ghi lý do`,id:j.id}));
   if(boss()){
-    pool.filter(j=>odState(j)==="pend").forEach(j=>out.push({k:"op"+j.id,ic:"✅",t:`${j.code} · ${j.title||""}`,s:`Lý do quá hạn chờ duyệt: ${j.odAck.reason}`,id:j.id}));
-    pool.filter(j=>lateState(j)==="pend").forEach(j=>out.push({k:"lp"+j.id,ic:"✅",t:`${j.code} · ${j.title||""}`,s:`Lý do trễ bước chờ duyệt: ${j.lateAck.reason}`,id:j.id}));
+    pool.filter(j=>odState(j)==="pend").forEach(j=>out.push({k:"op"+j.id,ic:svi("okc"),t:`${j.code} · ${j.title||""}`,s:`Lý do quá hạn chờ duyệt: ${j.odAck.reason}`,id:j.id}));
+    pool.filter(j=>lateState(j)==="pend").forEach(j=>out.push({k:"lp"+j.id,ic:svi("okc"),t:`${j.code} · ${j.title||""}`,s:`Lý do trễ bước chờ duyệt: ${j.lateAck.reason}`,id:j.id}));
   }
   return out}
 let nOpen=false;
@@ -3909,7 +3926,7 @@ function nbellPaint(){
   if(nOpen)nPanelPaint(items)}
 function nPanelPaint(items){
   let p=$("#npanel");if(!p){p=document.createElement("div");p.id="npanel";p.className="npanel";p.setAttribute("role","dialog");p.setAttribute("aria-label","Thông báo");document.body.appendChild(p)}
-  p.innerHTML=`<div class="np-h"><b>Thông báo</b><span><button class="ghost sm" data-ntest title="Gửi 1 thông báo thử tới các máy của bạn">🔔 Thử thông báo</button><button class="ghost sm" data-nclose aria-label="Đóng">✕</button></span></div>`+
+  p.innerHTML=`<div class="np-h"><b>Thông báo</b><span><button class="ghost sm" data-ntest title="Gửi 1 thông báo thử tới các máy của bạn">${svi("bell")}Thử thông báo</button><button class="ghost sm" data-nclose aria-label="Đóng">✕</button></span></div>`+
     (items.length?items.map((it,i)=>`<button class="np-i ${it.cls||""}" data-ni="${i}"><span class="np-ic">${it.ic}</span><span class="np-t"><b>${esc(it.t)}</b><small>${esc(it.s)}</small></span></button>`).join("")
       :`<div class="np-empty">Không có gì mới. Tin nhắn mới, job quá hạn và lý do chờ duyệt sẽ hiện ở đây.</div>`);
   p.onclick=e=>{if(e.target.closest("[data-nclose]")){nToggle(false);return}if(e.target.closest("[data-ntest]")){pushTest();return}const x=e.target.closest("[data-ni]");if(!x)return;const it=items[+x.dataset.ni];nToggle(false);if(it.go)it.go();else if(it.id)openJobAny(it.id)}}
@@ -3922,7 +3939,7 @@ const PUSH_URL="https://script.google.com/macros/s/AKfycbybwZjSrdEh0xrt0MFKtbwh6
 let PUSH_ON=false;
 const isIOS=/iPhone|iPad|iPod/i.test(navigator.userAgent),isStandalone=matchMedia("(display-mode: standalone)").matches||navigator.standalone===true;
 function bellPaint(){const b=$("#btnBell");if(!b)return;b.hidden=!team();
-  const on=!!(window.Notification&&Notification.permission==="granted");b.textContent=on?"🔔":"🔕";
+  const on=!!(window.Notification&&Notification.permission==="granted");b.innerHTML=on?svi("bell"):svi("belloff");
   b.title=on?(PUSH_ON?"Đã bật thông báo trên máy này (kể cả khi tắt app)":"Đã bật thông báo khi app đang mở"):"Bật thông báo tin nhắn trên máy này";b.classList.toggle("on",on)}
 const loadSdk=src=>new Promise((res,rej)=>{if(document.querySelector(`script[src="${src}"]`))return res();const sc=document.createElement("script");sc.src=src;sc.onload=res;sc.onerror=()=>rej(new Error("Không tải được "+src));document.head.appendChild(sc)});
 async function pushSetup(){
@@ -3953,7 +3970,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26q";
+const APP_VER="2026-11-26r";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4140,7 +4157,7 @@ function aiErr(e){
 }
 function aiModal(title){
   const d=document.createElement("div");d.className="modal ask aibox";
-  d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h2>✦ ${esc(title)}</h2><div class="ai-body"></div><div class="ai-acts"></div></div>`;
+  d.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h2>${svi("spark")}${esc(title)}</h2><div class="ai-body"></div><div class="ai-acts"></div></div>`;
   const ctl=new AbortController(),body=d.querySelector(".ai-body"),acts=d.querySelector(".ai-acts");
   const esck=e=>{if(e.key==="Escape"){e.stopPropagation();close()}};
   const close=()=>{ctl.abort();d.remove();document.removeEventListener("keydown",esck,true)};
@@ -4324,10 +4341,10 @@ $("#btnOcr").addEventListener("click",async()=>{
 const TK_URL="https://script.google.com/macros/s/AKfycbwtQV7vcwRtQLjxpZde6wB59jGrjdrakSeUNznnYNtOKa6Wv5BaBJ2cBPcRl0DgIT_G/exec";const tkApi=()=>window.SOJOB_TKAPI||TK_URL;
 let MV_OPEN="",TK_BUSY="";
 function tkCheckRow(j){const c=j.tkCheck,busy=TK_BUSY===j.id;
-  const line=!c?"":c.ok?`<span class="tkst ok">${/thông quan/i.test(c.status)?"✅":"📦"} <b>${esc(c.status||"Đã có mã vạch")}</b>${c.lane?` · ${c.lane==="Xanh"?"🟢":c.lane==="Vàng"?"🟡":c.lane==="Đỏ"?"🔴":""} Luồng ${esc(c.lane)}`:""}${c.kind?` · ${esc(c.kind)}`:""}</span>`
-    :`<span class="tkst bad">${/chưa được cấp phép/i.test(c.msg||"")?"⏳":"❌"} ${esc(c.msg||"Chưa có kết quả")}</span>`;
+  const line=!c?"":c.ok?`<span class="tkst ok">${/thông quan/i.test(c.status)?svi("okc"):svi("pkg")}<b>${esc(c.status||"Đã có mã vạch")}</b>${c.lane?` · ${c.lane==="Xanh"?'<i class="ldot g"></i>':c.lane==="Vàng"?'<i class="ldot y"></i>':c.lane==="Đỏ"?'<i class="ldot r"></i>':""}Luồng ${esc(c.lane)}`:""}${c.kind?` · ${esc(c.kind)}`:""}</span>`
+    :`<span class="tkst bad">${/chưa được cấp phép/i.test(c.msg||"")?svi("hour"):svi("xc")}${esc(c.msg||"Chưa có kết quả")}</span>`;
   const when=c?`<small>Kiểm tra lúc ${new Date(c.at).toLocaleString("vi-VN",{hour:"2-digit",minute:"2-digit",day:"2-digit",month:"2-digit"})}${c.tkNo&&c.tkNo!==j.tkNo?` · TK ${esc(c.tkNo)}`:""}</small>`:`<small>Tờ khai đã sửa thì ghi số TK bản sửa mới nhất (số cuối 0, 1, 2…).</small>`;
-  return `<div class="mvrow"><button type="button" class="mvbtn tkbtn" data-tkcheck="${esc(j.id)}"${busy?" disabled":""}>${busy?"⏳ Đang kiểm tra…":ic("search")+"Kiểm tra trạng thái tờ khai"}</button>
+  return `<div class="mvrow"><button type="button" class="mvbtn tkbtn" data-tkcheck="${esc(j.id)}"${busy?" disabled":""}>${busy?svi("load","spin")+"Đang kiểm tra…":ic("search")+"Kiểm tra trạng thái tờ khai"}</button>
     ${c&&c.ok&&c.url?`<button type="button" class="primary mvbtn" data-mvopen="${esc(j.id)}">${MV_OPEN===j.id?ic("close")+"Đóng MV":ic("barcode")+"Lấy MV"}</button>`:""}
     <div class="tkinfo">${line}${when}</div></div>
     ${MV_OPEN===j.id&&c&&c.url?`<div class="mvframe"><iframe src="${esc(c.url)}" title="Bản kê mã vạch"></iframe></div>`:""}`}
@@ -4445,9 +4462,9 @@ function debitOpen(j){
     <td>${l.sec==="B"?`<span class="muted">đã gồm</span>`:`<select data-dl="${i}:vat">${DB_VAT.map(v=>`<option value="${v}"${String(l.vat)===v?" selected":""}>${v==="KCT"?"KCT":v+"%"}</option>`).join("")}</select>`}</td>
     <td><input data-dl="${i}:inv" value="${esc(l.inv||"")}" placeholder="${l.sec==="B"?"Số HĐ":"FDI / Xuất sau"}"></td><td><button class="x" data-dlx="${i}" aria-label="Xoá dòng">✕</button></td></tr>`;
   const draw=()=>{
-    box.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h2>🧾 Debit ${esc(j.code)}</h2>
-      <div class="dbto"><span>Xuất debit cho:</span><button type="button" data-dbto="cust" class="${d.to!=="fwd"?"on":""}">🏭 Chủ hàng<small>${esc(j.company||"(chưa có tên)")}</small></button>${dbFwdOk(j)?`<button type="button" data-dbto="fwd" class="${d.to==="fwd"?"on":""}">🚚 FWD<small>${esc(j.fwd)}</small></button>`:`<span class="muted">Job chưa có FWD riêng</span>`}</div>
-      <div class="dbgrid"><div><div class="sub">${d.to==="fwd"?"FWD nhận debit":"Khách hàng (chủ hàng)"}</div>${IN("cust.name",d.to==="fwd"?"Tên FWD (xuất hoá đơn)":"Tên công ty khách hàng","","full")}${IN("cust.addr","Địa chỉ")}<div class="dbmst">${IN("cust.mst","Mã số thuế")}<button type="button" class="ghost sm" data-dbmst title="Lấy tên, địa chỉ đăng ký thuế theo MST">🔎 Tra MST</button></div>${IN("cust.email","Email nhận","nhiều email cách nhau dấu ;")}</div>
+    box.innerHTML=`<div class="sheet" role="dialog" aria-modal="true"><h2>${svi("rcpt")}Debit ${esc(j.code)}</h2>
+      <div class="dbto"><span>Xuất debit cho:</span><button type="button" data-dbto="cust" class="${d.to!=="fwd"?"on":""}">${svi("fac")}Chủ hàng<small>${esc(j.company||"(chưa có tên)")}</small></button>${dbFwdOk(j)?`<button type="button" data-dbto="fwd" class="${d.to==="fwd"?"on":""}">${svi("vc")}FWD<small>${esc(j.fwd)}</small></button>`:`<span class="muted">Job chưa có FWD riêng</span>`}</div>
+      <div class="dbgrid"><div><div class="sub">${d.to==="fwd"?"FWD nhận debit":"Khách hàng (chủ hàng)"}</div>${IN("cust.name",d.to==="fwd"?"Tên FWD (xuất hoá đơn)":"Tên công ty khách hàng","","full")}${IN("cust.addr","Địa chỉ")}<div class="dbmst">${IN("cust.mst","Mã số thuế")}<button type="button" class="ghost sm" data-dbmst title="Lấy tên, địa chỉ đăng ký thuế theo MST">${svi("search")}Tra MST</button></div>${IN("cust.email","Email nhận","nhiều email cách nhau dấu ;")}</div>
       <div><div class="sub">Thông tin lô</div><div class="g2">${IN("info.tk","TKHQ")}${IN("info.qty","Số lượng","VD: 1x20")}${IN("info.bl","Bill")}${IN("info.cargo","Tên hàng")}${IN("info.veh","Loại xe")}${IN("info.conts","Số container")}</div></div></div>
       <div class="sub">Bảng phí <small>A = FDI xuất hoá đơn (tính VAT) · B = chi trả hộ, hoá đơn đứng tên khách (đã gồm VAT)</small></div>
       <div class="qwrap"><table class="q dbt"><thead><tr><th style="width:62px">Mục</th><th>Nội dung</th><th style="width:60px">ĐVT</th><th class="num" style="width:110px">Đơn giá</th><th class="num" style="width:50px">SL</th><th class="num" style="width:110px">Thành tiền</th><th style="width:72px">Thuế</th><th style="width:100px">Số HĐ</th><th style="width:28px"></th></tr></thead>
@@ -4458,7 +4475,7 @@ function debitOpen(j){
   draw();
   /* điền tên, địa chỉ theo MST: tự chạy khi thiếu địa chỉ; nút Tra MST thì ghi đè */
   const mstFill=async(force,btn)=>{const m=String(d.cust.mst||"").replace(/[^\d-]/g,"");if(!mstOk(m)){if(force)toast("MST chưa đúng hoặc là cá nhân không có MST: nhập tay tên, địa chỉ.");return}
-    if(btn){btn.disabled=true;btn.textContent="⏳ Đang tra…"}
+    if(btn){btn.disabled=true;btn.innerHTML=svi("load","spin")+"Đang tra…"}
     try{const x=await mstLookup(m),ch=[];
       if(force||!d.cust.name||d.cust.name===((d.to==="fwd"?j.fwd:j.company)||"")){if(d.cust.name!==x.name){d.cust.name=x.name;ch.push("tên")}}
       if(force||!d.cust.addr){if(x.addr&&d.cust.addr!==x.addr){d.cust.addr=x.addr;ch.push("địa chỉ")}}
@@ -4466,7 +4483,7 @@ function debitOpen(j){
       if(force)toast(ch.length?`Đã điền ${ch.join(", ")} theo MST${/ngừng|đóng|giải thể/i.test(x.status)?" · ⚠ "+x.status:""}.`:"Tên, địa chỉ đã khớp với đăng ký thuế.");
       else if(/ngừng|đóng|giải thể/i.test(x.status))toast("⚠ MST "+m+": "+x.status)}
     catch(er){if(force)toast("Chưa tra được MST: "+(er.message||er))}
-    finally{if(btn){btn.disabled=false;btn.textContent="🔎 Tra MST"}}};
+    finally{if(btn){btn.disabled=false;btn.innerHTML=svi("search")+"Tra MST"}}};
   /* debit gửi FWD: lưu tên, MST, địa chỉ, email vào hồ sơ FWD để lô sau tự điền */
   const fwdKeep=()=>{if(d.to!=="fwd"||!j.fwd||mineOn())return;const p=partnerOf(j.fwd);p.dbName=d.cust.name||"";p.dbAddr=d.cust.addr||"";p.dbMst=d.cust.mst||"";p.dbEmail=d.cust.email||"";savePartner(j.fwd)};
   if(!d.cust.addr)mstFill(false);
