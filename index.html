@@ -821,6 +821,11 @@ body.view-report #side,body.view-report #detail{display:none}
 .dbto button small{font-weight:400;font-size:12px;color:var(--muted);max-width:260px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dbto button.on{border-color:var(--primary)!important;background:#E3EEFB!important;color:var(--primary)!important;box-shadow:0 0 0 1px var(--primary)}.dbto button.on small{color:var(--ink)}
 .pdb{margin-top:8px}.pdb summary{cursor:pointer;font-weight:600;font-size:13.5px;color:var(--info)}
+/* thanh tab ghim trên cùng khi cuộn (máy tính, máy tính bảng; điện thoại đã có thanh tab đáy) */
+@media (min-width:781px){
+  .bar{position:sticky;top:calc(var(--topH,58px) + env(safe-area-inset-top,0px));z-index:4;background:var(--bg);margin-block:-6px;padding-block:6px;box-shadow:0 1px 0 transparent;transition:box-shadow .15s}
+  .bar.stuck{box-shadow:0 6px 8px -8px rgba(0,0,0,.25)}
+}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1969,6 +1974,10 @@ function lateNotify(){
   toast(fresh.length===1?`⚠ ${fresh[0].code} vừa ${lateState(fresh[0])==="pend"?"có lý do chờ duyệt":"quá hạn ở “"+fresh[0].status+"”"}.`:`⚠ ${fresh.length} job vừa quá hạn / chờ duyệt.`);
 }
 setInterval(()=>{if(S.loaded){renderAll(false)}},5*60*1000); // cập nhật đồng hồ quá hạn
+/* chiều cao thanh trên cùng → thanh tab ghim ngay bên dưới; đổ bóng khi đã ghim */
+(function(){const set=()=>{const t=document.querySelector(".top");if(t)document.documentElement.style.setProperty("--topH",t.offsetHeight+"px")};
+  addEventListener("resize",set);addEventListener("load",set);setTimeout(set,0);
+  addEventListener("scroll",()=>{const b=document.querySelector(".bar");if(!b)return;const top=parseFloat(getComputedStyle(b).top)||0;b.classList.toggle("stuck",getComputedStyle(b).position==="sticky"&&b.getBoundingClientRect().top<=top+1&&scrollY>0)},{passive:true})})();
 function renderAll(forceDetail){renderLateBar();lateNotify();chatNotify();renderSide();renderMain();renderDetail(forceDetail);nbellPaint();try{todayBadge()}catch(e){}try{dkSbPaint()}catch(e){}}
 /* thanh trạng thái (màn rộng): kết nối, sổ đang xem, số job đang mở / quá hạn, người dùng, phiên bản */
 let dkSync=0;
@@ -3516,7 +3525,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26c";
+const APP_VER="2026-11-26d";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
