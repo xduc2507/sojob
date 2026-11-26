@@ -1229,6 +1229,53 @@ html.ios .modal .sheet,html.ios .dbbox .sheet{border-radius:18px!important}
   html.ios .bar .tabs button .ic-fa{color:inherit;font-size:22px}
   html.ios .kb-fab{bottom:calc(96px + env(safe-area-inset-bottom,0px))!important}
 }
+/* ===== Chuyển động kiểu iOS (chỉ khi bật ?ios=1): lò xo, trượt, phóng to từ gốc; tắt khi máy bật "giảm chuyển động" ===== */
+html.ios{--sp:cubic-bezier(.32,.72,0,1);--spb:cubic-bezier(.34,1.56,.64,1)}
+/* nút: nhấn co lại, thả ra bật lò xo */
+html.ios button{transition:transform .38s var(--spb),background-color .2s ease,color .2s ease,filter .2s ease,opacity .2s ease}
+html.ios button:active:not(:disabled){transform:scale(.95)!important;transition-duration:.08s}
+html.ios .kc,html.ios .row,html.ios .g{transition:transform .38s var(--spb),box-shadow .25s ease,background-color .2s ease}
+html.ios .kc:active,html.ios .row:active{transform:scale(.98)!important;transition-duration:.1s}
+/* công tắc phân đoạn: viên trắng trượt sang tab mới */
+html.ios .tabs,html.ios .top .space{position:relative}
+html.ios .tabs>button,html.ios .top .space>button{position:relative;z-index:1}
+html.ios .ios-ind{position:absolute;z-index:0;pointer-events:none;border-radius:8px;background:var(--ios-sel);box-shadow:0 3px 8px rgba(0,0,0,.12),0 3px 1px rgba(0,0,0,.04);
+  transition:left .45s var(--sp),width .45s var(--sp),top .45s var(--sp),height .45s var(--sp)}
+html.ios .tabs:has(>.ios-ind)>button.on,html.ios .top .space:has(>.ios-ind)>button.on:not(#btnManual){background:transparent!important;box-shadow:none!important}
+@media (max-width:780px){html.ios .bar .tabs{position:fixed}html.ios .bar .tabs>.ios-ind{border-radius:26px;background:var(--ios-fill);box-shadow:none}}
+/* đổi tab: nội dung trượt ngang theo hướng tab (View Transitions) */
+html.ios #content{view-transition-name:ios-content}
+::view-transition-old(root),::view-transition-new(root){animation-duration:.25s}
+::view-transition-group(ios-content){animation-duration:.42s;animation-timing-function:var(--sp,cubic-bezier(.32,.72,0,1))}
+html.ios[data-vt="r"]::view-transition-old(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-out-l}
+html.ios[data-vt="r"]::view-transition-new(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-in-r}
+html.ios[data-vt="l"]::view-transition-old(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-out-r}
+html.ios[data-vt="l"]::view-transition-new(ios-content){animation:.42s cubic-bezier(.32,.72,0,1) both ios-in-l}
+@keyframes ios-out-l{to{opacity:0;transform:translateX(-40px)}}
+@keyframes ios-out-r{to{opacity:0;transform:translateX(40px)}}
+@keyframes ios-in-r{from{opacity:0;transform:translateX(60px)}}
+@keyframes ios-in-l{from{opacity:0;transform:translateX(-60px)}}
+/* mở job: máy tính trượt nhẹ vào; điện thoại / bảng Quy trình: đẩy vào từ phải như iOS */
+html.ios #detail.ios-in{animation:ios-pane .4s var(--sp) both}
+html.ios body.view-board.has-detail #detail.ios-in{animation:ios-push .5s var(--sp) both}
+@media (max-width:780px){html.ios body.has-detail #detail.ios-in{animation:ios-push .5s var(--sp) both}}
+@keyframes ios-pane{from{opacity:0;transform:translateX(18px)}}
+@keyframes ios-push{from{transform:translateX(100%);box-shadow:-20px 0 40px rgba(0,0,0,0)}to{box-shadow:-20px 0 40px rgba(0,0,0,.12)}}
+/* hộp thoại: nền mờ dần, tấm trồi lên từ dưới */
+html.ios .modal:not([hidden]){animation:ios-fade .3s ease both;-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+html.ios .modal:not([hidden]) .sheet,html.ios .dbbox .sheet{animation:ios-sheet .5s var(--sp) both}
+@keyframes ios-fade{from{opacity:0}}
+@keyframes ios-sheet{from{transform:translateY(60px) scale(.97);opacity:0}}
+/* menu, thông báo, gợi ý: phóng to từ gốc */
+html.ios .kmenu,html.ios .npanel:not([hidden]),html.ios .tm-sug,html.ios #chatPops .cpop{animation:ios-pop .32s var(--spb) both;transform-origin:top right}
+html.ios .kmenu{transform-origin:top left}
+html.ios .tmenu{animation:ios-pop .32s var(--spb) both;transform-origin:bottom right}
+@keyframes ios-pop{from{opacity:0;transform:scale(.86)}}
+/* thông báo nhỏ (toast): bật lên dạng viên */
+html.ios #toast{border-radius:999px;padding:10px 18px;box-shadow:0 10px 30px rgba(0,0,0,.2);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);background:color-mix(in srgb,var(--ink) 88%,transparent)}
+html.ios #toast:not([hidden]){animation:ios-toast .5s var(--spb) both}
+@keyframes ios-toast{from{opacity:0;transform:translateX(-50%) translateY(24px) scale(.9)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){html.ios *,html.ios *::before{animation:none!important;transition:none!important}::view-transition-group(*),::view-transition-old(*),::view-transition-new(*){animation:none!important}}
 /* icon nét mảnh (thay Font Awesome) */
 html.ios .fa-archive::before,html.ios .fa-arrow-right::before,html.ios .fa-ban::before,html.ios .fa-bar-chart::before,html.ios .fa-barcode::before,html.ios .fa-bell::before,html.ios .fa-bell-slash::before,html.ios .fa-building::before,html.ios .fa-calendar::before,html.ios .fa-check::before,html.ios .fa-columns::before,html.ios .fa-comments::before,html.ios .fa-copy::before,html.ios .fa-download::before,html.ios .fa-ellipsis-h::before,html.ios .fa-envelope::before,html.ios .fa-file-excel-o::before,html.ios .fa-file-text-o::before,html.ios .fa-filter::before,html.ios .fa-folder-open::before,html.ios .fa-inbox::before,html.ios .fa-list::before,html.ios .fa-lock::before,html.ios .fa-paper-plane-o::before,html.ios .fa-paperclip::before,html.ios .fa-plus::before,html.ios .fa-print::before,html.ios .fa-refresh::before,html.ios .fa-remove::before,html.ios .fa-search::before,html.ios .fa-send::before,html.ios .fa-sun-o::before,html.ios .fa-times::before,html.ios .fa-trash-o::before,html.ios .fa-upload::before{content:""!important;display:inline-block;width:1.2em;height:1.2em;vertical-align:-.22em;background-color:currentColor;-webkit-mask:var(--ic) center/contain no-repeat;mask:var(--ic) center/contain no-repeat}
 html.ios .fa-archive{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round' %3E%3Crect width='20' height='5' x='2' y='3' rx='1'/%3E%3Cpath d='M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8'/%3E%3Cpath d='M10 12h4'/%3E%3C/svg%3E")}
@@ -1556,7 +1603,7 @@ function renderSpace(){
   const el=$("#space");if(!el)return;el.hidden=!spaceOn();if(!spaceOn())return;
   const alert=v=>S.all.filter(j=>(v==="mine")===isMine(j)&&((lateState(j)&&lateState(j)!=="ok")||chatNew(j))).length;
   const b=(v,t)=>{const n=SPACE===v?0:alert(v);return `<button role="tab" aria-selected="${SPACE===v}" class="${SPACE===v?"on":""}" data-space="${v}">${t}${n?`<span class="n" title="Có ${n} job cần xem">${n}</span>`:""}</button>`};
-  el.innerHTML=b("team",ic("team")+"Sổ chung")+b("mine",ic("lock")+"Việc riêng");
+  el.innerHTML=b("team",ic("team")+"Sổ chung")+b("mine",ic("lock")+"Việc riêng");iosInd(el);
 }
 const dirty=new Set(),timers={},chains={};
 
@@ -1909,8 +1956,22 @@ document.addEventListener("click",e=>{
 document.addEventListener("keydown",e=>{if(e.key==="Escape"){if(kmenu){closeKmenu();return}if(S.view==="board"&&S.sel&&!document.querySelector(".modal:not([hidden])")){S.sel=null;renderAll(true)}}});
 addEventListener("resize",closeKmenu);
 document.addEventListener("scroll",closeKmenu,true);
+/* chuyển động kiểu iOS: viên trượt của công tắc phân đoạn, đổi tab trượt ngang, mở job trượt vào */
+const iosOn=()=>document.documentElement.classList.contains("ios");
+const iosCalm=()=>matchMedia("(prefers-reduced-motion: reduce)").matches;
+function iosInd(box){if(!box)return;let ind=box.querySelector(":scope>.ios-ind");const on=box.querySelector(":scope>button.on");
+  if(!iosOn()||!on||!on.offsetWidth){if(ind)ind.remove();return}
+  if(!ind){ind=document.createElement("span");ind.className="ios-ind";box.prepend(ind);if(box._ix){ind.style.cssText=box._ix;ind.getBoundingClientRect()}}
+  const css=`left:${on.offsetLeft}px;top:${on.offsetTop}px;width:${on.offsetWidth}px;height:${on.offsetHeight}px`;ind.style.cssText=css;box._ix=css}
+let iosRO;
+function iosIndAll(){try{const tb=document.querySelector(".bar .tabs"),sp=$("#space");iosInd(tb);iosInd(sp);
+  if(!iosRO&&iosOn()&&window.ResizeObserver){iosRO=new ResizeObserver(()=>{iosInd(tb);iosInd(sp)});tb.querySelectorAll(":scope>button").forEach(x=>iosRO.observe(x));iosRO.observe(tb);if(sp)iosRO.observe(sp)}}catch(e){}}
+addEventListener("resize",()=>iosIndAll());
+function iosGo(fn,dir){if(!iosOn()||iosCalm()||!document.startViewTransition){fn();return}
+  document.documentElement.dataset.vt=dir||"";const t=document.startViewTransition(fn);t.finished.finally(()=>{delete document.documentElement.dataset.vt})}
+function iosTabDir(v){const bs=[...document.querySelectorAll(".bar .tabs button[data-view]")].filter(b=>b.offsetWidth),i=bs.findIndex(b=>b.dataset.view===v),k=bs.findIndex(b=>b.dataset.view===S.view);return i>k?"r":"l"}
 function renderMain(){
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));iosIndAll();
   document.body.classList.toggle("view-board",S.view==="board");document.body.classList.toggle("view-report",S.view==="report"||S.view==="today"||S.view==="mail");if(S.view!=="board")closeKmenu();
   $("#fStatus").hidden=S.view!=="list";
   renderProfile();
@@ -1919,7 +1980,7 @@ function renderMain(){
   if(!S.view0){S.view0=true;if(teamOn())S.view="team"} // mở sổ: vào Chat chung
   if(S.view==="team"&&!teamOn())S.view="list";
   teamWatch();peopleWatch();teamBadge();
-  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));$("#fStatus").hidden=S.view!=="list";
+  document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));$("#fStatus").hidden=S.view!=="list";iosIndAll();
   document.body.classList.toggle("view-team",S.view==="team");tmoreSync();
   {const rb=document.querySelector('.tabs [data-view="report"]');if(rb)rb.hidden=!boss()}
   if(S.view==="report"&&!boss())S.view="list";
@@ -2037,6 +2098,7 @@ function histText(h){
 function renderDetail(force){
   const el=$("#detail"),j=cur();
   if(!force&&j&&el.dataset.id===j.id&&el.contains(document.activeElement))return;
+  if(j&&el.dataset.id!==j.id&&iosOn()&&!iosCalm()){el.classList.remove("ios-in");void el.offsetWidth;el.classList.add("ios-in");clearTimeout(el._iosT);el._iosT=setTimeout(()=>el.classList.remove("ios-in"),600)}
   el.dataset.id=j?j.id:"";
   document.body.classList.toggle("has-detail",!!j);
   if(!j){el.innerHTML=`<div class="empty-detail">Chọn một job để xem thông tin, trao đổi và báo giá.</div>`;return}
@@ -2167,7 +2229,7 @@ setInterval(()=>{if(S.loaded){renderAll(false)}},5*60*1000); // cập nhật đ�
     else if(!top&&b.parentNode!==m)m.insertBefore(b,pf||m.firstChild)};
   const set=()=>{place();const t=document.querySelector(".top"),b=document.querySelector(".bar"),r=document.documentElement.style;
     if(t)r.setProperty("--topH",t.offsetHeight+"px");if(b&&b.offsetHeight)r.setProperty("--barH",b.offsetHeight+"px")};
-  addEventListener("resize",set);addEventListener("load",set);setTimeout(set,0);
+  addEventListener("resize",set);addEventListener("load",()=>{set();try{iosIndAll()}catch(e){}});setTimeout(set,0);try{document.fonts&&document.fonts.ready.then(()=>{try{iosIndAll()}catch(e){}})}catch(e){}
   addEventListener("scroll",()=>{const b=document.querySelector(".bar");if(!b)return;const top=parseFloat(getComputedStyle(b).top)||0;b.classList.toggle("stuck",getComputedStyle(b).position==="sticky"&&b.getBoundingClientRect().top<=top+1&&scrollY>0)},{passive:true})})();
 function renderAll(forceDetail){renderLateBar();lateNotify();chatNotify();renderSide();renderMain();renderDetail(forceDetail);nbellPaint();try{todayBadge()}catch(e){}try{dkSbPaint()}catch(e){}}
 /* thanh trạng thái (màn rộng): kết nối, sổ đang xem, số job đang mở / quá hạn, người dùng, phiên bản */
@@ -2226,7 +2288,7 @@ $("#space").addEventListener("click",e=>{const b=e.target.closest("[data-space]"
 $("#latebar").addEventListener("click",e=>{const x=e.target.closest("[data-xl]");if(x){x.dataset.xl==="in"?xlImport():xlExport();return}const b=e.target.closest("[data-late]");if(!b)return;S.fLate=b.dataset.late==="on";if(S.fLate&&S.view!=="board")S.view="list";renderAll(false)});
 $("#q").addEventListener("input",e=>{S.q=e.target.value;renderMain()});
 $("#fStatus").addEventListener("change",e=>{S.fStatus=e.target.value;renderMain()});
-document.querySelectorAll(".tabs button[data-view]").forEach(b=>b.addEventListener("click",()=>{tmenuClose();S.view=b.dataset.view;renderMain();try{b.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}}));
+document.querySelectorAll(".tabs button[data-view]").forEach(b=>b.addEventListener("click",()=>{tmenuClose();const v=b.dataset.view;if(v===S.view){renderMain();return}iosGo(()=>{S.view=v;renderMain()},iosTabDir(v));try{b.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}}));
 /* Điện thoại: thanh tab ở đáy; Danh sách / Báo cáo nằm trong nút Thêm */
 function tmenuClose(){document.getElementById("tmenu")?.remove();document.querySelector(".tmore")?.setAttribute("aria-expanded","false")}
 function tmoreSync(){const m=document.querySelector(".tmore");if(!m)return;const on=S.view==="list"||S.view==="report";m.classList.toggle("on",on);
@@ -3716,7 +3778,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26g";
+const APP_VER="2026-11-26h";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
