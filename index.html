@@ -874,6 +874,42 @@ html.ios .arch-m{border:0;box-shadow:0 1px 2px rgba(0,0,0,.04)}
 .kmenu button i .svi{width:16px;height:16px;margin:0;vertical-align:-3px}
 .odbox .svi,.latebar .svi,.dltag .svi,.odmiss .svi,.note-b .svi{color:currentColor}
 .td-i small .svi,.asgchip .svi{width:13px;height:13px;margin-right:3px}
+/* ===== Thông báo kiểu iPhone ===== */
+/* huy hiệu: đỏ #FF3B30, chữ trắng đậm, viên tròn, viền trắng tách khỏi nền; nảy khi số tăng */
+.cbadge,.tbadge,.nbell .nb,.space button .n{background:#FF3B30!important;color:#fff!important;font-weight:600!important;font-size:12px!important;line-height:20px!important;height:20px!important;min-width:20px!important;padding:0 6px!important;border-radius:10px!important;border:0!important;text-align:center;font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.kc .cbadge.corner{position:absolute;top:-7px;right:-7px;z-index:2;box-shadow:0 0 0 2px var(--surface),0 2px 5px rgba(255,59,48,.35)}
+.kb .col-b{padding-top:9px;padding-right:9px}
+.kc:has(>.cbadge.corner) .mn{margin-right:8px}
+.nbell .nb,.tabs .cbadge,.tabs .tbadge{box-shadow:0 0 0 2px var(--surface)}
+.cbadge.pop,.tbadge.pop{animation:ibadge .55s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes ibadge{0%{transform:scale(.2);opacity:0}60%{transform:scale(1.2);opacity:1}100%{transform:scale(1)}}
+/* banner: kính mờ bo 22px, icon app bên trái, tên người gửi đậm + "bây giờ", nội dung 3 dòng */
+html.ios #chatPops{top:calc(10px + env(safe-area-inset-top,0px));right:12px;width:min(380px,calc(100vw - 24px));gap:8px}
+@media (max-width:780px){html.ios #chatPops{left:8px;right:8px;width:auto}}
+html.ios #chatPops .cpop{border:0!important;border-radius:22px!important;padding:11px 14px 12px!important;background:rgba(246,246,248,.78)!important;-webkit-backdrop-filter:saturate(180%) blur(26px);backdrop-filter:saturate(180%) blur(26px);
+  box-shadow:0 12px 40px rgba(0,0,0,.18),0 1px 3px rgba(0,0,0,.08)!important;animation:ibanner .65s cubic-bezier(.34,1.3,.64,1) both;transition:transform .35s cubic-bezier(.32,.72,0,1),opacity .3s;touch-action:pan-x;user-select:none}
+@media (prefers-color-scheme: dark){html.ios:not([data-theme="light"]) #chatPops .cpop{background:rgba(44,44,46,.82)!important}}
+html.ios[data-theme="dark"] #chatPops .cpop{background:rgba(44,44,46,.82)!important}
+html.ios #chatPops .cpop+.cpop{transform:scale(.97);opacity:.92}
+html.ios #chatPops .cpop.out{animation:ibanner-out .34s cubic-bezier(.4,0,.8,.4) both}
+html.ios #chatPops .cpop-x{top:8px;right:10px;width:22px;height:22px;border-radius:50%;background:rgba(118,118,128,.18)!important;font-size:10px;opacity:0;transition:opacity .2s}
+html.ios #chatPops .cpop:hover .cpop-x{opacity:1}
+.ib{display:flex;gap:11px;align-items:flex-start}
+.ib-ic{width:38px;height:38px;border-radius:9px;flex:none;box-shadow:0 0 0 .5px rgba(0,0,0,.08)}
+.ib-c{min-width:0;flex:1;display:flex;flex-direction:column;gap:1px}
+.ib-t{display:flex;align-items:baseline;gap:8px}.ib-t b{font-size:14.5px;font-weight:600;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;letter-spacing:-.01em}
+.ib-t time{font-size:12.5px;color:var(--muted);flex:none;margin-right:18px}
+.ib-s{font-size:13px;font-weight:500;color:var(--ink);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ib-m{font-size:13.5px;line-height:1.32;color:var(--ink);opacity:.92;overflow:hidden;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;white-space:pre-wrap}
+@keyframes ibanner{from{transform:translateY(calc(-100% - 30px)) scale(.96);opacity:0}to{transform:none;opacity:1}}
+@keyframes ibanner-out{to{transform:translateY(calc(-100% - 30px)) scale(.96);opacity:0}}
+@media (prefers-reduced-motion:reduce){.cbadge.pop,html.ios #chatPops .cpop{animation:none}}
+/* huy hiệu trên thanh tab (máy tính): ở góc trên phải icon như tab bar iPhone */
+@media (min-width:781px){
+  .bar .tabs{overflow:visible!important}
+  .bar .tabs>button{position:relative}
+  .bar .tabs>button .cbadge,.bar .tabs>button .tbadge{position:absolute!important;top:-7px;left:17px;margin:0!important;height:18px!important;min-width:18px!important;line-height:18px!important;font-size:11px!important;padding:0 5px!important;box-shadow:0 0 0 2px var(--bg)!important;z-index:2;pointer-events:none}
+}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1935,12 +1971,12 @@ function timeTag(j){
 function kanbanCard(j){
   const done=(j.tasks||[]).filter(t=>t.done).length,all=(j.tasks||[]).length,who=groupKey(j),svc=svcOf(j);
   const desc=j.pol||j.pod?`${j.pol||"?"} → ${j.pod||"?"}`:""; // chỉ giữ tuyến: thẻ gọn, xem được nhiều job
-  const tags=[cbadge(j),odState(j)==="none"?'<span class="odm">Thiếu lý do</span>':"",`<span class="sv sv-${svc==="HQ"?"hq":svc==="VC"?"vc":"both"}">${svcTag(j)}</span>`,j.priority==="Gấp"?'<span class="u">GẤP</span>':"",
+  const tags=[odState(j)==="none"?'<span class="odm">Thiếu lý do</span>':"",`<span class="sv sv-${svc==="HQ"?"hq":svc==="VC"?"vc":"both"}">${svcTag(j)}</span>`,j.priority==="Gấp"?'<span class="u">GẤP</span>':"",
     j.bl?`<span title="Số B/L">${esc(j.bl)}</span>`:"",hasVC(j)&&isTruck(j)?'<span>Xe tải</span>':"",hasVC(j)&&isTruck(j)&&j.cbm?`<span title="Số khối">${esc(j.cbm)} m³</span>`:"",hasVC(j)&&!isTruck(j)&&j.yard?`<span title="Bãi hạ cont">Hạ: ${esc(j.yard)}</span>`:"",j.cont?`<span title="${isTruck(j)?"Xe / tải trọng":"Số cont"}">${esc(j.cont)}</span>`:"",
     j.lane?`<span class="ln ln-${j.lane==="Xanh"?"g":j.lane==="Vàng"?"y":"r"}">Luồng ${esc(j.lane)}</span>`:"",
     depositPending(j)?'<span class="w">Chưa hoàn cược</span>':"",j.coNeed==="Có"&&j.coStatus!=="Đã cấp"&&isOpen(j.status)?`<span class="w" title="C/O form ${esc(j.coForm||"?")}">C/O ${esc(j.coStatus||"chưa xin")}</span>`:"",
     num(j.debitAmount)&&stIdx(j.status)>=stIdx("Bảng kê / debit")?`<span class="mono">${fmt(j.debitAmount,j.debitCurrency)} ${esc(j.debitCurrency||"VND")}</span>`:"",j.example?'<span>VÍ DỤ</span>':"",`<span class="cd" title="${esc(cDateFull(j))}">${cDate(j)}</span>`].join("");
-  return `<div class="kc${S.sel===j.id?" on":""}${S.bulkOn&&S.bulk.has(j.id)?" bsel":""}${isLate(j)?" over":""}${j.priority==="Gấp"?" urg":""}" draggable="true" data-drag="${j.id}" data-open="${j.id}">
+  return `<div class="kc${S.sel===j.id?" on":""}${S.bulkOn&&S.bulk.has(j.id)?" bsel":""}${isLate(j)?" over":""}${j.priority==="Gấp"?" urg":""}" draggable="true" data-drag="${j.id}" data-open="${j.id}">${cbadge(j,"corner")}
     <button class="mn" data-kmenu="${j.id}" aria-label="Thao tác với job ${esc(j.code)}">⋯</button>
     <span class="t" title="${esc(j.title||"")}">${esc(j.title||"(chưa có tiêu đề)")}</span>
     ${desc?`<span class="ds">${esc(desc)}</span>`:""}
@@ -2119,7 +2155,7 @@ function iosIndAll(){try{const tb=document.querySelector(".bar .tabs"),sp=$("#sp
   if(!iosRO&&iosOn()&&window.ResizeObserver){iosRO=new ResizeObserver(()=>{iosInd(tb);iosInd(sp)});tb.querySelectorAll(":scope>button").forEach(x=>iosRO.observe(x));iosRO.observe(tb);if(sp)iosRO.observe(sp)}}catch(e){}}
 addEventListener("resize",()=>iosIndAll());
 function iosGo(fn,dir){if(!iosOn()||iosCalm()||!document.startViewTransition){fn();return}
-  document.documentElement.dataset.vt=dir||"";const t=document.startViewTransition(fn);t.finished.finally(()=>{delete document.documentElement.dataset.vt})}
+  if(document.hidden){fn();return}document.documentElement.dataset.vt=dir||"";try{const t=document.startViewTransition(fn);t.ready.catch(()=>{});t.updateCallbackDone.catch(()=>{});t.finished.catch(()=>{}).finally(()=>{delete document.documentElement.dataset.vt})}catch(e){delete document.documentElement.dataset.vt;fn()}}
 function iosTabDir(v){const bs=[...document.querySelectorAll(".bar .tabs button[data-view]")].filter(b=>b.offsetWidth),i=bs.findIndex(b=>b.dataset.view===v),k=bs.findIndex(b=>b.dataset.view===S.view);return i>k?"r":"l"}
 function renderMain(){
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));iosIndAll();
@@ -3077,14 +3113,24 @@ function chatNotify(){
   if(document.hidden&&!PUSH_ON&&window.Notification&&Notification.permission==="granted")
     fresh.slice(0,3).forEach(j=>{try{const n=new Notification(`💬 ${j.chatByName||j.chatBy} · ${j.code}`,{body:(j.title?String(j.title).slice(0,60)+"\n":"")+(j.chatLast||""),tag:"job-"+j.id,icon:"icon-192.png"});n.onclick=()=>{window.focus();openJobAny(j.id);n.close()}}catch(e){}});
 }
+/* banner thông báo kiểu iPhone: rơi từ trên xuống, xếp chồng, vuốt lên (hoặc ✕) để tắt, tự kéo lên sau 15 giây */
+function popOut(c){if(!c||c._out)return;c._out=1;if(!iosOn()||iosCalm()){c.remove();return}c.classList.add("out");setTimeout(()=>c.remove(),340)}
+function popBanner(c,{title,sub,msg}){
+  c.innerHTML=`<button class="cpop-x" aria-label="Đóng">✕</button><div class="ib"><img class="ib-ic" src="icon-192.png" alt=""><div class="ib-c"><div class="ib-t"><b>${esc(title)}</b><time>bây giờ</time></div>${sub?`<div class="ib-s">${esc(sub)}</div>`:""}<div class="ib-m">${emoIc(esc(msg||""))}</div></div></div>`;
+  let y0=null,dy=0;
+  c.addEventListener("pointerdown",e=>{if(e.target.closest(".cpop-x"))return;y0=e.clientY;dy=0;c.style.transition="none"});
+  c.addEventListener("pointermove",e=>{if(y0==null)return;dy=e.clientY-y0;if(Math.abs(dy)>4){c.style.transform=`translateY(${dy<0?dy:dy*.25}px)`;c.style.opacity=dy<0?String(Math.max(0,1+dy/120)):""}});
+  const up=()=>{if(y0==null)return;y0=null;c.style.transition="";if(dy<-40){c._swiped=1;c.style.transform="";c.style.opacity="";popOut(c)}else{c.style.transform="";c.style.opacity=""}};
+  c.addEventListener("pointerup",up);c.addEventListener("pointercancel",up);
+  c.addEventListener("click",e=>{if(c._swiped||Math.abs(dy)>6){e.stopImmediatePropagation();e.preventDefault()}},true)}
 function chatPop(j){
   let box=$("#chatPops");if(!box){box=document.createElement("div");box.id="chatPops";document.body.appendChild(box)}
   box.querySelector(`[data-pop="${j.id}"]`)?.remove();
   const c=document.createElement("div");c.className="cpop";c.dataset.pop=j.id;c.setAttribute("role","status");
-  c.innerHTML=`<button class="cpop-x" aria-label="Đóng">✕</button><b>${svi("chat")}${esc(j.chatByName||j.chatBy)} · <span class="mono">${esc(j.code)}</span></b><span class="t">${esc((j.title||"").slice(0,50))}</span><span class="m">${esc(j.chatLast||"")}</span>`;
-  c.onclick=e=>{c.remove();if(!e.target.closest(".cpop-x"))openJobAny(j.id)};
+  popBanner(c,{title:j.chatByName||j.chatBy||"Tin nhắn",sub:`${j.code}${j.title?" · "+String(j.title).slice(0,50):""}`,msg:j.chatLast||""});
+  c.onclick=e=>{popOut(c);if(!e.target.closest(".cpop-x"))openJobAny(j.id)};
   box.prepend(c);while(box.children.length>3)box.lastChild.remove();
-  setTimeout(()=>c.remove(),15000);
+  setTimeout(()=>popOut(c),15000);
 }
 async function openJobAny(id){
   const j=S.all.find(x=>x.id===id);if(!j)return;
@@ -3767,9 +3813,9 @@ function teamPop(m,n){
   let box=$("#chatPops");if(!box){box=document.createElement("div");box.id="chatPops";document.body.appendChild(box)}
   box.querySelector('[data-pop="__team"]')?.remove();
   const c=document.createElement("div");c.className="cpop team";c.dataset.pop="__team";
-  c.innerHTML=`<button class="cpop-x" aria-label="Đóng">✕</button><b>${svi("chat")}${esc(fake.chatByName)} · Chat chung</b>${fake.title?`<span class="t">${esc(fake.title)}</span>`:""}<span class="m">${esc(m.text||"")}</span>`;
-  c.onclick=e=>{c.remove();if(!e.target.closest(".cpop-x")){if(SPACE==="mine")setSpace("team").then(()=>{S.view="team";renderMain()});else{S.view="team";renderMain()}}};
-  box.prepend(c);setTimeout(()=>c.remove(),15000);
+  popBanner(c,{title:fake.chatByName||"Chat chung",sub:"Chat chung"+(fake.title?" · "+fake.title:""),msg:m.text||""});
+  c.onclick=e=>{popOut(c);if(!e.target.closest(".cpop-x")){if(SPACE==="mine")setSpace("team").then(()=>{S.view="team";renderMain()});else{S.view="team";renderMain()}}};
+  box.prepend(c);setTimeout(()=>popOut(c),15000);
   if(document.hidden&&!PUSH_ON&&window.Notification&&Notification.permission==="granted")try{const no=new Notification(`💬 ${fake.chatByName} · Chat chung`,{body:m.text||"",tag:"teamchat",icon:"icon-192.png"});no.onclick=()=>{window.focus();S.view="team";renderMain();no.close()}}catch(e){}
 }
 function teamBadge(){try{nbellPaint()}catch(e){}const b=$("#teamBadge"),t=document.querySelector('.tabs [data-view="team"]');if(t)t.hidden=!teamOn();if(!b)return;const n=teamUnread();b.hidden=!n;b.textContent=n>99?"99+":n}
@@ -3900,7 +3946,9 @@ const SEEN_N_LS="sojob.chatSeenN";
 let seenN=(()=>{try{return JSON.parse(localStorage.getItem(SEEN_N_LS)||"{}")}catch(e){return {}}})();
 const seenNSave=()=>{try{localStorage.setItem(SEEN_N_LS,JSON.stringify(seenN))}catch(e){}};
 function chatUnread(j){if(!team()||!chatNew(j))return 0;const n=j.chatN||0,s=seenN[j.id];return s==null||!n?1:Math.max(1,n-s)}
-const cbadge=j=>{const n=chatUnread(j);return n?`<span class="cbadge" title="${esc((j.chatByName||"")+": "+(j.chatLast||""))}" aria-label="${n} tin nhắn mới">${n>99?"99+":n}</span>`:""};
+const BADGE_N=new Map();
+const cbadge=(j,cls)=>{const n=chatUnread(j),k=j.id+(cls||""),o=BADGE_N.get(k);BADGE_N.set(k,n);if(!n)return "";
+  return `<span class="cbadge${cls?" "+cls:""}${o!=null&&n>o?" pop":""}" title="${esc((j.chatByName||"")+": "+(j.chatLast||""))}" aria-label="${n} tin nhắn mới">${n>99?"99+":n}</span>`};
 
 /* ---------- Chuông thông báo trên thanh trên cùng ---------- */
 function notifItems(){
@@ -3970,7 +4018,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26r";
+const APP_VER="2026-11-26s";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
