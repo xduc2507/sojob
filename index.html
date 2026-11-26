@@ -1463,7 +1463,7 @@ html.ios .fa-upload{--ic:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org
       <div class="tabs" role="tablist">
         <button data-view="today"><i class="fa fa-sun-o ic-fa" aria-hidden="true"></i>Hôm nay<span class="cbadge" id="todayN" hidden></span></button><button data-view="team" hidden><i class="fa fa-comments ic-fa" aria-hidden="true"></i>Chat chung<span class="tbadge" id="teamBadge" hidden></span></button>
         <button data-view="board"><i class="fa fa-columns ic-fa" aria-hidden="true"></i>Quy trình</button>
-        <button data-view="list" class="on"><i class="fa fa-list ic-fa" aria-hidden="true"></i>Danh sách</button><button data-view="mail" hidden><i class="fa fa-envelope ic-fa" aria-hidden="true"></i>Email<span class="tbadge" id="mailBadge" hidden></span></button><button data-view="report" hidden><i class="fa fa-bar-chart ic-fa" aria-hidden="true"></i>Báo cáo</button><button type="button" class="tmore" data-more aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h ic-fa" aria-hidden="true"></i>Thêm</button>
+        <button data-view="list" hidden><i class="fa fa-list ic-fa" aria-hidden="true"></i>Danh sách</button><button data-view="mail" hidden><i class="fa fa-envelope ic-fa" aria-hidden="true"></i>Email<span class="tbadge" id="mailBadge" hidden></span></button><button data-view="report" hidden><i class="fa fa-bar-chart ic-fa" aria-hidden="true"></i>Báo cáo</button><button type="button" class="tmore" data-more aria-haspopup="true" aria-expanded="false"><i class="fa fa-ellipsis-h ic-fa" aria-hidden="true"></i>Thêm</button>
       </div>
       <span class="sp"></span>
       <button type="button" id="fMine" class="sm fmine" aria-pressed="false" title="Chỉ hiện job mình phụ trách" hidden>👤 Việc của tôi</button><select id="fWho" class="fwho" aria-label="Lọc theo người phụ trách" hidden></select>
@@ -1568,7 +1568,7 @@ function dlPill(s,open=true){const k=dayDiff(s);if(k===null)return"";let cls="",
 const groupKey=j=>(j.fwd||"").trim()||(j.company||"").trim()||NOGROUP;
 const stPill=s=>`<span class="pill st${stIdx(s)}">${esc(s)}</span>`;
 
-const S={all:[],pMine:{},jobs:[],sel:null,group:"__all",svc:"",view:"list",q:"",fStatus:"open",loaded:false,tpl:JSON.parse(JSON.stringify(DEFAULT_TPL)),stall:{...DEFAULT_STALL},partners:{},todos:[]};
+const S={all:[],pMine:{},jobs:[],sel:null,group:"__all",svc:"",view:"today",q:"",fStatus:"open",loaded:false,tpl:JSON.parse(JSON.stringify(DEFAULT_TPL)),stall:{...DEFAULT_STALL},partners:{},todos:[]};
 const stageDays=j=>j.stageAt?Math.floor((Date.now()-j.stageAt)/864e5):null;
 const isOverdue=j=>isOpen(j.status)&&(dayDiff(j.deadline)??0)<0;
 const isStalled=j=>{if(!isOpen(j.status))return false;if(STRICT.includes(j.status))return isStrictLate(j);const n=num(S.stall[j.status]),d=stageDays(j);return n>0&&d!==null&&d>=n};
@@ -2006,7 +2006,7 @@ function genie(src,target,dir,done){
   if(!t||!t.width||t.bottom<0||t.top>innerHeight||t.right<0||t.left>innerWidth)t={left:innerWidth/2-28,top:innerHeight-10,width:56,height:10};
   const tc={x:t.left+t.width/2,y:t.top+t.height/2},rc={x:r.left+r.width/2,y:r.top+r.height/2};
   const ax=Math.abs(tc.x-rc.x)>Math.abs(tc.y-rc.y)?"x":"y"; // đích nằm ngang → lát dọc; đích nằm dưới/trên → lát ngang
-  const N=28,cs=getComputedStyle(src),st=src.scrollTop||0;
+  const N=Math.max(24,Math.min(44,Math.round((ax==="x"?r.width:r.height)/18))),cs=getComputedStyle(src),st=src.scrollTop||0;
   const base=src.cloneNode(true);base.removeAttribute("id");base.querySelectorAll("[id]").forEach(e=>e.removeAttribute("id"));base.classList.remove("ios-in");
   base.style.cssText=`position:absolute;left:0;top:${-st}px;width:${r.width}px;min-height:${r.height+st}px;height:auto;margin:0;max-height:none;overflow:visible;transform:none;animation:none;transition:none;box-shadow:none;border-radius:0;visibility:visible;background:${cs.backgroundColor==="rgba(0, 0, 0, 0)"?"var(--surface)":cs.backgroundColor}`;
   const box=document.createElement("div");box.className="genie";box.setAttribute("aria-hidden","true");
@@ -2017,27 +2017,33 @@ function genie(src,target,dir,done){
   const rS=X?r.left:r.top,rLen=X?r.width:r.height,rC=X?r.top:r.left,rCs=X?r.height:r.width;
   const tS=X?t.left:t.top,tLen=Math.max(8,X?t.width:t.height),tCs=Math.max(8,X?t.height:t.width),tCc=(X?t.top+t.height/2:t.left+t.width/2);
   const edge=near?tS+tLen:tS,gap=near?rS-edge:edge-(rS+rLen),Lf=Math.max(120,Math.abs(gap)+rLen*.55);
-  const E=x=>x<.5?4*x*x*x:1-Math.pow(-2*x+2,3)/2,EO=x=>1-Math.pow(1-x,3),SM=x=>x*x*(3-2*x),cl=x=>x<0?0:x>1?1:x,L=(a,b,k)=>a+(b-a)*k;
-  const DUR=dir==="out"?680:600,K=20,anims=[],w0=rLen/N;
+  /* đường cong mềm: uốn bằng cosin, trượt nhanh dần khi bị hút vào (đóng) / chậm dần khi bung ra (mở), 48 khung mỗi lát */
+  const cl=x=>x<0?0:x>1?1:x,L=(a,b,k)=>a+(b-a)*k,COS=x=>(1-Math.cos(Math.PI*x))/2;
+  const EIN=x=>Math.pow(cl(x),2.3); // nhanh dần (bị hút vào), mượt ở đầu
+  const SOFT=x=>{x=cl(x);return x<.5?8*x*x*x*x:1-Math.pow(-2*x+2,4)/2}; // vào/ra rất êm
+  const DUR=dir==="out"?760:660,K=48,anims=[],w0=rLen/N;
   for(let i=0;i<N;i++){
     const s=document.createElement("div"),c=base.cloneNode(true),m0=rS+i*w0;
     let x0,y0,sw,sh;
     if(X){x0=m0;y0=r.top;sw=w0;sh=r.height;c.style.left=`${-i*w0}px`}else{x0=r.left;y0=m0;sw=r.width;sh=w0;c.style.top=`${-st-i*w0}px`}
-    s.style.cssText=`position:absolute;left:${x0}px;top:${y0}px;width:${sw+.8}px;height:${sh+.8}px;overflow:hidden;transform-origin:0 0;will-change:transform,opacity;background:var(--surface)`;
+    s.style.cssText=`position:absolute;left:${x0}px;top:${y0}px;width:${sw+(X?1.2:0)}px;height:${sh+(X?0:1.2)}px;overflow:hidden;transform-origin:0 0;will-change:transform,opacity;background:var(--surface);backface-visibility:hidden`;
     s.appendChild(c);box.appendChild(s);
     const fr=[];
-    for(let k=0;k<=K;k++){const p=k/K,bend=EO(cl(p/.42)),sl=E(cl((p-.2)/.8));
-      // vị trí trục chính: trượt về đích, bề dài khối co còn bằng đích
+    for(let k=0;k<=K;k++){const p=k/K;
+      const bend=SOFT(p/.55),sl=dir==="out"?EIN(cl((p-.18)/.82)):SOFT(cl((p-.18)/.82));
       const tm=near?edge-tLen+i*tLen/N:edge+i*tLen/N,mm=L(m0,tm,sl),mw=L(w0,tLen/N,sl);
-      const u=near?(mm+mw/2)-edge:edge-(mm+mw/2),g=SM(cl(u/Lf));
-      const fs=L(tCs,rCs,g),fc=L(tCc,rC+rCs/2,g); // phễu tại u
+      const u=near?(mm+mw/2)-edge:edge-(mm+mw/2),g=COS(cl(u/Lf));
+      const fs=L(tCs,rCs,g),fc=L(tCc,rC+rCs/2,g);
       const cs2=L(rCs,fs,bend),cc=L(rC+rCs/2,fc,bend);
-      const op=p>.86?1-(p-.86)/.14:1;
+      const op=p>.9?1-COS((p-.9)/.1):1;
       let tx,ty,sx,sy;
       if(X){tx=mm-x0;ty=cc-cs2/2-y0;sx=mw/sw;sy=cs2/sh}else{ty=mm-y0;tx=cc-cs2/2-x0;sy=mw/sh;sx=cs2/sw}
-      fr.push({transform:`translate(${tx.toFixed(2)}px,${ty.toFixed(2)}px) scale(${sx.toFixed(4)},${sy.toFixed(4)})`,opacity:op.toFixed(3)})}
+      fr.push({transform:`translate3d(${tx.toFixed(2)}px,${ty.toFixed(2)}px,0) scale(${sx.toFixed(4)},${sy.toFixed(4)})`,opacity:op.toFixed(3)})}
     if(dir!=="out")fr.reverse();
     anims.push(s.animate(fr,{duration:DUR,easing:"linear",fill:"forwards"}))}
+  /* bóng mờ dưới phễu, nhạt dần theo tiến trình */
+  const sh0=document.createElement("div");sh0.style.cssText=`position:absolute;left:${r.left}px;top:${r.top}px;width:${r.width}px;height:${r.height}px;border-radius:14px;box-shadow:0 18px 50px rgba(0,0,0,.18)`;
+  box.prepend(sh0);anims.push(sh0.animate(dir==="out"?[{opacity:1},{opacity:0,offset:.45},{opacity:0}]:[{opacity:0},{opacity:0,offset:.55},{opacity:1}],{duration:DUR,fill:"forwards"}));
   document.body.appendChild(box);
   Promise.all(anims.map(a=>a.finished)).catch(()=>{}).then(()=>{box.remove();done&&done()})}
 const genieCard=id=>[...document.querySelectorAll(`[data-open="${CSS.escape(id)}"]`)].find(e=>e.offsetParent)||null;
@@ -2102,15 +2108,15 @@ function renderMain(){
   const el=$("#content");
   if(!S.loaded)return;
   if(!S.view0){S.view0=true;if(teamOn())S.view="team"} // mở sổ: vào Chat chung
-  if(S.view==="team"&&!teamOn())S.view="list";
+  if(S.view==="team"&&!teamOn())S.view="today";
   teamWatch();peopleWatch();teamBadge();
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));$("#fStatus").hidden=S.view!=="list";iosIndAll();
   document.body.classList.toggle("view-team",S.view==="team");tmoreSync();
   {const rb=document.querySelector('.tabs [data-view="report"]');if(rb)rb.hidden=!boss()}
-  if(S.view==="report"&&!boss())S.view="list";
+  if(S.view==="report"&&!boss())S.view="today";
   fMinePaint();try{bulkBar()}catch(e){}
   {const mb=document.querySelector('.tabs [data-view="mail"]');if(mb)mb.hidden=!mailOn()}
-  if(S.view==="mail"&&!mailOn())S.view="list";
+  if(S.view==="mail"&&!mailOn())S.view="today";
   if(S.view==="team"){renderTeam(el);return}
   mjWatch();mlWatch();
   if(S.view==="mail"){renderMail(el);mjPaint();return}
@@ -2234,7 +2240,7 @@ function renderDetail(force){
   const tpl=S.tpl[j.type]||[],have=new Set(tasks.map(t=>normName(t.text))),missing=tpl.filter(t=>!have.has(normName(t))).length;
   el.innerHTML=`<div class="d">
   <div class="d-head">
-    <div class="l1"><button class="back" data-act="close">← Danh sách</button><span class="acts">${isOpen(j.status)?`<button class="primary go" data-act="stpop" aria-haspopup="true" aria-expanded="false" aria-controls="stpop">Chuyển tiếp ▾</button>`:`<button class="sm" data-st="${esc(STAGES[0])}">Mở lại</button>`}</span></div>
+    <div class="l1"><button class="back" data-act="close">← ${S.view==="team"?"Chat chung":S.view==="today"?"Hôm nay":"Quy trình"}</button><span class="acts">${isOpen(j.status)?`<button class="primary go" data-act="stpop" aria-haspopup="true" aria-expanded="false" aria-controls="stpop">Chuyển tiếp ▾</button>`:`<button class="sm" data-st="${esc(STAGES[0])}">Mở lại</button>`}</span></div>
     <div class="l2"><span class="mono jcode">${esc(j.code)}${j.example?' <span class="ex">VÍ DỤ</span>':""}</span><span class="stnow${j.status===FAIL?" bad":""}" title="Bước hiện tại">${esc(SHORT[j.status]||j.status)}</span>${asgSel(j)}<button class="ghost sm" data-act="remind" title="Hẹn giờ nhắc lô này lên điện thoại">⏰ Nhắc tôi</button><button class="ghost sm urg${j.priority==="Gấp"?" on":""}" data-act="urgent" title="Bật / tắt job gấp">⚡ Gấp</button>${spaceOn()&&isMine(j)?`<button class="ghost sm shr" data-act="share" title="Đưa job này sang Sổ chung: nhân viên thấy và làm cùng">→ Chuyển sang Sổ chung</button>`:""}</div>
     ${remList(j)}
     <div id="stpop" class="stpop" hidden role="dialog" aria-label="Chọn bước"><div class="stp-h">${nextStage(j)&&isOpen(j.status)?`<button class="primary go stp-next" data-st="${esc(nextStage(j))}">→ Sang bước tiếp: ${esc(nextStage(j))}</button>`:""}<span class="muted">hoặc chọn bước khác</span></div><div id="stagebar">${stagesHtml(j)}</div></div>
@@ -2411,8 +2417,10 @@ document.addEventListener("click",e=>{
 setInterval(()=>{if(mineOn()&&!mineOpen()){SPACE="team";try{localStorage.setItem(SPACE_LS,"team")}catch(e){}applySpace();renderAll(true);toast("Đã tự khoá Việc riêng sau 10 phút không dùng.")}},30000);
 document.addEventListener("visibilitychange",()=>{if(document.hidden||!mineOn()||mineOpen())return;SPACE="team";applySpace();renderAll(true)});
 $("#space").addEventListener("click",e=>{const b=e.target.closest("[data-space]");if(b&&b.dataset.space!==SPACE)setSpace(b.dataset.space)});
-$("#latebar").addEventListener("click",e=>{const x=e.target.closest("[data-xl]");if(x){x.dataset.xl==="in"?xlImport():xlExport();return}const b=e.target.closest("[data-late]");if(!b)return;S.fLate=b.dataset.late==="on";if(S.fLate&&S.view!=="board")S.view="list";renderAll(false)});
-$("#q").addEventListener("input",e=>{S.q=e.target.value;renderMain()});
+$("#latebar").addEventListener("click",e=>{const x=e.target.closest("[data-xl]");if(x){x.dataset.xl==="in"?xlImport():xlExport();return}const b=e.target.closest("[data-late]");if(!b)return;S.fLate=b.dataset.late==="on";if(S.fLate&&S.view!=="board")S.view="board";renderAll(false)});
+$("#q").addEventListener("input",e=>{S.q=e.target.value;
+  if(S.q&&S.view!=="board"&&S.view!=="list"){S.qBack=S.view;S.view="board"}else if(!S.q&&S.qBack){S.view=S.qBack;S.qBack=null}
+  renderMain()});
 $("#fStatus").addEventListener("change",e=>{S.fStatus=e.target.value;renderMain()});
 document.querySelectorAll(".tabs button[data-view]").forEach(b=>b.addEventListener("click",()=>{tmenuClose();const v=b.dataset.view;if(v===S.view){renderMain();return}iosGo(()=>{S.view=v;renderMain()},iosTabDir(v));try{b.scrollIntoView({block:"nearest",inline:"nearest"})}catch(e){}}));
 /* Điện thoại: thanh tab ở đáy; Danh sách / Báo cáo nằm trong nút Thêm */
@@ -3042,8 +3050,8 @@ async function openJobAny(id){
   const inTeam=!(boss()&&isMine(j));
   if(inTeam&&SPACE==="mine")await setSpace("team");
   if(!inTeam&&SPACE!=="mine")await setSpace("mine");
-  if(!["list","board","team"].includes(S.view))S.view="list";
-  if(S.view==="team"&&!inTeam)S.view="list";
+  if(!["list","board","team"].includes(S.view))S.view="board";
+  if(S.view==="team"&&!inTeam)S.view="board";
   openJob(id);
 }
 let urlJobDone=false;
@@ -3272,15 +3280,19 @@ function todayData(){
     {k:"due",ic:"⏰",t:"Đến hạn hôm nay",d:"",js:pool.filter(j=>j.deadline===T)},
     {k:"st",ic:"🐢",t:"Đứng yên quá lâu",d:"Nằm ở một bước quá số ngày cho phép",js:pool.filter(j=>!isOverdue(j)&&isLate(j)),cls:"warn"},
     {k:"urg",ic:"⚡",t:"Lô gấp",d:"",js:pool.filter(j=>j.priority==="Gấp"&&!isOverdue(j)&&j.deadline!==T)},
+    {k:"blk",ic:"⛔",t:"Đang vướng mắc",d:"",js:pool.filter(j=>!!j.blocker),cls:"warn",why:j=>j.blocker},
+    {k:"ret",ic:"↩",t:"Bị trả về",d:"",js:pool.filter(j=>!!j.returnNote),cls:"bad",why:j=>j.returnNote},
+    {k:"dep",ic:"🧾",t:"Chưa hoàn cược cont",d:"",js:pool.filter(depositPending),why:j=>j.deposit||"chưa ghi"},
+    {k:"ks",ic:"📥",t:"Nhập Ksmart",d:"",js:pool.filter(j=>j.status==="Nhập Ksmart"),why:j=>`${num(j.debitAmount)?fmt(j.debitAmount,j.debitCurrency)+" "+(j.debitCurrency||"VND"):"chưa ghi số tiền"}${j.debitDate?" · gửi debit "+dmy(j.debitDate):""}`},
   ];
   if(boss())G.push({k:"pay",ic:"💰",t:"Chờ thu tiền",d:"Đã gửi debit, chưa thu",js:S.jobs.filter(j=>j.debitDate&&!j.paidDate).sort((a,b)=>String(a.debitDate).localeCompare(String(b.debitDate)))});
   const tags=typeof mnUnread==="function"?mnUnread():[];
-  return {all,G,tags,n:G.filter(g=>g.k!=="pay"&&g.k!=="urg").reduce((a,g)=>a+g.js.length,0)+tags.length}}
+  return {all,G,tags,n:G.filter(g=>!["pay","urg","dep","ks"].includes(g.k)).reduce((a,g)=>a+g.js.length,0)+tags.length}}
 function todayBadge(){const b=document.getElementById("todayN");if(!b)return;const n=S.loaded?todayData().n:0;b.hidden=!n;b.textContent=n>99?"99+":n}
 function renderToday(el){
   const D=todayData(),T=TODAY(),dd=new Date().toLocaleDateString("vi-VN",{weekday:"long",day:"2-digit",month:"2-digit"});
-  const line=j=>`<button type="button" class="td-i" data-tdopen="${esc(j.id)}"><span class="mono">${esc(j.code)}</span><b>${esc(j.title||"(chưa có tiêu đề)")}</b><small>${esc(j.status)}${j.deadline?` · hạn ${esc(dmy(j.deadline))}`:""}${j.debitDate&&!j.paidDate?` · debit ${esc(fmt(j.debitAmount,"VND"))} gửi ${esc(dmy(j.debitDate))}`:""}${team()?` · 👤 ${esc(whoName(whoOf(j)))}`:""}</small></button>`;
-  const sec=g=>g.js.length?`<section class="td-g ${g.cls||""}"><h3>${g.ic} ${esc(g.t)} <span class="mono">${g.js.length}</span></h3>${g.d?`<p>${esc(g.d)}</p>`:""}${g.js.slice(0,30).map(line).join("")}</section>`:"";
+  const line=(j,w)=>`<button type="button" class="td-i" data-tdopen="${esc(j.id)}"><span class="mono">${esc(j.code)}</span><b>${esc(j.title||"(chưa có tiêu đề)")}</b><small>${esc(j.status)}${typeof w==="function"&&w(j)?` · ${esc(String(w(j)).slice(0,120))}`:""}${j.deadline?` · hạn ${esc(dmy(j.deadline))}`:""}${j.debitDate&&!j.paidDate?` · debit ${esc(fmt(j.debitAmount,"VND"))} gửi ${esc(dmy(j.debitDate))}`:""}${team()?` · 👤 ${esc(whoName(whoOf(j)))}`:""}</small></button>`;
+  const sec=g=>g.js.length?`<section class="td-g ${g.cls||""}"><h3>${g.ic} ${esc(g.t)} <span class="mono">${g.js.length}</span></h3>${g.d?`<p>${esc(g.d)}</p>`:""}${g.js.slice(0,30).map(j=>line(j,g.why)).join("")}</section>`:"";
   const tg=D.tags.length?`<section class="td-g tag"><h3>🔔 Nhắc đến bạn <span class="mono">${D.tags.length}</span></h3>${D.tags.slice(0,20).map(m=>`<button type="button" class="td-i" ${m.job?`data-tdopen="${esc(m.job.id)}"`:'data-tdteam="1"'}><span class="mono">${esc(m.job?m.job.code:"Chat chung")}</span><b>${esc(m.byName||m.by)}: ${esc(String(m.text||"").slice(0,90))}</b><small>${esc(tmTime(m.at))}</small></button>`).join("")}</section>`:"";
   const body=tg+D.G.map(sec).join("");
   el.dataset.v="today";
@@ -3289,7 +3301,7 @@ function renderToday(el){
     ${body||`<div class="td-empty">Không có việc nào cần làm gấp. 🎉<br><small>Lô quá hạn, đến hạn, vừa thông quan, đứng yên lâu và tin nhắc đến bạn sẽ hiện ở đây.</small></div>`}</div>`;
 }
 document.addEventListener("click",e=>{if(S.view!=="today")return;
-  const o=e.target.closest("[data-tdopen]");if(o){S.view="list";openJobAny(o.dataset.tdopen);return}
+  const o=e.target.closest("[data-tdopen]");if(o){S.view="board";openJobAny(o.dataset.tdopen);return}
   if(e.target.closest("[data-tdteam]")){S.view="team";renderAll(true);return}
   const a=e.target.closest("[data-tdall]");if(a){S.todayAll=a.dataset.tdall==="1";renderMain();return}});
 /* AI tóm tắt khung Trao đổi của job */
@@ -3669,7 +3681,7 @@ async function mjCreate(id,btn){
   const j=await createJob(data);
   if(sv){if(sv!=="VC")addFee(j,FEE_HQ,"tờ khai",true);if(sv!=="HQ")addFee(j,FEE_VC,isTruck(j)?"chuyến":"cont");queueSave(j)}
   try{await db.doc("mailjobs/"+id).update({jobId:j.id,code:j.code})}catch(e){}
-  S.view="list";renderMain();openJobAny(j.id);toast(`Đã tạo ${j.code} ở cột Mới nhận. Kiểm tra lại thông tin trong phiếu job.`);
+  S.view="board";renderMain();openJobAny(j.id);toast(`Đã tạo ${j.code} ở cột Mới nhận. Kiểm tra lại thông tin trong phiếu job.`);
 }
 document.addEventListener("click",async e=>{
   const ok=e.target.closest("[data-mjok]");if(ok){mjCreate(ok.dataset.mjok,ok);return}
@@ -3908,7 +3920,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-26l";
+const APP_VER="2026-11-26n";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
