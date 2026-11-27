@@ -2276,9 +2276,10 @@ async function gsCapture(){const el=gsEl();if(!el||!S.sel||!genieOk()||!detOverl
     style:{transform:"none",animation:"none",transition:"none",position:"static",inset:"auto",top:"auto",left:"auto",right:"auto",bottom:"auto",margin:"0",width:w+"px",height:h+"px",maxHeight:"none",overflow:"visible",visibility:"visible",boxShadow:"none",borderRadius:"0"}});
   if(S.sel!==id)return null;
   GS.snap={id,ver,cv,w,h,dpr};return GS.snap}
-function gsSchedule(ms){clearTimeout(GS.t);if(!genieOk())return;GS.t=setTimeout(()=>{const go=()=>{if(GS.busy)return gsSchedule(800);GS.busy=gsCapture().catch(()=>null).finally(()=>{GS.busy=null})};window.requestIdleCallback?requestIdleCallback(go,{timeout:2000}):go()},ms||700)}
+function gsSchedule(ms){clearTimeout(GS.t);if(!genieOk())return;GS.t=setTimeout(()=>{const go=()=>{if(GS.busy)return gsSchedule(800);GS.busy=gsCapture().catch(()=>null).finally(()=>{GS.busy=null})};window.requestIdleCallback?requestIdleCallback(go,{timeout:600}):go()},ms||700)}
 function gsWatch(){const el=gsEl();if(!el||GS.mo)return;
-  GS.mo=new MutationObserver(()=>{GS.ver++;if(S.sel)gsSchedule(1500)});GS.mo.observe(el,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["value","class","open","checked"]});
+  const noise=m=>{const n=m.target.nodeType===1?m.target:m.target.parentElement;return !n||(m.type==="attributes"&&(n===el||!!n.closest(".dnav")))};
+  GS.mo=new MutationObserver(ms=>{if(ms.every(noise))return;GS.ver++;if(S.sel)gsSchedule(1500)});GS.mo.observe(el,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["value","class","open","checked"]});
   el.addEventListener("input",()=>{GS.ver++;gsSchedule(1500)},true);el.addEventListener("change",()=>{GS.ver++;gsSchedule(1500)},true)}
 /* --- WebGL --- */
 let GLX=null;
@@ -2336,8 +2337,9 @@ function gsCrop(sn,el){const st=el.scrollTop||0,w=el.clientWidth,h=el.clientHeig
 /* đóng phiếu có thần đèn: ảnh sẵn → chạy ngay; ảnh cũ → chụp nhanh (tối đa 260ms); không được → thu nhỏ bay vào thẻ */
 async function genieClose(el,card,after){
   const box=el.getBoundingClientRect(),rect={left:box.left+el.clientLeft,top:box.top+el.clientTop,width:el.clientWidth,height:el.clientHeight};
-  let sn=GS.snap&&GS.snap.id===S.sel&&GS.snap.ver===GS.ver&&GS.snap.w===el.clientWidth?GS.snap:null;
-  if(!sn&&glx()){try{sn=await Promise.race([GS.busy&&GS.busy.then(x=>x&&x.ver===GS.ver?x:null)||gsCapture(),new Promise(r=>setTimeout(()=>r(null),260))])}catch(e){sn=null}}
+  const okSn=x=>x&&x.id===S.sel&&x.w===el.clientWidth?x:null;
+  let sn=okSn(GS.snap);
+  if(!sn&&glx()){clearTimeout(GS.t);try{sn=okSn(await Promise.race([GS.busy||gsCapture(),new Promise(r=>setTimeout(()=>r(null),900))]))}catch(e){sn=null}}
   let ok=false;if(sn){try{ok=glGenie(rect,gsCrop(sn,el),card,"out")}catch(e){ok=false;try{GLX&&GLX.c.remove()}catch(_){}}}
   if(ok){el.style.visibility="hidden";after();return}
   zoomTo(el,card,"out",()=>{el.getAnimations().forEach(a=>a.cancel());after()})}
@@ -2543,7 +2545,7 @@ function renderDetail(force){
   const el=$("#detail"),j=cur();
   if(!force&&j&&el.dataset.id===j.id&&el.contains(document.activeElement))return;
   if(j&&!el.dataset.id&&genieOk()&&(S.view==="board"||S.view==="archive")){const card=genieCard(j.id);el.classList.remove("ios-in");
-    requestAnimationFrame(()=>{if(!detOverlay()||S.sel!==j.id)return;zoomTo(el,card,"in");gsWatch();GS.ver++;gsSchedule(800)})}
+    requestAnimationFrame(()=>{if(!detOverlay()||S.sel!==j.id)return;zoomTo(el,card,"in");gsWatch();GS.ver++;gsSchedule(500)})}
   else if(j&&el.dataset.id!==j.id&&iosOn()&&!iosCalm()){el.classList.remove("ios-in");void el.offsetWidth;el.classList.add("ios-in");clearTimeout(el._iosT);el._iosT=setTimeout(()=>el.classList.remove("ios-in"),600)}
   el.dataset.id=j?j.id:"";
   document.body.classList.toggle("has-detail",!!j);detNav(!!j);
@@ -4345,7 +4347,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-27f";
+const APP_VER="2026-11-27g";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
