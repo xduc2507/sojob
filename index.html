@@ -1019,6 +1019,14 @@ body.perm-view .kb .kc{cursor:pointer}
 .viewban .svi{width:16px;height:16px;margin:0;color:var(--muted)}
 #detail input:disabled,#detail select:disabled,#detail textarea:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink);cursor:default}
 #detail button:disabled{opacity:.45}
+/* email chờ duyệt: gợi ý job + chọn job để gắn */
+.mj-hint{display:flex;align-items:flex-start;gap:6px;margin:2px 0;padding:6px 10px;border-radius:9px;background:color-mix(in srgb,#007AFF 9%,var(--surface));color:var(--ink);font-size:13px}
+.mj-hint .svi{width:15px;height:15px;margin:2px 0 0;color:#007AFF;flex:none}.mj-hint i{color:var(--muted)}
+.mj-acts .svi{width:14px;height:14px;margin:0 4px 0 0}
+.mj-sel{flex:1 1 240px;min-width:0;max-width:100%}
+.mjc.mj-flash{animation:mjFlash 2.4s ease}
+@keyframes mjFlash{0%,40%{box-shadow:0 0 0 3px color-mix(in srgb,#007AFF 55%,transparent)}100%{box-shadow:0 0 0 0 transparent}}
+body.perm-view [data-mjgan],body.perm-view [data-mjpick]{display:none!important}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -2266,7 +2274,7 @@ function h2iLoad(){return H2I||(H2I=new Promise((res,rej)=>{if(window.htmlToImag
 const GS={ver:0,snap:null,busy:null,t:0,mo:null,fontCSS:""}; // không nhúng font web (stylesheet khác tên miền không đọc được): ảnh chụp dùng font hệ thống, đủ cho 0,6 giây hiệu ứng
 const gsEl=()=>$("#detail");
 async function gsCapture(){const el=gsEl();if(!el||!S.sel||!genieOk()||!detOverlay())return null;
-  const lib=await h2iLoad(),ver=GS.ver,id=S.sel,w=el.clientWidth,h=el.scrollHeight,dpr=Math.min(2,devicePixelRatio||1);
+  const lib=await h2iLoad(),ver=GS.ver,id=S.sel,w=el.clientWidth,h=el.scrollHeight,dpr=Math.min(1.5,devicePixelRatio||1);
   if(GS.fontCSS==null){try{GS.fontCSS=await lib.getFontEmbedCSS(el)}catch(e){GS.fontCSS=""}}
   const bg=getComputedStyle(el).backgroundColor;
   const cv=await lib.toCanvas(el,{pixelRatio:dpr,width:w,height:h,cacheBust:false,fontEmbedCSS:GS.fontCSS||undefined,skipFonts:!GS.fontCSS,
@@ -2279,8 +2287,8 @@ async function gsCapture(){const el=gsEl();if(!el||!S.sel||!genieOk()||!detOverl
 function gsSchedule(ms){clearTimeout(GS.t);if(!genieOk())return;GS.t=setTimeout(()=>{const go=()=>{if(GS.busy)return gsSchedule(800);GS.busy=gsCapture().catch(()=>null).finally(()=>{GS.busy=null})};window.requestIdleCallback?requestIdleCallback(go,{timeout:600}):go()},ms||700)}
 function gsWatch(){const el=gsEl();if(!el||GS.mo)return;
   const noise=m=>{const n=m.target.nodeType===1?m.target:m.target.parentElement;return !n||(m.type==="attributes"&&(n===el||!!n.closest(".dnav")))};
-  GS.mo=new MutationObserver(ms=>{if(ms.every(noise))return;GS.ver++;if(S.sel)gsSchedule(1500)});GS.mo.observe(el,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["value","class","open","checked"]});
-  el.addEventListener("input",()=>{GS.ver++;gsSchedule(1500)},true);el.addEventListener("change",()=>{GS.ver++;gsSchedule(1500)},true)}
+  GS.mo=new MutationObserver(ms=>{if(ms.every(noise))return;GS.ver++});GS.mo.observe(el,{subtree:true,childList:true,characterData:true,attributes:true,attributeFilter:["value","class","open","checked"]});
+  /* không chụp lại khi sửa / gõ: mỗi lần chụp chiếm máy ~0,6–1 giây; ảnh hơi cũ vẫn đủ cho 0,6 giây hiệu ứng */}
 /* --- WebGL --- */
 let GLX=null;
 function glx(){if(GLX!==null)return GLX;try{const c=document.createElement("canvas");const g=c.getContext("webgl",{alpha:true,premultipliedAlpha:true,antialias:true})||c.getContext("experimental-webgl");if(!g)return GLX=false;
@@ -2331,6 +2339,13 @@ function zoomTo(el,target,dir,done){const r=el.getBoundingClientRect();let t=tar
   const A={transform:"none",opacity:1,borderRadius:"0px"},B={transform:`translate(${tx}px,${ty}px) scale(${sx},${sy})`,opacity:0,borderRadius:`${Math.round(14/Math.min(sx,sy))}px`};
   const an=el.animate(dir==="out"?[A,{opacity:1,offset:.7},B]:[B,{opacity:1,offset:.3},A],{duration:dir==="out"?420:460,easing:dir==="out"?"cubic-bezier(.4,0,.2,1)":"cubic-bezier(.2,.8,.2,1)",fill:dir==="out"?"forwards":"none"});
   el.style.transformOrigin="0 0";an.finished.catch(()=>{}).then(()=>{el.style.transformOrigin="";done&&done()});return an}
+/* mở phiếu: thẻ nở thành phiếu — phóng đều 2 chiều (chữ không méo) + khung bo góc lớn dần từ đúng kích thước thẻ */
+function zoomIn(el,target){const r=el.getBoundingClientRect();let t=target&&target.getBoundingClientRect?target.getBoundingClientRect():null;
+  if(!t||!t.width||!r.width||t.bottom<0||t.top>innerHeight)return zoomTo(el,target,"in");
+  const s=Math.max(.12,Math.min(1,t.width/r.width)),tx=t.left-r.left,ty=t.top-r.top,hb=Math.max(0,r.height-t.height/s),rad=(12/s).toFixed(1);
+  el.style.transformOrigin="0 0";
+  const an=el.animate([{transform:`translate(${tx}px,${ty}px) scale(${s})`,clipPath:`inset(0px 0px ${hb}px 0px round ${rad}px)`,opacity:.5},{opacity:1,offset:.3},{transform:"translate(0px,0px) scale(1)",clipPath:"inset(0px 0px 0px 0px round 0px)",opacity:1}],{duration:500,easing:"cubic-bezier(.22,.9,.24,1)"});
+  an.finished.catch(()=>{}).then(()=>{el.style.transformOrigin=""});return an}
 /* cắt ảnh chụp đúng phần đang nhìn (theo vị trí cuộn) */
 function gsCrop(sn,el){const st=el.scrollTop||0,w=el.clientWidth,h=el.clientHeight,d=sn.dpr,c=document.createElement("canvas");
   c.width=Math.round(w*d);c.height=Math.round(h*d);c.getContext("2d").drawImage(sn.cv,0,Math.round(st*d),Math.round(w*d),Math.round(h*d),0,0,c.width,c.height);return c}
@@ -2545,7 +2560,7 @@ function renderDetail(force){
   const el=$("#detail"),j=cur();
   if(!force&&j&&el.dataset.id===j.id&&el.contains(document.activeElement))return;
   if(j&&!el.dataset.id&&genieOk()&&(S.view==="board"||S.view==="archive")){const card=genieCard(j.id);el.classList.remove("ios-in");
-    requestAnimationFrame(()=>{if(!detOverlay()||S.sel!==j.id)return;zoomTo(el,card,"in");gsWatch();GS.ver++;gsSchedule(500)})}
+    requestAnimationFrame(()=>{if(!detOverlay()||S.sel!==j.id)return;zoomIn(el,card);gsWatch();GS.ver++;gsSchedule(650)})}
   else if(j&&el.dataset.id!==j.id&&iosOn()&&!iosCalm()){el.classList.remove("ios-in");void el.offsetWidth;el.classList.add("ios-in");clearTimeout(el._iosT);el._iosT=setTimeout(()=>el.classList.remove("ios-in"),600)}
   el.dataset.id=j?j.id:"";
   document.body.classList.toggle("has-detail",!!j);detNav(!!j);
@@ -3465,7 +3480,7 @@ async function openJobAny(id){
 }
 let urlJobDone=false;
 function openFromUrl(){
-  if(urlJobDone)return;{const vw=new URLSearchParams(location.search).get("view");if(vw==="today"){urlJobDone=true;S.view0=true;S.view="today";try{history.replaceState(null,"",location.pathname)}catch(e){}setTimeout(renderMain,0);return}}if(new URLSearchParams(location.search).get("view")==="mail"){urlJobDone=true;S.view0=true;S.view="mail";try{history.replaceState(null,"",location.pathname)}catch(e){}setTimeout(renderMain,0);return}if(new URLSearchParams(location.search).get("view")==="team"){urlJobDone=true;S.view0=true;S.view="team";try{history.replaceState(null,"",location.pathname)}catch(e){}setTimeout(renderMain,0);return}const id=new URLSearchParams(location.search).get("job");if(!id){urlJobDone=true;return}
+  if(urlJobDone)return;{const vw=new URLSearchParams(location.search).get("view");if(vw==="today"){urlJobDone=true;S.view0=true;S.view="today";try{history.replaceState(null,"",location.pathname)}catch(e){}setTimeout(renderMain,0);return}}if(new URLSearchParams(location.search).get("view")==="mail"){urlJobDone=true;S.view0=true;S.view="mail";S.mjFocus=new URLSearchParams(location.search).get("mj")||null;try{history.replaceState(null,"",location.pathname)}catch(e){}setTimeout(renderMain,0);return}if(new URLSearchParams(location.search).get("view")==="team"){urlJobDone=true;S.view0=true;S.view="team";try{history.replaceState(null,"",location.pathname)}catch(e){}setTimeout(renderMain,0);return}const id=new URLSearchParams(location.search).get("job");if(!id){urlJobDone=true;return}
   if(!S.all.some(x=>x.id===id))return;urlJobDone=true;
   try{history.replaceState(null,"",location.pathname+location.hash)}catch(e){}
   setTimeout(()=>openJobAny(id),0)}
@@ -4081,16 +4096,38 @@ function mjWatch(){
 }
 function mjHtml(){
   const L=S.mj||[];if(!L.length||!mailOn())return "";
-  return `<section class="mjbox"><h3>${svi("mailp")}Job từ email · chờ duyệt <span class="mono">${L.length}</span></h3><p class="muted">AI đọc thư gửi tới ${MAIL_ADDR} và nhận ra yêu cầu làm hàng mới. Kiểm tra rồi bấm <b>Tạo job</b>: job vào cột <b>Mới nhận</b> ở Sổ chung.</p>`+
+  return `<section class="mjbox"><h3>${svi("mailp")}Job từ email · chờ duyệt <span class="mono">${L.length}</span></h3><p class="muted">Thư mới gửi tới ${MAIL_ADDR} (tiêu đề không có mã job) đều chờ ở đây, AI không tự gắn vào job cũ. Lô mới: bấm <b>Tạo job</b> (vào cột <b>Mới nhận</b>). Thư về lô đang làm: bấm <b>Gắn vào job</b> (thư vào mục Trao đổi của job đó).</p>`+
     L.map(x=>{const a=x.ai||{},sub=[a.congTy,a.fwd&&a.fwd!==a.congTy?"FWD "+a.fwd:"",a.dichVu,a.hang,a.bl?"B/L "+a.bl:"",a.cont,a.tkNo?"TK "+a.tkNo:""].filter(Boolean).join(" · ");
-      return `<div class="mjc"><b>${esc(a.tieuDe||x.s||"(không tiêu đề)")}</b>${sub?`<span>${esc(sub)}</span>`:""}${a.tomTat?`<span class="mj-sum">${esc(a.tomTat)}</span>`:""}<small class="muted">${svi("mail")}${esc(x.fromN||x.from)} · ${esc(x.s||"")} · ${mailTime(x.t||x.at)}</small>
-        <div class="mj-acts"><button class="primary sm" data-mjok="${esc(x.id)}">✓ Tạo job</button><button class="ghost sm" data-mjmail="${esc(x.id)}">Xem thư</button><button class="ghost sm" data-mjskip="${esc(x.id)}">Bỏ qua</button></div></div>`}).join("")+`</section>`;
+      const g=x.goiY&&x.goiY.code?x.goiY:null;
+      const hint=g?`<div class="mj-hint">${svi("link")}<span>Có thể thuộc <b>${esc(g.code)}</b>${g.nhan?" · "+esc(g.nhan):""}${g.lyDo?` <i>(${esc(g.lyDo)})</i>`:""}</span></div>`:"";
+      return `<div class="mjc" data-mjc="${esc(x.id)}"><b>${esc(a.tieuDe||x.s||"(không tiêu đề)")}</b>${hint}${sub?`<span>${esc(sub)}</span>`:""}${a.tomTat?`<span class="mj-sum">${esc(a.tomTat)}</span>`:""}<small class="muted">${svi("mail")}${esc(x.fromN||x.from)} · ${esc(x.s||"")} · ${mailTime(x.t||x.at)}</small>
+        <div class="mj-acts">${g&&g.id?`<button class="primary sm" data-mjgan="${esc(x.id)}" data-job="${esc(g.id)}">${svi("link")}Gắn vào ${esc(g.code)}</button><button class="ghost sm" data-mjok="${esc(x.id)}">✓ Tạo job mới</button>`:`<button class="primary sm" data-mjok="${esc(x.id)}">✓ Tạo job</button>`}<button class="ghost sm" data-mjpick="${esc(x.id)}">${g?"Gắn job khác…":"Gắn vào job…"}</button><button class="ghost sm" data-mjmail="${esc(x.id)}">Xem thư</button><button class="ghost sm" data-mjskip="${esc(x.id)}">Bỏ qua</button></div></div>`}).join("")+`</section>`;
 }
 function mjPaint(){
   document.querySelectorAll(".mjbox").forEach(x=>x.remove());
   const h=mjHtml();if(!h)return;
   const host=S.view==="mail"?$("#mailbox"):S.view==="today"?document.querySelector("#content .td"):null;
   if(host)host.insertAdjacentHTML("beforebegin",h);
+  if(S.mjFocus){const c=document.querySelector(`[data-mjc="${CSS.escape(S.mjFocus)}"]`);if(c){S.mjFocus=null;requestAnimationFrame(()=>c.scrollIntoView({block:"center",behavior:"smooth"}));c.classList.add("mj-flash");setTimeout(()=>c.classList.remove("mj-flash"),2600)}}
+}
+/* gắn thư chờ duyệt vào một job đang làm (người duyệt chọn — AI không tự gắn) */
+async function mjAttach(id,jobId,btn){
+  const x=(S.mj||[]).find(m=>m.id===id);if(!x||!jobId)return;
+  if(!canEdit()){viewWarn();return}
+  if(SPACE==="mine")await setSpace("team");
+  const j=S.all.find(t=>t.id===jobId);if(!j)return toast("Không thấy job này ở Sổ chung (có thể đã xoá hoặc chưa chia sẻ).");
+  if(btn){btn.disabled=true;btn.textContent="Đang gắn…"}
+  try{await db.doc("mailjobs/"+id).update({status:"gan",jobId:j.id,code:j.code||"",by:me(),byAt:Date.now()})}
+  catch(e){if(btn){btn.disabled=false;btn.textContent="Gắn"}return toast("Chưa gắn được: "+(e?.message||e?.code))}
+  const a=x.ai||{};await postJobMsg(j,"✉ Email từ "+(x.fromN||x.from)+": "+(x.s||"")+(a.tomTat?"\n"+a.tomTat:""));
+  toast(`Đã gắn thư vào ${j.code}. Thư nằm trong Trao đổi của job.`);
+}
+function mjPickOpen(id,btn){
+  const box=btn.closest(".mj-acts");if(!box)return;
+  const L=S.all.filter(j=>j.shared&&!isArch(j)&&j.status!=="Hoàn thành"&&j.status!=="Thất bại").sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  if(!L.length)return toast("Chưa có job đang làm ở Sổ chung để gắn.");
+  box.innerHTML=`<select class="mj-sel" aria-label="Chọn job để gắn thư">${L.map(j=>`<option value="${esc(j.id)}">${esc(j.code||"")} · ${esc(jobLabel(j))}${j.bl?" · B/L "+esc(j.bl):""}</option>`).join("")}</select><button class="primary sm" data-mjganpick="${esc(id)}">Gắn</button><button class="ghost sm" data-mjcancel>Huỷ</button>`;
+  box.querySelector("select").focus();
 }
 async function mjCreate(id,btn){
   const x=(S.mj||[]).find(m=>m.id===id);if(!x)return;const a=x.ai||{};
@@ -4110,6 +4147,10 @@ async function mjCreate(id,btn){
 }
 document.addEventListener("click",async e=>{
   const ok=e.target.closest("[data-mjok]");if(ok){mjCreate(ok.dataset.mjok,ok);return}
+  const ga=e.target.closest("[data-mjgan]");if(ga){mjAttach(ga.dataset.mjgan,ga.dataset.job,ga);return}
+  const pk=e.target.closest("[data-mjpick]");if(pk){if(SPACE==="mine")await setSpace("team");mjPickOpen(pk.dataset.mjpick,pk);return}
+  const gp=e.target.closest("[data-mjganpick]");if(gp){const sel=gp.parentElement.querySelector(".mj-sel");mjAttach(gp.dataset.mjganpick,sel&&sel.value,gp);return}
+  if(e.target.closest("[data-mjcancel]")){mjPaint();return}
   const sk=e.target.closest("[data-mjskip]");if(sk){if(!confirm("Bỏ qua thư này, không tạo job?"))return;try{await db.doc("mailjobs/"+sk.dataset.mjskip).update({status:"bo",by:me(),byAt:Date.now()})}catch(er){toast("Chưa bỏ qua được: "+(er?.message||er?.code))}return}
   const mv=e.target.closest("[data-mjmail]");if(mv){const x=(S.mj||[]).find(m=>m.id===mv.dataset.mjmail);if(!x)return;S.mail.folder="inbox";S.mail.q="";S.view="mail";renderMain();mailOpen(x.mid,x.f);return}
 });
@@ -4347,7 +4388,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-27g";
+const APP_VER="2026-11-27h";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
