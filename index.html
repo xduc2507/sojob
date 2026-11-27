@@ -4417,7 +4417,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-27i";
+const APP_VER="2026-11-27j";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4462,7 +4462,7 @@ setTimeout(()=>{if(team()&&window.Notification&&Notification.permission==="grant
    - Cây thư mục: [gốc] / FWD / Khách hàng / Lô hàng. Job riêng tự gắn với thư mục lô (tìm theo FWD + tên khách,
      lô có mã job / B/L / số tờ khai trong tên; chưa có thì tạo "R… - tên lô").
    - Job chỉ lưu đường dẫn thư mục (j.od); tệp thật nằm trên OneDrive, không giới hạn 1 MB. */
-const OD_CLIENT=""; // mã ứng dụng (Application / client ID) đăng ký trên Microsoft Entra — công khai, không phải mật khẩu
+const OD_CLIENT="75e45cab-7c6e-4ac4-a1d0-9797e376b79d"; // mã ứng dụng (Application / client ID) đăng ký trên Microsoft Entra — công khai, không phải mật khẩu
 const OD_AUTH="https://login.microsoftonline.com/consumers/oauth2/v2.0",OD_SCOPE="Files.ReadWrite offline_access User.Read",OD_G="https://graph.microsoft.com/v1.0";
 const OD={tok:null,exp:0,rt:null,root:null,cid:"",acct:"",cache:{},tried:new Set(),busy:false};
 const odKey=()=>"sojob.od."+(me()||"x");
