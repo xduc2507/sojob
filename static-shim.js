@@ -283,11 +283,12 @@
         <button class="primary" id="sj-save">Lưu key</button></div>` : ""}
       ${FB ? `<h2 style="margin-top:14px">Zalo</h2><div id="sj-zalo" class="note"></div>` : ""}
       ${FB && ROLE === "owner" ? `<h2 style="margin-top:14px">Thành viên</h2>
-      <p class="note">Nhân viên đăng nhập bằng Google của họ tại link này. Họ thấy job họ tạo và job bạn bấm “🔒 Chỉ mình tôi” → “👥 Đã chia sẻ”. Họ được xem tiền, sửa job, nhưng không xoá job và không vào được mục này.</p>
+      <p class="note">Nhân viên đăng nhập bằng Google của họ tại link này. Họ thấy job họ tạo và job đã chia sẻ, không xoá được job và không vào được mục này.<br><b>Quyền Sửa</b>: tạo job, sửa thông tin, chuyển bước, báo giá, debit. <b>Quyền Chỉ xem</b>: chỉ xem và nhắn tin trong Trao đổi / Chat chung, không sửa được gì.</p>
       <div id="sj-mem" class="note">Đang tải…</div>
       <div class="mrow" style="justify-content:flex-start;flex-wrap:wrap;align-items:flex-end">
         <label class="fld" style="flex:2;min-width:180px;margin:0"><span>Email Google của nhân viên</span><input id="sj-me" type="email" autocomplete="off" spellcheck="false" placeholder="ten@gmail.com"></label>
         <label class="fld" style="flex:1;min-width:120px;margin:0"><span>Tên gọi</span><input id="sj-mn" autocomplete="off" placeholder="VD: Hạnh"></label>
+        <label class="fld" style="flex:1;min-width:120px;margin:0"><span>Quyền</span><select id="sj-mp"><option value="edit">Sửa</option><option value="view">Chỉ xem</option></select></label>
         <button class="primary" id="sj-madd">Thêm</button></div>` : ""}
       ${FB && ROLE === "owner" ? `<h2 style="margin-top:14px">Dung lượng</h2><div id="sj-dung" class="note">Đang tải…</div>` : ""}
       ${FB && ROLE !== "owner" ? "" : `<h2 style="margin-top:14px">Dữ liệu</h2>
@@ -328,7 +329,11 @@
       const draw = async () => {
         try {
           const s = await fdb.collection("members").get();
-          memBox.innerHTML = s.empty ? "Chưa có nhân viên nào." : s.docs.map(x => `<div style="display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"><b>${esc(x.data().name || "")}</b> ${esc(x.id)}</span><button class="ghost sm danger" data-rm="${esc(x.id)}">Bỏ</button></div>`).join("");
+          memBox.innerHTML = s.empty ? "Chưa có nhân viên nào." : s.docs.map(x => `<div style="display:flex;gap:8px;align-items:center;padding:4px 0;border-bottom:1px solid var(--line)"><span style="flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis"><b>${esc(x.data().name || "")}</b> ${esc(x.id)}</span><select data-perm="${esc(x.id)}" aria-label="Quyền của ${esc(x.id)}" style="width:auto;min-width:110px"><option value="edit"${(x.data().perm || "edit") === "edit" ? " selected" : ""}>Sửa</option><option value="view"${x.data().perm === "view" ? " selected" : ""}>Chỉ xem</option></select><button class="ghost sm danger" data-rm="${esc(x.id)}">Bỏ</button></div>`).join("");
+          memBox.querySelectorAll("[data-perm]").forEach(sel => sel.onchange = async () => {
+            try { await fdb.doc("members/" + sel.dataset.perm).set({ perm: sel.value }, { merge: true }); msg(`Đã đổi quyền của ${sel.dataset.perm}: ${sel.value === "view" ? "Chỉ xem" : "Sửa"}. Người đó tải lại trang là áp dụng.`); }
+            catch (e) { msg("Chưa đổi được: " + (e.message || e.code), true); draw(); }
+          });
           memBox.querySelectorAll("[data-rm]").forEach(b => b.onclick = async () => {
             if (!confirm("Bỏ quyền của " + b.dataset.rm + "? Người này sẽ không mở được sổ nữa.")) return;
             try { await fdb.doc("members/" + b.dataset.rm).delete(); draw(); } catch (e) { msg("Chưa bỏ được: " + (e.message || e.code), true); }
@@ -337,10 +342,10 @@
       };
       draw();
       $("#sj-madd", d).onclick = async () => {
-        const em = $("#sj-me", d).value.trim().toLowerCase(), nm = $("#sj-mn", d).value.trim();
+        const em = $("#sj-me", d).value.trim().toLowerCase(), nm = $("#sj-mn", d).value.trim(), pm = ($("#sj-mp", d) || {}).value === "view" ? "view" : "edit";
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(em)) { msg("Email chưa đúng.", true); return; }
         if (fuser && em === (fuser.email || "").toLowerCase()) { msg("Đây là email của chủ sổ.", true); return; }
-        try { await fdb.doc("members/" + em).set({ name: nm, role: "staff", addedAt: Date.now() }); $("#sj-me", d).value = ""; $("#sj-mn", d).value = ""; msg("Đã thêm " + em + "."); draw(); }
+        try { await fdb.doc("members/" + em).set({ name: nm, role: "staff", perm: pm, addedAt: Date.now() }); $("#sj-me", d).value = ""; $("#sj-mn", d).value = ""; msg("Đã thêm " + em + " · quyền " + (pm === "view" ? "Chỉ xem" : "Sửa") + "."); draw(); }
         catch (e) { msg("Chưa thêm được: " + (e.message || e.code), true); }
       };
     }
@@ -492,16 +497,18 @@
         const legacyOwner = async () => { try { await fdb.doc("meta/templates").get({ source: "server" }); return true; } catch (e) { return false; } };
         const denied = () => loginScreen(`Tài khoản ${u.email} chưa được cấp quyền dùng sổ này. Gửi email này cho chủ sổ để được thêm vào (Cài đặt → Thành viên), hoặc đăng xuất để chọn tài khoản khác.`);
         // Chủ sổ: đọc được cả danh sách thành viên. Nhân viên: chỉ có hồ sơ của mình trong members/.
-        let memName = "";
+        let memName = "", PERM = "edit";
         try { await fdb.collection("members").limit(1).get({ source: "server" }); ROLE = "owner"; }
         catch (e) {
           if (e && e.code === "permission-denied") {
-            try { const m = await fdb.doc("members/" + mail).get({ source: "server" }); if (m.exists) { ROLE = "staff"; memName = String((m.data() || {}).name || "").trim(); } else if (await legacyOwner()) ROLE = "owner"; else { denied(); return; } }
-            catch (e2) { if (e2 && e2.code === "permission-denied") { if (await legacyOwner()) ROLE = "owner"; else { denied(); return; } } else ROLE = (localStorage.getItem(ROLE_LS + "." + mail) || "staff"); }
-          } else ROLE = (localStorage.getItem(ROLE_LS + "." + mail) || "staff"); // mất mạng: dùng vai trò lần trước
+            try { const m = await fdb.doc("members/" + mail).get({ source: "server" }); if (m.exists) { ROLE = "staff"; memName = String((m.data() || {}).name || "").trim(); PERM = (m.data() || {}).perm === "view" ? "view" : "edit"; } else if (await legacyOwner()) ROLE = "owner"; else { denied(); return; } }
+            catch (e2) { if (e2 && e2.code === "permission-denied") { if (await legacyOwner()) ROLE = "owner"; else { denied(); return; } } else { ROLE = (localStorage.getItem(ROLE_LS + "." + mail) || "staff"); PERM = localStorage.getItem(ROLE_LS + ".perm." + mail) || "edit"; } }
+          } else { ROLE = (localStorage.getItem(ROLE_LS + "." + mail) || "staff"); PERM = localStorage.getItem(ROLE_LS + ".perm." + mail) || "edit"; } // mất mạng: dùng vai trò lần trước
         }
         try { localStorage.setItem(ROLE_LS + "." + mail, ROLE); } catch (e) {}
-        window.SOJOB_ROLE = ROLE; window.SOJOB_EMAIL = mail;
+        if (ROLE === "owner") PERM = "edit";
+        try { localStorage.setItem(ROLE_LS + ".perm." + mail, PERM); } catch (e) {}
+        window.SOJOB_ROLE = ROLE; window.SOJOB_EMAIL = mail; window.SOJOB_PERM = PERM;
         if (memName) try { localStorage.setItem("sojob.memName." + mail, memName); } catch (e) {}
         if (!memName && ROLE === "staff") try { memName = localStorage.getItem("sojob.memName." + mail) || ""; } catch (e) {}
         if (!memName && ROLE === "owner") try { memName = localStorage.getItem("sojob.myName." + mail) || ""; } catch (e) {} // tên chủ sổ tự đặt (Cài đặt → Tên hiển thị)

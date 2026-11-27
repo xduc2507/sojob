@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="firebase-config.js?v=483007a3c3"></script>
-<script src="static-shim.js?v=676aafdffa"></script>
+<script src="static-shim.js?v=41f3c09777"></script>
 <script>/* giao diện kiểu iOS: mặc định cho mọi người; ?ios=0 tắt, ?ios=1 bật lại (nhớ trên máy) */
 (function(){var on=true;try{var q=location.search.match(/[?&]ios=([01])/);if(q)localStorage.setItem("sojob.ios2",q[1]);on=localStorage.getItem("sojob.ios2")!=="0"}catch(e){}if(on)document.documentElement.classList.add("ios")})();</script>
 <script>/* giao diện app máy tính: bật khi mở bằng app đã cài (cửa sổ riêng); ?desk=1 bật, ?desk=0 tắt (nhớ trên máy) */
@@ -1011,6 +1011,14 @@ body.kb-touchdrag .kb .col.over{outline:2px dashed var(--c,var(--accent));outlin
 @media (hover:none){.kb .kc{-webkit-user-select:none;user-select:none}}
 /* bôi chữ trong phiếu: không lan sang bảng / thanh trên */
 body.sel-in-detail #main,body.sel-in-detail #side,body.sel-in-detail .top{-webkit-user-select:none;user-select:none}
+/* quyền Chỉ xem: ẩn nút tạo / sửa */
+body.perm-view #btnManual,body.perm-view #btnNew,body.perm-view #kbFab,body.perm-view .kb-fab,body.perm-view .col-h .add,body.perm-view [data-bulk],body.perm-view [data-mjok],body.perm-view .col-rz{display:none!important}
+body.perm-view .kmenu [data-ka]:not([data-ka=open]):not([data-ka=copy]){display:none!important}
+body.perm-view .kb .kc{cursor:pointer}
+.viewban{display:flex;align-items:center;gap:8px;margin:0 0 8px;padding:8px 12px;border-radius:10px;background:var(--surface-2);color:var(--muted);font-size:13px}
+.viewban .svi{width:16px;height:16px;margin:0;color:var(--muted)}
+#detail input:disabled,#detail select:disabled,#detail textarea:disabled{opacity:1;color:var(--ink);-webkit-text-fill-color:var(--ink);cursor:default}
+#detail button:disabled{opacity:.45}
 /* Email */
 .mailbox{display:grid;grid-template-columns:180px minmax(260px,360px) minmax(0,1fr);gap:0;height:calc(100vh - 140px);min-height:420px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r,12px);overflow:hidden}
 .mb-side{display:flex;flex-direction:column;gap:4px;padding:10px;border-right:1px solid var(--line);background:var(--surface-2)}
@@ -1814,6 +1822,9 @@ function lateLine(j){
 const isLate=j=>{const st=lateState(j);if(st)return st!=="ok"||isOverdue(j);return isOverdue(j)||(isStalled(j)&&!STRICT.includes(j.status))};
 let db=null,sample=null,assets=null;
 const team=()=>!!window.SOJOB_ROLE,boss=()=>(window.SOJOB_ROLE||"owner")==="owner",me=()=>(window.SOJOB_EMAIL||"").toLowerCase();
+/* Quyền nhân viên: "edit" = Sửa (mặc định), "view" = Chỉ xem (xem + nhắn tin, không sửa) */
+const canEdit=()=>boss()||window.SOJOB_PERM!=="view";
+let viewWarnAt=0;function viewWarn(){if(Date.now()-viewWarnAt>3500){viewWarnAt=Date.now();toast("Bạn đang ở quyền Chỉ xem nên không sửa được. Nhắn trong Trao đổi để người phụ trách sửa giúp.")}}
 /* Chủ sổ có 2 sổ: "Sổ chung" (làm cùng nhân viên) và "Việc riêng" (chỉ mình chủ sổ) */
 const SPACE_LS="sojob.space";
 /* Việc riêng có khoá: hỏi mật khẩu khi vào, tự khoá sau 10 phút không dùng. Chỉ lưu mã băm, không lưu mật khẩu. */
@@ -1850,7 +1861,7 @@ const dirty=new Set(),timers={},chains={};
 /* ---------- persistence ---------- */
 function cur(){return S.jobs.find(j=>j.id===S.sel)||null}
 function body(j){const b={...j};delete b.id;return b}
-function saveDoc(path,getBody,delay=500){
+function saveDoc(path,getBody,delay=500){if(!canEdit()&&/^(partners|meta)\//.test(path)){viewWarn();return}
   dirty.add(path);clearTimeout(timers[path]);
   timers[path]=setTimeout(()=>{
     delete timers[path];
@@ -1860,7 +1871,7 @@ function saveDoc(path,getBody,delay=500){
       .finally(()=>{if(!timers[path])dirty.delete(path)});
   },delay);
 }
-function queueSave(j){j.updatedAt=Date.now();saveDoc("jobs/"+j.id,()=>body(j))}
+function queueSave(j,chatOnly){if(!canEdit()&&!chatOnly){viewWarn();return}j.updatedAt=Date.now();saveDoc("jobs/"+j.id,()=>body(j))}
 function saveTpl(){saveDoc("meta/templates",()=>({byType:S.tpl,stall:S.stall,stallV2:true}),700)}
 function partnerOf(name){const k=slug(name);
   if(mineOn())return S.pMine[k]||(S.pMine[k]=Object.assign({name,phone:"",email:"",note:""},JSON.parse(JSON.stringify(S.partners[k]||{}))));
@@ -1931,7 +1942,7 @@ function setStatus(j,st,kind="move",note=""){
   queueSave(j);
 }
 /* Ba thao tác kiểu Base: đi tới (kiểm tra trường bắt buộc), trả về (bắt buộc lý do), thất bại (chọn lý do) */
-async function moveJob(j,target){
+async function moveJob(j,target){if(!canEdit()){viewWarn();return false}
   if(!j||!target||j.status===target)return false;
   const from=j.status,fi=stIdx(from),ti=stIdx(target),r=route(j);
   if(target===FAIL){
@@ -2591,7 +2602,7 @@ function renderDetail(force){
     ${j.raw?`<textarea id="f-raw" data-f="raw" rows="3">${esc(j.raw)}</textarea>`:""}${sizeBar(j)}</div>
   <div class="sec"><div class="acts" style="justify-content:space-between"><span style="color:var(--muted);font-size:12px">Tạo ${new Date(j.createdAt||Date.now()).toLocaleString("vi-VN")}${j.createdByName?" · bởi "+esc(j.createdByName):""}</span>${boss()?`<button class="danger" data-act="del">${ic("del")}Xoá job</button>`:""}</div></div>
   </div>`;
-  renderTotals(j);dnavBuild(el);
+  renderTotals(j);dnavBuild(el);viewLock(el);
 }
 /* Mục lục dính trong phiếu job: bấm để nhảy tới mục, mục đang xem được tô sáng */
 const DNAV=[[/^Trao đổi/,"Trao đổi"],[/^Thông tin lô hàng/,"Lô hàng"],[/^Báo giá/,"Báo giá"],[/^(Checklist|Việc cần làm|Các bước)/,"Việc cần làm"],[/^Lịch sử/,"Lịch sử"],[/^Nguồn gốc/,"Tài liệu"]];
@@ -2608,6 +2619,12 @@ function dnavBuild(el){const d=el.querySelector(":scope>.d");if(!d)return;d.quer
   let raf=0;const mark=()=>{raf=0;const y=sc.scrollTop+navH()+4;let k=-1;secs.forEach(([c],i)=>{if(c.offsetTop<=y)k=i});if(clicked!=null&&sc.scrollTop+sc.clientHeight>=sc.scrollHeight-6&&clicked>k)k=clicked;
     nav.querySelectorAll("button").forEach(b=>{const on=+b.dataset.dn===k;if(on!==b.classList.contains("on")){b.classList.toggle("on",on);if(on){const L=b.offsetLeft,R=L+b.offsetWidth;if(L<nav.scrollLeft+8)nav.scrollLeft=L-8;else if(R>nav.scrollLeft+nav.clientWidth-8)nav.scrollLeft=R-nav.clientWidth+8}}})};
   if(sc._dnavOn)sc.removeEventListener("scroll",sc._dnavOn);sc._dnavOn=()=>{if(!raf)raf=requestAnimationFrame(mark)};sc.addEventListener("scroll",sc._dnavOn,{passive:true});mark()}
+/* Chỉ xem: khoá ô nhập và nút sửa trong phiếu; vẫn cho đọc, nhắn tin, copy, chuyển mục */
+const VIEW_OK=["close","copyQuote","copyBrief","chatSend","aiSum","mailJob"];
+function viewLock(el){document.body.classList.toggle("perm-view",!canEdit());if(canEdit())return;
+  el.querySelectorAll("input,select,textarea").forEach(x=>{if(x.id!=="chatTxt")x.disabled=true});
+  el.querySelectorAll("button").forEach(b=>{if(b.closest(".dnav,.chatin,.chat,.mreply")||VIEW_OK.includes(b.dataset.act)||b.dataset.mact)return;b.disabled=true});
+  const d=el.querySelector(":scope>.d");if(d&&!d.querySelector(".viewban"))d.insertAdjacentHTML("afterbegin",`<div class="viewban">${svi("lock")}Quyền <b>Chỉ xem</b>: xem và nhắn tin, không sửa được.</div>`)}
 function renderTotals(j){
   const t=totals(j),vat=vatRate(j),el=$("#qtot");if(!el)return;
   const ct=chTotals(j),cs=[...new Set(Object.keys(t).concat(Object.keys(ct)))];if(!cs.length){el.innerHTML="";return}
@@ -2688,7 +2705,7 @@ setInterval(()=>{if(S.loaded){renderAll(false)}},5*60*1000); // cập nhật đ�
     if(t)r.setProperty("--topH",t.offsetHeight+"px");if(b&&b.offsetHeight)r.setProperty("--barH",b.offsetHeight+"px")};
   addEventListener("resize",set);addEventListener("load",()=>{set();try{iosIndAll()}catch(e){}});setTimeout(set,0);try{document.fonts&&document.fonts.ready.then(()=>{try{iosIndAll()}catch(e){}})}catch(e){}
   addEventListener("scroll",()=>{const b=document.querySelector(".bar");if(!b)return;const top=parseFloat(getComputedStyle(b).top)||0;b.classList.toggle("stuck",getComputedStyle(b).position==="sticky"&&b.getBoundingClientRect().top<=top+1&&scrollY>0)},{passive:true})})();
-function renderAll(forceDetail){renderLateBar();lateNotify();chatNotify();renderSide();renderMain();renderDetail(forceDetail);nbellPaint();try{todayBadge()}catch(e){}try{dkSbPaint()}catch(e){}}
+function renderAll(forceDetail){document.body.classList.toggle("perm-view",!canEdit());renderLateBar();lateNotify();chatNotify();renderSide();renderMain();renderDetail(forceDetail);nbellPaint();try{todayBadge()}catch(e){}try{dkSbPaint()}catch(e){}}
 /* thanh trạng thái (màn rộng): kết nối, sổ đang xem, số job đang mở / quá hạn, người dùng, phiên bản */
 let dkSync=0;
 function dkSbPaint(){const el=$("#dkSb");if(!el)return;
@@ -2808,7 +2825,7 @@ function dmWire(root){root.querySelectorAll(".dmbox").forEach(b=>{const t=b.quer
   b.querySelector(".dmcal").onclick=()=>{const r=dmParse(t.value);p.value=r||TODAY();try{p.showPicker()}catch(e){p.focus();p.click()}};
   p.onchange=()=>{if(p.value){t.value=dmShow(p.value)+(p.value.slice(0,4)!==String(new Date().getFullYear())?"/"+p.value.slice(2,4):"");t.focus()}}})}
 /* Tạo job nhập tay: khi không có ảnh / email (khách gọi điện, dặn miệng…) */
-async function manualJob(status){
+async function manualJob(status){if(!canEdit()){viewWarn();return}
   const known=[...new Set(S.jobs.flatMap(x=>[x.fwd,x.company]).filter(Boolean))].sort((a,b)=>a.localeCompare(b,"vi"));
   const st={service:"",hang:"Nhập khẩu",vehicle:"Xe cont"};
   const d=document.createElement("div");d.className="modal ask";
@@ -2883,7 +2900,7 @@ $("#prof").addEventListener("input",e=>{
 });
 /* drag & drop on board */
 let dragId=null;
-$("#content").addEventListener("dragstart",e=>{const c=e.target.closest?.("[data-drag]");if(!c)return;dragId=c.dataset.drag;c.classList.add("dragging");try{e.dataTransfer.setData("text/plain",dragId);e.dataTransfer.effectAllowed="move"}catch(_){}});
+$("#content").addEventListener("dragstart",e=>{const c=e.target.closest?.("[data-drag]");if(!c)return;if(!canEdit()){e.preventDefault();viewWarn();return}dragId=c.dataset.drag;c.classList.add("dragging");try{e.dataTransfer.setData("text/plain",dragId);e.dataTransfer.effectAllowed="move"}catch(_){}});
 $("#content").addEventListener("dragend",e=>{dragId=null;e.target.closest?.("[data-drag]")?.classList.remove("dragging");document.querySelectorAll(".col.over").forEach(c=>c.classList.remove("over"))});
 $("#content").addEventListener("dragover",e=>{const c=e.target.closest("[data-col]");if(!c||!dragId)return;e.preventDefault();document.querySelectorAll(".col.over").forEach(x=>x!==c&&x.classList.remove("over"));c.classList.add("over")});
 $("#content").addEventListener("drop",e=>{const c=e.target.closest("[data-col]");if(!c||!dragId)return;e.preventDefault();
@@ -2904,7 +2921,7 @@ $("#content").addEventListener("drop",e=>{const c=e.target.closest("[data-col]")
     const W=innerWidth;edge=x<44?-14:x>W-44?14:0;hover(x,y)};
   const clean=()=>{clearTimeout(tm);tm=0;if(!drag)return;ghost?.remove();ghost=null;drag.c.classList.remove("dragging");lastCol?.classList.remove("over");
     document.body.classList.remove("kb-touchdrag");const k=kb();if(k)k.style.scrollSnapType="";edge=0;noClick=Date.now()};
-  document.addEventListener("touchstart",e=>{if(S.view!=="board"||e.touches.length!==1||drag)return;const c=e.target.closest(".kb .kc");
+  document.addEventListener("touchstart",e=>{if(S.view!=="board"||e.touches.length!==1||drag||!canEdit())return;const c=e.target.closest(".kb .kc");
     if(!c||e.target.closest("button,a,input,select,textarea"))return;const t=e.touches[0];sx=t.clientX;sy=t.clientY;clearTimeout(tm);
     tm=setTimeout(()=>{tm=0;start(c);if(drag){move(sx,sy);requestAnimationFrame(loop)}},420)},{passive:true});
   document.addEventListener("touchmove",e=>{if(!drag){if(tm){const t=e.touches[0];if(Math.hypot(t.clientX-sx,t.clientY-sy)>8){clearTimeout(tm);tm=0}}return}
@@ -3399,7 +3416,7 @@ async function chatSend(j){
   (S.chat[j.id]=S.chat[j.id]||[]).push(Object.assign({id:"tmp"+msg.at},msg));chatPaint(j.id);
   try{await db.collection("jobs/"+j.id+"/chat").add(msg)}
   catch(e){toast("Chưa gửi được: "+(e?.message||e?.code));S.chat[j.id]=S.chat[j.id].filter(m=>m.id!=="tmp"+msg.at);chatPaint(j.id);t.value=text;return}
-  j.chatAt=msg.at;j.chatBy=me();j.chatByName=msg.byName;j.chatLast=text.slice(0,80);j.chatN=(j.chatN||0)+1;queueSave(j);chatMarkSeen(j);pushPing(j);teamMirror(j,msg);
+  j.chatAt=msg.at;j.chatBy=me();j.chatByName=msg.byName;j.chatLast=text.slice(0,80);j.chatN=(j.chatN||0)+1;queueSave(j,true);chatMarkSeen(j);pushPing(j);teamMirror(j,msg);
 }
 const chatToasted=new Map();
 const chatMuted=j=>false; // thông báo luôn bật, không cho tắt
@@ -4182,7 +4199,7 @@ async function teamSend(){
   try{await db.collection("teamchat").add(doc)}catch(e){toast("Chưa gửi được: "+(e?.message||e?.code));t.value=text;return}
   if(j){
     try{await db.collection("jobs/"+j.id+"/chat").add(Object.assign({fromTeam:true},msg));
-      j.chatAt=msg.at;j.chatBy=me();j.chatByName=msg.byName;j.chatLast=text.slice(0,80);j.chatN=(j.chatN||0)+1;queueSave(j);chatMarkSeen(j);pushPing(j)}
+      j.chatAt=msg.at;j.chatBy=me();j.chatByName=msg.byName;j.chatLast=text.slice(0,80);j.chatN=(j.chatN||0)+1;queueSave(j,true);chatMarkSeen(j);pushPing(j)}
     catch(e){toast("Đã gửi ở Chat chung nhưng chưa lưu được vào job: "+(e?.message||e?.code))}
   }else pushPingTeam();
   teamPaint(true);
@@ -4232,7 +4249,7 @@ function odBox(j){const st=odState(j);if(!st)return "";const a=j.odAck||{};
 async function postJobMsg(j,text,extra){ // đăng 1 tin vào Trao đổi của job (lý do quá hạn, giao việc…)
   if(!db||!team())return;const msg=Object.assign({text,by:me(),byName:window.SOJOB_USER||me(),at:Date.now()},extra||{});
   try{await db.collection("jobs/"+j.id+"/chat").add(msg)}catch(e){return}
-  j.chatAt=msg.at;j.chatBy=me();j.chatByName=msg.byName;j.chatLast=text.slice(0,80);j.chatN=(j.chatN||0)+1;queueSave(j);chatMarkSeen(j);
+  j.chatAt=msg.at;j.chatBy=me();j.chatByName=msg.byName;j.chatLast=text.slice(0,80);j.chatN=(j.chatN||0)+1;queueSave(j,true);chatMarkSeen(j);
   teamMirror(j,msg);pushPing(j)}
 function odSend(j){
   const reason=(($("#odTxt")||{}).value||"").trim(),nd=(($("#odDate")||{}).value||"").trim();
@@ -4328,7 +4345,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-27e";
+const APP_VER="2026-11-27f";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4413,7 +4430,7 @@ async function srcDel(j,k,i){
 /* ---------- modal: capture & analyze ---------- */
 let pending=[],ctl=null;
 const M=$("#modal");
-function openModal(){M.hidden=false;if(genieOk()){const sh=M.querySelector(".sheet");M.classList.add("genie-on");requestAnimationFrame(()=>zoomTo(sh,$("#btnManual"),"in",()=>M.classList.remove("genie-on")))}note("");renderPending();setTimeout(()=>$("#drop").focus(),30)}
+function openModal(){if(!canEdit()){viewWarn();return}M.hidden=false;if(genieOk()){const sh=M.querySelector(".sheet");M.classList.add("genie-on");requestAnimationFrame(()=>zoomTo(sh,$("#btnManual"),"in",()=>M.classList.remove("genie-on")))}note("");renderPending();setTimeout(()=>$("#drop").focus(),30)}
 function closeModal(){if(ctl)ctl.abort();if(genieOk()&&!M.hidden){const sh=M.querySelector(".sheet");M.classList.add("genie-on");zoomTo(sh,$("#btnManual"),"out",()=>{sh.getAnimations().forEach(a=>a.cancel());M.classList.remove("genie-on");M.hidden=true})}else iosHide(M,300);pending.forEach(p=>URL.revokeObjectURL(p.url));pending=[];$("#rawtext").value=""}
 function addFiles(files){
   [...files].filter(f=>f&&f.type&&f.type.startsWith("image/")).forEach(f=>pending.push({file:f,url:URL.createObjectURL(f)}));
