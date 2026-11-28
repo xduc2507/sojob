@@ -1164,6 +1164,41 @@ table.q td input::placeholder{color:#b3b8c0;font-weight:400}
 .tabs .cbadge{margin-left:6px;min-width:18px;height:18px;font-size:11px}
 .aisum{font-size:14.5px;line-height:1.6;white-space:normal}
 /* Quy trình: độ rộng cột chỉnh được */
+.kb-pg{display:none}
+@media (max-width:780px){
+  /* điện thoại: 1 cột chiếm trọn bề ngang, lướt ngang dừng đúng từng cột */
+  html .kb.kb{gap:12px!important;padding-left:0!important;padding-right:0!important;scroll-snap-type:x mandatory;scroll-padding:0!important;overscroll-behavior-x:contain;scrollbar-width:none}
+  .kb::-webkit-scrollbar{display:none}
+  html .kb>.col.col{flex:0 0 100%!important;width:100%!important;max-width:100%!important;scroll-snap-align:start;scroll-snap-stop:always}
+  .kb .col-rz,.kbw{display:none!important}
+  /* khung cố định: trang không cuộn, không nảy; cột cao đúng bằng bảng, thẻ cuộn bên trong cột */
+  html.kb-lock,html.kb-lock body{overflow:hidden!important;overscroll-behavior:none;height:100%}
+  html.kb-lock .kb.kb{min-height:0!important;margin-bottom:0!important;padding-bottom:0!important;align-items:stretch}
+  html.kb-lock .kb>.col.col{height:100%;display:flex;flex-direction:column;overflow:hidden;min-height:0}
+  html.kb-lock .kb .col-h{flex:none}
+  html.kb-lock .kb .col-b{flex:1 1 auto;min-height:0;overflow-y:auto;overscroll-behavior:contain;-webkit-overflow-scrolling:touch;padding-bottom:18px!important;scrollbar-width:none}
+  html.kb-lock .kb .col-b::-webkit-scrollbar{display:none}
+  /* phần đầu gọn: Lọc + tóm tắt trên 1 dòng (vuốt ngang nếu dài), dải bước ngay dưới */
+  html.kb-lock .kb-bar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-bottom:8px!important;gap:8px}
+  html.kb-lock .kb-bar::-webkit-scrollbar{display:none}
+  html.kb-lock .kb-bar>*{flex:none}
+  html.kb-lock .kb-bar .sum{white-space:nowrap}
+  html.kb-lock .kb-bar:has(.kb-f:not([hidden])){flex-wrap:wrap}
+  /* khoảng trống gọn: chừa đúng 8px giữa các khối */
+  html.kb-lock .app{padding-top:8px!important}
+  html.kb-lock #main{gap:8px!important}
+  html.kb-lock .kb-bar{margin-bottom:6px!important}
+  html.kb-lock .kb-pg{margin:0 0 8px;padding:0}
+  html.kb-lock .kb-pg button{min-height:30px;padding:4px 11px}
+  html.kb-lock .kb .col-h{padding:8px 12px 6px!important;min-height:0!important}
+  html.kb-lock .kb .col-b{padding-top:2px!important}
+  .kb-pg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;margin:0 0 10px;padding:2px 0;-webkit-overflow-scrolling:touch}
+  .kb-pg::-webkit-scrollbar{display:none}
+  .kb-pg button{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:32px;padding:5px 12px;border-radius:999px;border:0;background:rgba(118,118,128,.12);color:var(--ink);font-size:13px;font-weight:600;box-shadow:none;white-space:nowrap;transition:background .2s,color .2s}
+  .kb-pg button i{font-style:normal;font-size:11.5px;font-weight:700;color:var(--muted);font-variant-numeric:tabular-nums}
+  html .kb-pg button{background:rgba(118,118,128,.12)!important;color:var(--ink)!important;border:0!important;box-shadow:none!important}
+  html .kb-pg button.on{background:var(--c,var(--accent))!important;color:#fff!important}html .kb-pg button.on i{color:rgba(255,255,255,.85)}
+}
 .kb .col{flex:0 0 var(--cw,var(--colw,196px))!important;width:var(--cw,var(--colw,196px));min-width:0!important;max-width:var(--cw,var(--colw,196px))!important;position:relative}
 .kb .col.cw-own .col-h{box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--accent) 35%,transparent)}
 .kb .col-b,.kb .kc,.kb .kc>*{min-width:0;max-width:100%}
@@ -2204,7 +2239,30 @@ function renderBoard(el){
     <select id="kbSvc" aria-label="Lọc theo loại dịch vụ"><option value="">Mọi dịch vụ</option>${SERVICES.map(s=>`<option value="${s}" ${S.svc===s?"selected":""}>${s} · ${SERVICE_NAME[s]}</option>`).join("")}</select>
     <button type="button" class="sm${S.bulkOn?" on":""}" data-bulk="toggle" title="Chọn nhiều thẻ để chuyển bước / giao việc cùng lúc">${svi("sqchk")}Chọn nhiều</button>
     <span class="kbw" title="Độ rộng chung các cột (kéo thanh). Kéo mép phải một cột để đổi riêng cột đó, bấm đúp mép để trả về độ rộng chung"><button type="button" class="sm ghost" data-kbw="-" aria-label="Thu hẹp cột">−</button><input type="range" id="kbW" min="150" max="360" step="10" value="${kbColW()}" aria-label="Độ rộng cột"><button type="button" class="sm ghost" data-kbw="+" aria-label="Nới rộng cột">+</button><button type="button" class="sm" data-kbw="fit" title="Chia đều cho vừa màn hình">Vừa màn hình</button></span>${nf?`<button type="button" class="sm ghost" data-kbfx>✕ Bỏ lọc</button>`:""}</div></div>
+    <div class="kb-pg" role="tablist" aria-label="Các bước quy trình">${shown.map((st,i)=>`<button type="button" role="tab" data-kbpg="${i}">${esc(COLNAME[st]||st)}<i>${all.filter(j=>j.status===st).length}</i></button>`).join("")}</div>
     <div class="kb" style="--colw:${kbColW()}px">${cols}</div>`;
+  kbPager(el);
+}
+/* điện thoại: Quy trình cố định như app thật — phần đầu đứng yên, bảng vừa khít tới thanh tab dưới, trang không cuộn, chỉ danh sách thẻ trong cột cuộn dọc */
+const kbMob=()=>innerWidth<=780;
+function kbLock(){const kb=document.querySelector("#content .kb"),on=S.view==="board"&&kbMob()&&!!kb;
+  document.documentElement.classList.toggle("kb-lock",on);if(!kb)return;if(!on){kb.style.height="";return}
+  if(scrollY)scrollTo(0,0);
+  const tb=document.querySelector(".tabs"),vh=window.visualViewport?visualViewport.height:innerHeight;
+  const bot=tb&&tb.offsetHeight&&getComputedStyle(tb).position==="fixed"?Math.min(vh,tb.getBoundingClientRect().top):vh;
+  const h=Math.max(240,Math.floor(bot-kb.getBoundingClientRect().top-8));if(kb.style.height!==h+"px")kb.style.height=h+"px"}
+addEventListener("resize",()=>requestAnimationFrame(kbLock));addEventListener("orientationchange",()=>setTimeout(kbLock,300));
+if(window.visualViewport)visualViewport.addEventListener("resize",()=>requestAnimationFrame(kbLock));
+/* điện thoại: mỗi lần thấy 1 cột, lướt ngang sang bước sau; dải tên bước ở trên để biết đang ở đâu và bấm nhảy cột */
+function kbPager(el){const kb=el.querySelector(".kb"),pg=el.querySelector(".kb-pg");if(!kb||!pg)return;
+  const cols=[...kb.querySelectorAll(":scope>.col")],bs=[...pg.querySelectorAll("button")];
+  bs.forEach((b,i)=>{const c=cols[i];if(c){const v=getComputedStyle(c).getPropertyValue("--c").trim();if(v)b.style.setProperty("--c",v)}});
+  const step=()=>cols.length>1?cols[1].offsetLeft-cols[0].offsetLeft:kb.clientWidth||1;
+  const mark=()=>{const i=Math.max(0,Math.min(cols.length-1,Math.round(kb.scrollLeft/step())));if(kb.clientWidth)S.kbCol=i;
+    bs.forEach((b,k)=>{const on=k===i;if(b.classList.contains("on")!==on){b.classList.toggle("on",on);b.setAttribute("aria-selected",on);if(on)pg.scrollTo({left:b.offsetLeft-(pg.clientWidth-b.offsetWidth)/2,behavior:"smooth"})}})};
+  let raf=0;kb.addEventListener("scroll",()=>{cancelAnimationFrame(raf);raf=requestAnimationFrame(mark)},{passive:true});
+  pg.onclick=e=>{const b=e.target.closest("[data-kbpg]");if(!b)return;const c=cols[+b.dataset.kbpg];if(c)kb.scrollTo({left:c.offsetLeft-cols[0].offsetLeft,behavior:"smooth"})};
+  kbLock();requestAnimationFrame(()=>{kbLock();if(!kb.scrollLeft&&S.kbCol&&getComputedStyle(pg).display!=="none"&&cols[S.kbCol])kb.scrollLeft=cols[S.kbCol].offsetLeft-cols[0].offsetLeft;mark()});
 }
 let kmenu=null;
 document.addEventListener("click",e=>{
@@ -2450,7 +2508,7 @@ function iosGo(fn,dir){if(!iosOn()||iosCalm()||!document.startViewTransition){fn
 function iosTabDir(v){const bs=[...document.querySelectorAll(".bar .tabs button[data-view]")].filter(b=>b.offsetWidth),i=bs.findIndex(b=>b.dataset.view===v),k=bs.findIndex(b=>b.dataset.view===S.view);return i>k?"r":"l"}
 function renderMain(){
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));iosIndAll();
-  document.body.classList.toggle("view-board",S.view==="board");document.body.classList.toggle("view-archive",S.view==="archive");document.body.classList.toggle("view-report",S.view==="report"||S.view==="today"||S.view==="mail");if(S.view!=="board")closeKmenu();
+  document.body.classList.toggle("view-board",S.view==="board");requestAnimationFrame(kbLock);document.body.classList.toggle("view-archive",S.view==="archive");document.body.classList.toggle("view-report",S.view==="report"||S.view==="today"||S.view==="mail");if(S.view!=="board")closeKmenu();
   $("#fStatus").hidden=S.view!=="list";
   renderProfile();
   const el=$("#content");
@@ -4427,7 +4485,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-28d";
+const APP_VER="2026-11-28f";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
