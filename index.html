@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="firebase-config.js?v=483007a3c3"></script>
-<script src="static-shim.js?v=a4ea1f9aa7"></script>
+<script src="static-shim.js?v=0d36d19b21"></script>
 <script>/* giao diện kiểu iOS: mặc định cho mọi người; ?ios=0 tắt, ?ios=1 bật lại (nhớ trên máy) */
 (function(){var on=true;try{var q=location.search.match(/[?&]ios=([01])/);if(q)localStorage.setItem("sojob.ios2",q[1]);on=localStorage.getItem("sojob.ios2")!=="0"}catch(e){}if(on)document.documentElement.classList.add("ios")})();</script>
 <script>/* giao diện app máy tính: bật khi mở bằng app đã cài (cửa sổ riêng); ?desk=1 bật, ?desk=0 tắt (nhớ trên máy) */
@@ -1163,6 +1163,27 @@ table.q td input::placeholder{color:#b3b8c0;font-weight:400}
 .td-empty{padding:40px 10px;text-align:center;font-size:16px}.td-empty small{color:var(--muted);font-size:13px}
 .tabs .cbadge{margin-left:6px;min-width:18px;height:18px;font-size:11px}
 .aisum{font-size:14.5px;line-height:1.6;white-space:normal}
+/* ===== iOS / điện thoại: chắc tay như app thật (2026-11-28i) ===== */
+@media (max-width:780px){
+  /* không nảy kéo lố, không trượt ngang cả trang */
+  html{overscroll-behavior:none}
+  html,body{overflow-x:clip}
+  /* ô nhập >= 16px: iOS không tự phóng to màn hình khi chạm vào để gõ */
+  html input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),html select,html textarea{font-size:16px!important}
+  /* phần đầu gọn: nút Đăng xuất chuyển vào Cài đặt */
+  #sj-user{display:none!important}
+  /* trang tự có vùng cuộn riêng (Chat chung, Email): khung vừa khít tới thanh tab, trang không cuộn thừa */
+  html[data-view=team] body,html[data-view=mail] body,html[data-view=board] body{padding-bottom:0!important}
+  html[data-view=team] .app,html[data-view=mail] .app,html[data-view=board] .app{padding-bottom:0!important}
+  /* bảng rộng (Báo cáo…): cuộn ngang trong khung của nó, không đẩy cả trang */
+  .qwrap,.rp{max-width:100%;overflow-x:auto;-webkit-overflow-scrolling:touch}
+  .rp-h{flex-wrap:wrap}
+}
+/* chạm kiểu app: không bôi đen chữ / hiện menu khi nhấn giữ vào nút, thanh tab, thẻ, đầu cột */
+@media (hover:none){
+  button,.tabs,.kb-pg,.col-h,.kc,.chips2,.space,.od-row,.od-jr,label>span{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+  a,button{-webkit-tap-highlight-color:transparent}
+}
 /* Quy trình: độ rộng cột chỉnh được */
 .kb-pg{display:none}
 @media (max-width:780px){
@@ -2508,7 +2529,7 @@ function iosGo(fn,dir){if(!iosOn()||iosCalm()||!document.startViewTransition){fn
 function iosTabDir(v){const bs=[...document.querySelectorAll(".bar .tabs button[data-view]")].filter(b=>b.offsetWidth),i=bs.findIndex(b=>b.dataset.view===v),k=bs.findIndex(b=>b.dataset.view===S.view);return i>k?"r":"l"}
 function renderMain(){
   document.querySelectorAll(".tabs button").forEach(b=>b.classList.toggle("on",b.dataset.view===S.view));iosIndAll();
-  document.body.classList.toggle("view-board",S.view==="board");requestAnimationFrame(kbLock);document.body.classList.toggle("view-archive",S.view==="archive");document.body.classList.toggle("view-report",S.view==="report"||S.view==="today"||S.view==="mail");if(S.view!=="board")closeKmenu();
+  document.body.classList.toggle("view-board",S.view==="board");document.documentElement.dataset.view=S.view;requestAnimationFrame(kbLock);document.body.classList.toggle("view-archive",S.view==="archive");document.body.classList.toggle("view-report",S.view==="report"||S.view==="today"||S.view==="mail");if(S.view!=="board")closeKmenu();
   $("#fStatus").hidden=S.view!=="list";
   renderProfile();
   const el=$("#content");
@@ -4495,7 +4516,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-28h";
+const APP_VER="2026-11-28i";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)

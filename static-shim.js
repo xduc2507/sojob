@@ -275,7 +275,7 @@
     const k = getKey(), showKey = !FB || !!k || reason === "nokey"; // bản online đã có AI miễn phí qua máy chủ: chỉ hiện ô key Claude khi còn key cũ (để xoá) hoặc bản thử
     const d = overlay(`<h2>Cài đặt</h2>
       ${reason === "nokey" ? `<div class="banner">Muốn Claude đọc ảnh thì cần API key Claude của bạn (tính phí theo lượt dùng ở console.anthropic.com). Chưa có key: bấm <b>Đóng</b>, rồi bấm <b>Tạo job trống</b> hoặc <b>+ Tạo job</b> để gõ tay.</div>` : ""}
-      ${FB ? `<p class="note">Đang đăng nhập <b>${esc(fuser && fuser.email || "")}</b>${ROLE === "owner" ? " (chủ sổ)" : " (nhân viên)"}.</p>${ROLE === "owner" ? `
+      ${FB ? `<p class="note" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap"><span>Đang đăng nhập <b>${esc(fuser && fuser.email || "")}</b>${ROLE === "owner" ? " (chủ sổ)" : " (nhân viên)"}.</span><button class="ghost sm" id="sj-logout" style="margin-left:auto">Đăng xuất</button></p>${ROLE === "owner" ? `
       <div class="mrow" style="justify-content:flex-start;align-items:flex-end;flex-wrap:wrap"><label class="fld" style="flex:1;min-width:160px;margin:0"><span>Tên hiển thị của bạn (cả nhóm thấy)</span><input id="sj-myn" autocomplete="off" value="${esc(window.SOJOB_USER || "")}" placeholder="VD: Đức"></label><button class="primary" id="sj-mysave">Lưu tên</button></div>` : ""}`
         : `<p>Bản dùng thử trên GitHub Pages. Dữ liệu chỉ nằm <b>trong trình duyệt này</b>: máy khác, trình duyệt khác sẽ thấy sổ trống. Nhớ sao lưu thường xuyên.</p>`}
       ${showKey ? `<label class="fld"><span>API key Claude (lấy ở console.anthropic.com → API keys)</span>
@@ -304,6 +304,7 @@
     const msg = (t, err) => { const n = $("#sj-msg", d); n.textContent = t; n.className = "note" + (err ? " err" : ""); };
     const close = () => { d.remove(); settingsOpen = false; };
     $("#sj-close", d).onclick = close;
+    { const lo = $("#sj-logout", d); if (lo) lo.onclick = () => { if (confirm("Đăng xuất " + (fuser && fuser.email || "") + "?")) fauth.signOut(); }; } // điện thoại: nút Đăng xuất ở đầu trang đã ẩn, đăng xuất ở đây
     const sv = $("#sj-save", d); if (sv) sv.onclick = () => {
       const v = $("#sj-key", d).value.trim();
       if (!/^sk-ant-[\w-]{20,}$/.test(v)) { msg("Key phải bắt đầu bằng sk-ant-…", true); return; }
