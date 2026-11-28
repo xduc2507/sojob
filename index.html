@@ -1052,6 +1052,7 @@ body.perm-view [data-mjgan],body.perm-view [data-mjpick]{display:none!important}
 .od-jr .mono{flex:none;font-size:12.5px;min-width:92px}.od-jr .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .od-lnk{flex:1;min-width:0;display:flex;align-items:center;background:none;border:0;padding:2px 0;box-shadow:none;color:#007AFF;font:inherit;text-align:left;cursor:pointer}.od-lnk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.od-lnk .svi{color:#F5A623;flex:none}
 @media (max-width:560px){.od-jr{flex-wrap:wrap;gap:2px 10px}.od-jr .mono{min-width:0}.od-jr .nm,.od-jr .od-lnk{flex:1 1 calc(100% - 110px)}.od-jr button.sm{margin-left:auto}}
+.od-skips summary{cursor:pointer;color:var(--muted);font-size:13px}.od-skips[open] summary{margin-bottom:4px}.od-jr .od-skip{color:var(--muted)}
 .od-pend{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding:6px 10px;border-radius:9px;background:color-mix(in srgb,#007AFF 9%,var(--surface));font-size:13px}.od-pend .svi{width:15px;height:15px;color:#007AFF;flex:none}
 .od-path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}.od-path a{font-weight:600;color:#007AFF;word-break:break-word}.od-path .svi{color:#F5A623}
 .od-sec.od-over,.od-drop.od-over{outline:2px dashed #007AFF;outline-offset:2px}
@@ -4426,7 +4427,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-28c";
+const APP_VER="2026-11-28d";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4588,20 +4589,20 @@ async function odFill(el,j){const b=el.querySelector("#odBody");if(!b||!odJob(j)
   if(!odReady())return put(`<p class="muted" style="margin:0">Chưa nối OneDrive. <button class="ghost sm" data-act="cloudTab">Mở tab OneDrive để nối</button></p>`);
   try{
     if(!j.od){
+      if(j.odSkip)return put(`<p class="muted" style="margin:0">Job này không cần thư mục OneDrive (khách tự khai, chỉ trình tờ khai). <button class="ghost sm" data-act="cloudUnskip">Cần thư mục</button></p>`);
       if(!OD.root)return put(`<p class="muted" style="margin:0">Chưa chọn thư mục gốc (chứa các FWD). <button class="ghost sm" data-act="cloudTab">Chọn trong tab OneDrive</button></p>`);
       if(OD.tried.has(id))return put(odMissHtml(j,OD.tried.r&&OD.tried.r[id]));
       OD.tried.add(id);put(`<p class="muted" style="margin:0">Đang tìm thư mục của ${esc(j.company||"khách")}…</p>`);
-      if(odOpen(j)&&j.company){await odEnsure(j);toast(`Đã gắn ${j.code} với thư mục OneDrive: ${j.od.path}. Sai thì bấm Đổi thư mục.`)}
-      else{const r=await odAuto(j,false);(OD.tried.r=OD.tried.r||{})[id]=r;
-        if(r.lo){odLink(j,r);toast(`Đã gắn ${j.code} với thư mục OneDrive: ${j.od.path}`)}else return put(odMissHtml(j,r))}
+      const r=await odAuto(j,false);(OD.tried.r=OD.tried.r||{})[id]=r;
+      if(r.lo){odLink(j,r);toast(`Đã gắn ${j.code} với thư mục OneDrive: ${j.od.path}`)}else return put(odMissHtml(j,r));
     }
     const L=await odKids(j.od.id);
     put(`<div class="od-path">${svi("folder")}<a href="${esc(j.od.url)}" target="_blank" rel="noopener">${esc(j.od.path||j.od.name)}</a>${j.od.auto===false?"":""}<button class="ghost sm" data-act="cloudRefresh" title="Tải lại">${svi("refresh")}</button><button class="ghost sm danger" data-act="cloudUnlink">Bỏ gắn</button></div>`+
       (L.length?`<div class="od-files">${L.map(odRowHtml).join("")}</div>`:`<p class="muted" style="margin:6px 0 0">Thư mục trống. Kéo thả tệp vào đây hoặc bấm “Tải tệp lên”.</p>`));
   }catch(e){put(`<p class="muted" style="margin:0">${esc(e.message||String(e))} ${e.login?`<button class="ghost sm" data-act="cloudTab">Đăng nhập</button>`:""}</p>`)}}
 function odMissHtml(j,r){r=r||{};
-  const why=!j.company?"Job chưa có tên khách hàng / chủ hàng nên chưa tự tìm được thư mục.":r.fwd?`Trong FWD “${esc(r.fwd.name)}” chưa thấy thư mục khách “${esc(j.company)}”.`:`Chưa thấy thư mục khách “${esc(j.company)}”${j.fwd?` (FWD “${esc(j.fwd)}”)`:""} trong OneDrive.`;
-  return `<p class="muted" style="margin:0 0 6px">${why}</p><div class="lrow">${r.fwd&&j.company?`<button class="primary sm" data-act="cloudMkKh">Tạo thư mục “${esc(j.company)}” trong ${esc(r.fwd.name)}</button>`:""}<button class="ghost sm" data-act="cloudPick">Chọn thư mục…</button><button class="ghost sm" data-act="cloudRetry">Tìm lại</button></div>`}
+  const why=!j.company?"Job chưa có tên khách hàng / chủ hàng nên chưa tự tìm được thư mục.":r.kh?`Có thư mục khách “${esc(r.kh.name)}” nhưng chưa có thư mục lô.`:r.fwd?`Trong FWD “${esc(r.fwd.name)}” chưa thấy thư mục khách “${esc(j.company)}”.`:`Chưa thấy thư mục khách “${esc(j.company)}”${j.fwd?` (FWD “${esc(j.fwd)}”)`:""} trong OneDrive.`;
+  return `<p class="muted" style="margin:0 0 6px">${why}</p><div class="lrow">${j.company?`<button class="primary sm" data-act="cloudMk">Tạo thư mục lô</button>`:""}<button class="ghost sm" data-act="cloudPick">Chọn thư mục…</button><button class="ghost sm" data-act="cloudSkip">Không cần thư mục</button><button class="ghost sm" data-act="cloudRetry">Tìm lại</button></div>`}
 const odExt=n=>((/\.([a-z0-9]{1,5})$/i.exec(n||"")||[])[1]||"").toUpperCase();
 const odSize=n=>n>=1048576?(n/1048576).toFixed(1)+" MB":n>=1024?Math.round(n/1024)+" KB":(n||0)+" B";
 function odRowHtml(f){const d=f.lastModifiedDateTime?new Date(f.lastModifiedDateTime).toLocaleDateString("vi-VN",{day:"2-digit",month:"2-digit",year:"2-digit"}):"";
@@ -4625,6 +4626,9 @@ async function odAct(a,j,b){
   if(a==="cloudMkKh"){const r=(OD.tried.r||{})[j.id];if(!r||!r.fwd)return;b.disabled=true;
     try{const kh=await odMkdir(r.fwd.id,j.company);const lo=await odMkdir(kh.id,`${j.code} - ${odShort(j)}`);odLink(j,{fwd:r.fwd,kh,lo});toast(`Đã tạo thư mục ${j.od.path}`);renderDetail(true)}
     catch(e){b.disabled=false;toast("Chưa tạo được: "+(e.message||e))}return}
+  if(a==="cloudMk"){b.disabled=true;b.textContent="Đang tạo…";try{await odEnsure(j);toast(`Đã tạo / gắn thư mục ${j.od.path}`);renderDetail(true)}catch(e){b.disabled=false;b.textContent="Tạo thư mục lô";toast("Chưa tạo được: "+(e.message||e))}return}
+  if(a==="cloudSkip"){j.odSkip=true;queueSave(j);toast(`${j.code}: không cần thư mục OneDrive.`);renderDetail(true);return}
+  if(a==="cloudUnskip"){delete j.odSkip;OD.tried.delete(j.id);queueSave(j);renderDetail(true);return}
   if(a==="cloudPick"){S.odPick=j.id;S.odPath=null;S.view="od";S.sel=null;renderAll(true);return}}
 /* kéo thả tệp vào mục OneDrive của phiếu */
 document.addEventListener("dragover",e=>{const z=e.target.closest&&e.target.closest("#odSec,.od-drop");if(z&&e.dataTransfer&&[...e.dataTransfer.types].includes("Files")){e.preventDefault();z.classList.add("od-over")}});
@@ -4648,13 +4652,15 @@ function renderOd(el){odInit();el.dataset.v="od";
 /* khối trên cùng tab OneDrive: tệp Zalo chờ lưu · job riêng chưa có thư mục · lô gần đây */
 function odHomeHtml(){const M=S.all.filter(j=>isMine(j)&&!(typeof isArch==="function"&&isArch(j)));
   const pend=M.filter(j=>Array.isArray(j.odPending)&&j.odPending.length),np=pend.reduce((a,j)=>a+j.odPending.length,0);
-  const miss=M.filter(j=>!j.od&&odOpen(j)).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  const miss=M.filter(j=>!j.od&&!j.odSkip&&odOpen(j)).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  const skip=M.filter(j=>!j.od&&j.odSkip&&odOpen(j));
   const rec=M.filter(j=>j.od&&j.od.id).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,6);
   const row=(j,act)=>`<div class="od-jr"><span class="mono">${esc(j.code||"")}</span>${act}</div>`;
   return (np?`<div class="od-blk od-blk-pend">${svi("clip")}<span><b>${np} tệp gửi qua Zalo</b> đang chờ lưu · ${pend.map(j=>esc(j.code)).join(", ")}</span><button class="primary sm" data-odsweep>Lưu ngay</button></div>`:"")+
     (miss.length?`<div class="od-blk"><div class="od-bh"><b>Job riêng chưa có thư mục</b><span class="mono">${miss.length}</span><span class="sp"></span>${OD.root?`<button class="ghost sm" data-odauto>${svi("link")}Tạo / gắn tất cả</button>`:""}</div>
       ${OD.root?"":`<p class="muted" style="margin:2px 0 6px">Chọn thư mục gốc (thư mục chứa các FWD) ở dưới trước.</p>`}
-      ${miss.slice(0,8).map(j=>row(j,`<span class="nm">${esc(j.company||odShort(j)||"")}</span>${OD.root?`<button class="ghost sm" data-odmkjob="${esc(j.id)}">${j.company?"Tạo / gắn thư mục":"Chọn thư mục…"}</button>`:""}`)).join("")}${miss.length>8?`<small class="muted">+${miss.length-8} job nữa</small>`:""}</div>`:"")+
+      ${miss.slice(0,8).map(j=>row(j,`<span class="nm">${esc(j.company||odShort(j)||"")}</span>${OD.root?`<button class="ghost sm" data-odmkjob="${esc(j.id)}">${j.company?"Tạo / gắn thư mục":"Chọn thư mục…"}</button>`:""}<button class="ghost sm od-skip" data-odskip="${esc(j.id)}" title="Khách tự khai, chỉ trình tờ khai: không cần thư mục">Không cần</button>`)).join("")}${miss.length>8?`<small class="muted">+${miss.length-8} job nữa</small>`:""}</div>`:"")+
+    (skip.length?`<details class="od-blk od-skips"><summary>${skip.length} job không cần thư mục (khách tự khai)</summary>${skip.map(j=>row(j,`<span class="nm">${esc(j.company||odShort(j)||"")}</span><button class="ghost sm" data-odunskip="${esc(j.id)}">Cần thư mục</button>`)).join("")}</details>`:"")+
     (rec.length?`<div class="od-blk"><div class="od-bh"><b>Lô gần đây</b></div>${rec.map(j=>row(j,`<button type="button" class="od-lnk" data-odopen="${esc(j.id)}">${svi("folder")}<span>${esc(j.od.path||j.od.name)}</span></button><button class="ghost sm" data-odjob="${esc(j.id)}">Mở job</button>`)).join("")}</div>`:"")}
 async function odPaint(fresh){const hm=$("#odHome");if(hm)hm.innerHTML=odHomeHtml();const top=$("#odTop"),list=$("#odList");if(!top||!list)return;const at=odAt(),lv=odLv(),pj=S.odPick?S.all.find(x=>x.id===S.odPick):null;
   const LBL=["Các FWD","Khách hàng","Lô hàng"];
@@ -4667,7 +4673,7 @@ async function odPaint(fresh){const hm=$("#odHome");if(hm)hm.innerHTML=odHomeHtm
   try{const L=await odKids(at.id,fresh);if(odAt()!==at)return;const q=odN(S.odQ);const V=q?L.filter(f=>odN(f.name).includes(q)):L;
     list.innerHTML=V.length?V.map(odRowHtml).join(""):`<p class="muted">${q?"Không có mục nào khớp.":"Thư mục trống. Kéo thả tệp vào đây để tải lên."}</p>`}
   catch(e){list.innerHTML=`<p class="muted">${esc(e.message||String(e))}</p>${e.login?`<button class="primary" data-odlogin>Đăng nhập OneDrive</button>`:""}`}}
-async function odAutoAll(btn){const L=S.all.filter(j=>isMine(j)&&!j.od&&odOpen(j));if(!L.length)return toast("Job riêng đang làm đều đã có thư mục.");
+async function odAutoAll(btn){const L=S.all.filter(j=>isMine(j)&&!j.od&&!j.odSkip&&odOpen(j));if(!L.length)return toast("Job riêng đang làm đều đã có thư mục.");
   btn.disabled=true;let ok=0;const miss=[],bad=[];
   for(const j of L){btn.textContent=`Đang gắn ${ok+miss.length+bad.length+1}/${L.length}…`;if(!j.company){miss.push(j.code);continue}try{await odEnsure(j);ok++}catch(e){bad.push(j.code)}}
   btn.disabled=false;toast(`Đã tạo / gắn thư mục cho ${ok} job.${miss.length?` Chưa có tên khách (bấm Chọn thư mục…): ${miss.join(", ")}.`:""}${bad.length?` Lỗi: ${bad.join(", ")}.`:""}`);odPaint(true)}
@@ -4700,13 +4706,14 @@ async function odSweep(){if(odSweeping||!odOn()||!odReady()||!OD.root||!canEdit(
   if(S.view==="od")odPaint(true)}
 setInterval(()=>{odSweep().catch(()=>{})},30000);setTimeout(()=>{odSweep().catch(()=>{})},6000);
 document.addEventListener("input",e=>{if(e.target.id==="odQ"){S.odQ=e.target.value;odPaint()}});
-document.addEventListener("click",async e=>{const t=e.target.closest("[data-odlogin],[data-odout],[data-odsweep],[data-odmkjob],[data-odopen],[data-odjob],[data-odgo],[data-odcr],[data-odup],[data-odmk],[data-odroot],[data-odauto],[data-odref],[data-odpickhere],[data-odpickno]");if(!t||!odOn())return;
+document.addEventListener("click",async e=>{const t=e.target.closest("[data-odlogin],[data-odout],[data-odskip],[data-odunskip],[data-odsweep],[data-odmkjob],[data-odopen],[data-odjob],[data-odgo],[data-odcr],[data-odup],[data-odmk],[data-odroot],[data-odauto],[data-odref],[data-odpickhere],[data-odpickno]");if(!t||!odOn())return;
   const d=t.dataset;
   if(d.odlogin!=null){try{await odLogin();toast("Đã nối OneDrive"+(OD.acct?": "+OD.acct:"")+".");}catch(er){toast(er.message||String(er))}S.odPath=null;renderMain();return}
   if(d.odout!=null){const v=await ask({title:"Ngắt kết nối OneDrive?",text:OD.srv?"Máy chủ bỏ phiên OneDrive: mọi máy của anh và bot Zalo thôi lưu vào OneDrive cho tới khi đăng nhập lại. Thư mục đã gắn với job vẫn giữ.":"Xoá phiên đăng nhập OneDrive trên máy này. Thư mục đã gắn với job vẫn giữ.",ok:"Ngắt",danger:true});if(!v)return;
     if(OD.srv){try{odTake(await odSrv({op:"out"}))}catch(er){return toast("Chưa ngắt được: "+(er.message||er))}}OD.rt=null;OD.tok=null;OD.linked=false;OD.acct="";odSave();renderMain();return}
   if(d.odsweep!=null){OD.ztFail.clear();t.disabled=true;t.textContent="Đang lưu…";await odSweep().catch(er=>toast(er.message||String(er)));odPaint(true);return}
   if(d.odjob){openJobAny(d.odjob);return}
+  if(d.odskip||d.odunskip){const j=S.all.find(x=>x.id===(d.odskip||d.odunskip));if(!j)return;if(d.odskip){j.odSkip=true;toast(`${j.code}: không cần thư mục OneDrive. Bật lại ở mục “job không cần thư mục”.`)}else delete j.odSkip;queueSave(j);odPaint();return}
   if(d.odopen){const j=S.all.find(x=>x.id===d.odopen);if(!j||!j.od)return;const P=[OD.root?{id:OD.root.id,name:OD.root.name}:{id:"root",name:"OneDrive"}];
     if(j.od.fwd)P.push(j.od.fwd);if(j.od.kh)P.push(j.od.kh);P.push({id:j.od.id,name:j.od.name});S.odPath=P;S.odQ="";renderOd($("#content"));return}
   if(d.odmkjob){const j=S.all.find(x=>x.id===d.odmkjob);if(!j)return;
