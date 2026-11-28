@@ -2788,7 +2788,7 @@ function renderLateBar(){
   const el=$("#latebar");if(!el)return;
   renderSpace();
   if(!S.loaded){el.innerHTML="";return}
-  const sum=mineSummary();
+  const sum=""; // dải tóm tắt Việc riêng đã chuyển vào Báo cáo (mineRpHtml)
   const open=S.jobs.filter(j=>lateState(j));
   const none=open.filter(j=>lateState(j)==="none").length,pend=open.filter(j=>lateState(j)==="pend").length;
   if(S.fLate){el.innerHTML=sum+`<div class="latebar f">Đang lọc job quá hạn ở 3 bước hải quan (${none+pend} job)<button class="ghost sm" data-late="off">Bỏ lọc</button></div>`;return}
@@ -3730,32 +3730,42 @@ function rpCalc(month){
   const js=S.jobs.filter(j=>rpKey(j)===month),row=j=>{
     const Q=j.quote||[],dv=Q.filter(q=>!q.ch).reduce((a,q)=>a+num(q.qty)*num(q.price),0),ch=Q.filter(q=>q.ch).reduce((a,q)=>a+num(q.qty)*num(q.price),0),
       net=Q.filter(q=>!q.ch&&num(q.net)>0).reduce((a,q)=>a+num(q.qty)*num(q.net),0),noNet=Q.some(q=>!q.ch&&num(q.price)>0&&!(num(q.net)>0));
-    return {j,dv,ch,net,lai:dv-net,noNet,no:j.debitDate&&!j.paidDate?num(j.debitAmount):0}};
+    return {j,dv,ch,net,lai:SPACE==="mine"?num(j.debitAmount)-num(j.cost):dv-net,noNet,no:j.debitDate&&!j.paidDate?num(j.debitAmount):0}};
   const R=js.map(row),sum=k=>R.reduce((a,r)=>a+r[k],0);
   const by={};R.forEach(r=>{const k=r.j.fwd||r.j.company||"(chưa ghi)";const g=by[k]=by[k]||{k,n:0,dv:0,ch:0,net:0,lai:0,no:0};g.n++;["dv","ch","net","lai","no"].forEach(x=>g[x]+=r[x])});
   const noAll=S.jobs.filter(j=>j.debitDate&&!j.paidDate);
   return {month,R,n:js.length,done:js.filter(j=>j.status==="Hoàn thành").length,fail:js.filter(j=>j.status===FAIL).length,open:js.filter(j=>isOpen(j.status)).length,
     late:js.filter(j=>j.odAck||isOverdue(j)).length,dv:sum("dv"),ch:sum("ch"),net:sum("net"),lai:sum("lai"),noNet:R.filter(r=>r.noNet).length,
     groups:Object.values(by).sort((a,b)=>b.dv-a.dv),noAll:noAll.reduce((a,j)=>a+num(j.debitAmount),0),noAllN:noAll.length}}
+/* Báo cáo · Việc riêng: đang chạy, đã thu trong tháng, trả Tuấn (số liệu trước nằm ở dải trên đầu trang) */
+function mineRpHtml(month){
+  const add=(o,v,c)=>{c=c||"VND";o[c]=(o[c]||0)+num(v)},paid={};let run=0;
+  S.jobs.forEach(j=>{if(isOpen(j.status))run++;if(j.paidDate&&String(j.paidDate).startsWith(month))add(paid,j.debitAmount,j.debitCurrency)});
+  const show=o=>Object.keys(o).length?Object.entries(o).map(([c,v])=>`${fmt(v,c)}${c==="VND"?"":" "+esc(c)}`).join(" + "):"0";
+  const nP=S.jobs.filter(j=>j.paidDate&&String(j.paidDate).startsWith(month)).length,nT=S.jobs.filter(j=>rpKey(j)===month&&j.doer==="Tuấn").length;
+  return `<div><b>${run}</b><span>job đang chạy</span><small>mọi tháng, chưa xong</small></div>
+      <div><b>${show(paid)}</b><span>đã thu trong tháng</span><small>${nP} job ghi ngày thu</small></div>
+      <div><b>${fmt(nT*FEE_TUAN,"VND")}</b><span>trả Tuấn</span><small>${nT} tờ khai × ${fmt(FEE_TUAN,"VND")}</small></div>`}
 function renderReport(el){
   const months=[...new Set(S.jobs.map(rpKey))].sort().reverse();const now=TODAY().slice(0,7);if(!months.includes(now))months.unshift(now);
   if(!S.rpMonth||!months.includes(S.rpMonth))S.rpMonth=months[0];
   const r=rpCalc(S.rpMonth),v=x=>fmt(x,"VND"),ml=m=>m.slice(5)+"/"+m.slice(0,4);
   el.dataset.v="report";
   el.innerHTML=`<div class="rp"><div class="rp-h"><label class="fld"><span>Tháng</span><select id="rpMonth">${months.map(m=>`<option value="${m}"${m===S.rpMonth?" selected":""}>Tháng ${ml(m)}</option>`).join("")}</select></label>
-      <button class="primary" id="rpXlsx">${ic("xlsx")}Xuất Excel</button><span class="muted">${SPACE==="mine"?"Việc riêng":"Sổ chung"} · tính theo ngày tờ khai, chưa có thì theo ngày tạo job</span></div>
+      <button class="primary" id="rpXlsx">${ic("xlsx")}Xuất Excel</button>${SPACE==="mine"?`<button class="sm" data-rpxl="in" title="Nhập danh sách job riêng từ file Excel">${ic("xlsx")}Nhập job từ Excel</button><button class="sm" data-rpxl="out" title="Xuất toàn bộ job riêng ra Excel">${ic("xlsx")}Xuất danh sách job</button>`:""}<span class="muted">${SPACE==="mine"?"Việc riêng":"Sổ chung"} · tính theo ngày tờ khai, chưa có thì theo ngày tạo job</span></div>
     <div class="rp-k">
       <div><b>${r.n}</b><span>job trong tháng</span><small>${r.done} xong · ${r.open} đang làm</small></div>
       <div><b>${v(r.dv)}</b><span>phí dịch vụ (chưa VAT)</span><small>chi hộ ${v(r.ch)}</small></div>
-      <div><b>${v(r.lai)}</b><span>lãi gộp (phí dịch vụ − NET)</span><small>${r.noNet?`${r.noNet} job chưa nhập đủ NET`:"đủ NET"}</small></div>
+      <div><b>${v(r.lai)}</b><span>${SPACE==="mine"?"lãi (tiền debit − chi phí)":"lãi gộp (phí dịch vụ − NET)"}</span><small>${SPACE==="mine"?`${r.R.filter(x=>!(num(x.j.debitAmount)>0)).length} job chưa có tiền debit`:r.noNet?`${r.noNet} job chưa nhập đủ NET`:"đủ NET"}</small></div>
       <div class="${r.noAll?"warn":""}"><b>${v(r.noAll)}</b><span>công nợ chưa thu (mọi tháng)</span><small>${r.noAllN} job đã gửi debit</small></div>
-      <div class="${r.late?"bad":""}"><b>${r.late}</b><span>job quá hạn trong tháng</span><small>gồm đã ghi lý do</small></div></div>
+      <div class="${r.late?"bad":""}"><b>${r.late}</b><span>job quá hạn trong tháng</span><small>gồm đã ghi lý do</small></div>${SPACE==="mine"?mineRpHtml(S.rpMonth):""}</div>
     ${team()&&SPACE!=="mine"?rpLoad():""}
     <div class="qwrap"><table class="rp-t"><thead><tr><th>FWD / khách</th><th class="num">Job</th><th class="num">Phí dịch vụ</th><th class="num">Chi hộ</th><th class="num">NET</th><th class="num">Lãi gộp</th><th class="num">Chưa thu</th></tr></thead><tbody>
       ${r.groups.map(g=>`<tr><td>${esc(g.k)}</td><td class="num">${g.n}</td><td class="num">${v(g.dv)}</td><td class="num">${v(g.ch)}</td><td class="num">${v(g.net)}</td><td class="num"><b>${v(g.lai)}</b></td><td class="num">${g.no?v(g.no):""}</td></tr>`).join("")||`<tr><td colspan="7" class="muted">Tháng này chưa có job.</td></tr>`}
       </tbody>${r.groups.length?`<tfoot><tr><td>Cộng</td><td class="num">${r.n}</td><td class="num">${v(r.dv)}</td><td class="num">${v(r.ch)}</td><td class="num">${v(r.net)}</td><td class="num"><b>${v(r.lai)}</b></td><td class="num"></td></tr></tfoot>`:""}</table></div></div>`;
   el.querySelector("#rpMonth").onchange=e=>{S.rpMonth=e.target.value;renderReport(el)};
   el.querySelector("#rpXlsx").onclick=()=>rpXlsx(r);
+  el.querySelectorAll("[data-rpxl]").forEach(b=>b.onclick=()=>b.dataset.rpxl==="in"?xlImport():xlExport());
 }
 async function rpXlsx(r){
   let X;try{X=await loadXL()}catch(e){return toast(e.message)}
@@ -4485,7 +4495,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-28f";
+const APP_VER="2026-11-28h";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
