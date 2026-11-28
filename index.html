@@ -4419,7 +4419,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-28a";
+const APP_VER="2026-11-28b";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4476,12 +4476,18 @@ const odJob=j=>!!j&&odOn()&&isMine(j);
 const odReady=()=>{odInit();return !!OD.cid&&!!(OD.rt||OD.tok)};
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
 const odRedirect=()=>location.origin+location.pathname.replace(/[^/]*$/,"")+"od-auth.html";
+/* app cài trên màn hình chính (iPhone/iPad): cửa sổ bật lên không dùng được (bị chặn, hoặc mở ra Safari riêng không chung bộ nhớ),
+   nên chuyển hẳn sang trang đăng nhập Microsoft rồi quay về app; odResume() đổi mã lấy phiên khi app mở lại */
+const odStandalone=()=>{try{return !!(navigator.standalone||matchMedia("(display-mode: standalone)").matches)}catch(e){return false}};
 async function odLogin(){odInit();
   if(!OD.cid)throw new Error("Chưa có mã ứng dụng Microsoft.");
+  const w=odStandalone()?null:open("about:blank","odlogin","width=500,height=680"); // mở ngay lúc bấm, trước mọi await, để Safari không chặn
   const ver=b64u(crypto.getRandomValues(new Uint8Array(32))),ch=b64u(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(ver))),st=b64u(crypto.getRandomValues(new Uint8Array(16)));
   try{localStorage.removeItem("sojob.odcb")}catch(e){}
-  const w=open(OD_AUTH+"/authorize?"+new URLSearchParams({client_id:OD.cid,response_type:"code",redirect_uri:odRedirect(),scope:OD_SCOPE,code_challenge:ch,code_challenge_method:"S256",state:st,prompt:"select_account"}),"odlogin","width=500,height=680");
-  if(!w)throw new Error("Trình duyệt chặn cửa sổ đăng nhập: cho phép cửa sổ bật lên rồi bấm lại.");
+  const url=OD_AUTH+"/authorize?"+new URLSearchParams({client_id:OD.cid,response_type:"code",redirect_uri:odRedirect(),scope:OD_SCOPE,code_challenge:ch,code_challenge_method:"S256",state:st,prompt:"select_account"});
+  if(!w){try{localStorage.setItem("sojob.odpkce",JSON.stringify({ver,st,at:Date.now()}))}catch(e){throw new Error("Máy không cho lưu tạm để đăng nhập, thử lại.")}
+    location.href=url;return new Promise(()=>{})} // rời trang sang Microsoft; đăng nhập xong od-auth.html đưa về app
+  w.location.href=url;
   const q=await new Promise((res,rej)=>{let closedAt=0;const t=setInterval(()=>{let h="";try{h=w.location.href}catch(e){}
       let cb=null;try{cb=JSON.parse(localStorage.getItem("sojob.odcb")||"null")}catch(e){}
       if(cb&&cb.q){clearInterval(t);try{localStorage.removeItem("sojob.odcb");w.close()}catch(e){}return res(new URLSearchParams(cb.q))}
@@ -4492,6 +4498,17 @@ async function odLogin(){odInit();
   await odToken({grant_type:"authorization_code",code:q.get("code"),redirect_uri:odRedirect(),code_verifier:ver});
   try{const u=await odApi("/me?$select=displayName,mail,userPrincipalName");OD.acct=u.mail||u.userPrincipalName||u.displayName||"";odSave()}catch(e){}
 }
+async function odResume(){let p=null,cb=null;try{p=JSON.parse(localStorage.getItem("sojob.odpkce")||"null");cb=JSON.parse(localStorage.getItem("sojob.odcb")||"null")}catch(e){}
+  if(!p||!cb||!cb.q)return false;try{localStorage.removeItem("sojob.odpkce");localStorage.removeItem("sojob.odcb")}catch(e){}
+  if(Date.now()-p.at>20*60000)return toast("Phiên đăng nhập OneDrive đã quá hạn, bấm Đăng nhập lại."),false;
+  const q=new URLSearchParams(cb.q);if(q.get("state")!==p.st)return toast("Đăng nhập OneDrive không hợp lệ, thử lại."),false;
+  if(!q.get("code"))return toast(q.get("error_description")||q.get("error")||"Chưa đăng nhập được OneDrive."),false;
+  odInit();await odToken({grant_type:"authorization_code",code:q.get("code"),redirect_uri:odRedirect(),code_verifier:p.ver});
+  try{const u=await odApi("/me?$select=displayName,mail,userPrincipalName");OD.acct=u.mail||u.userPrincipalName||u.displayName||"";odSave()}catch(e){}
+  toast("Đã nối OneDrive"+(OD.acct?": "+OD.acct:"")+".");
+  if(odOn()||boss()){if(spaceOn()&&SPACE!=="mine"&&typeof setSpace==="function")await setSpace("mine");S.odPick=null;S.view="od";S.sel=null;renderAll(true)}
+  return true}
+{let n=0;const t=setInterval(()=>{if(++n>60)return clearInterval(t);if(!me()||!S.all)return;clearInterval(t);odResume().catch(e=>toast("OneDrive: "+(e.message||e)))},1000)}
 async function odToken(p){
   const r=await fetch(OD_AUTH+"/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(Object.assign({client_id:OD.cid,scope:OD_SCOPE},p))});
   let j={};try{j=await r.json()}catch(e){}

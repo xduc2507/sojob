@@ -5,4 +5,7 @@
 <script>/* trả mã đăng nhập Microsoft về cho cửa sổ Sổ Job đã mở trang này (cùng tên miền), rồi đóng */
 try{localStorage.setItem("sojob.odcb",JSON.stringify({q:location.search,at:Date.now()}))}catch(e){}
 try{history.replaceState(null,"",location.pathname)}catch(e){}
-setTimeout(function(){try{window.close()}catch(e){}},1200);</script></body></html>
+/* mở bằng cửa sổ bật lên: tự đóng. App trên màn hình chính iPhone (chuyển hẳn trang, không có cửa sổ mẹ): quay về app */
+var ve=false;try{ve=!!localStorage.getItem("sojob.odpkce")}catch(e){}
+if(ve&&!window.opener)location.replace(location.pathname.replace(/[^/]*$/,""));
+else setTimeout(function(){try{window.close()}catch(e){}},1200);</script></body></html>
