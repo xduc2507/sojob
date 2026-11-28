@@ -1045,6 +1045,13 @@ body.perm-view [data-mjgan],body.perm-view [data-mjpick]{display:none!important}
 .od-row .ext{flex:none;min-width:38px;text-align:center;font-size:10.5px;padding:3px 4px;border-radius:6px;background:color-mix(in srgb,#007AFF 12%,var(--surface));color:#0060D0}
 .od-jobs{display:flex;gap:4px}.od-jobs i{font-style:normal;font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px;background:color-mix(in srgb,#34C759 16%,var(--surface));color:#1E8E3E}
 .od-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,#007AFF 10%,var(--surface));font-size:14px}.od-pick span{flex:1;min-width:200px}
+.od-blk{display:flex;flex-direction:column;gap:2px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);font-size:14px}
+.od-blk-pend{flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;background:color-mix(in srgb,#007AFF 9%,var(--surface));border-color:color-mix(in srgb,#007AFF 25%,var(--line))}.od-blk-pend>span{flex:1;min-width:200px}.od-blk-pend>.svi{width:16px;height:16px;color:#007AFF}
+.od-bh{display:flex;align-items:center;gap:8px;margin:0 0 4px}.od-bh .sp{flex:1}.od-bh .mono{font-size:12px;color:var(--muted)}.od-blk .svi{width:15px;height:15px;margin:0 4px 0 0}
+.od-jr{display:flex;align-items:center;gap:10px;padding:5px 0;border-top:1px solid var(--line);min-width:0}.od-bh+.od-jr,.od-bh+p+.od-jr{border-top:0}
+.od-jr .mono{flex:none;font-size:12.5px;min-width:92px}.od-jr .nm{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.od-lnk{flex:1;min-width:0;display:flex;align-items:center;background:none;border:0;padding:2px 0;box-shadow:none;color:#007AFF;font:inherit;text-align:left;cursor:pointer}.od-lnk span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.od-lnk .svi{color:#F5A623;flex:none}
+@media (max-width:560px){.od-jr{flex-wrap:wrap;gap:2px 10px}.od-jr .mono{min-width:0}.od-jr .nm,.od-jr .od-lnk{flex:1 1 calc(100% - 110px)}.od-jr button.sm{margin-left:auto}}
 .od-pend{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding:6px 10px;border-radius:9px;background:color-mix(in srgb,#007AFF 9%,var(--surface));font-size:13px}.od-pend .svi{width:15px;height:15px;color:#007AFF;flex:none}
 .od-path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}.od-path a{font-weight:600;color:#007AFF;word-break:break-word}.od-path .svi{color:#F5A623}
 .od-sec.od-over,.od-drop.od-over{outline:2px dashed #007AFF;outline-offset:2px}
@@ -4419,7 +4426,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-28b";
+const APP_VER="2026-11-28c";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4466,55 +4473,72 @@ setTimeout(()=>{if(team()&&window.Notification&&Notification.permission==="grant
    - Job chỉ lưu đường dẫn thư mục (j.od); tệp thật nằm trên OneDrive, không giới hạn 1 MB. */
 const OD_CLIENT="75e45cab-7c6e-4ac4-a1d0-9797e376b79d"; // mã ứng dụng (Application / client ID) đăng ký trên Microsoft Entra — công khai, không phải mật khẩu
 const OD_AUTH="https://login.microsoftonline.com/consumers/oauth2/v2.0",OD_SCOPE="Files.ReadWrite offline_access User.Read",OD_G="https://graph.microsoft.com/v1.0";
-const OD={tok:null,exp:0,rt:null,root:null,cid:"",acct:"",cache:{},tried:new Set(),busy:false};
+const OD={tok:null,exp:0,rt:null,root:null,cid:"",acct:"",cache:{},tried:new Set(),busy:false,srv:null,linked:false};
 const odKey=()=>"sojob.od."+(me()||"x");
-function odLoad(){try{const o=JSON.parse(localStorage.getItem(odKey())||"{}");OD.rt=o.rt||null;OD.root=o.root||null;OD.cid=o.cid||OD_CLIENT;OD.acct=o.acct||""}catch(e){OD.cid=OD_CLIENT}}
-function odSave(){try{localStorage.setItem(odKey(),JSON.stringify({rt:OD.rt,root:OD.root,cid:OD.cid,acct:OD.acct}))}catch(e){}}
-let odLoaded=false;const odInit=()=>{if(!odLoaded&&me()){odLoaded=true;odLoad()}};
+function odLoad(){try{const o=JSON.parse(localStorage.getItem(odKey())||"{}");OD.rt=o.rt||null;OD.root=o.root||null;OD.cid=OD_CLIENT;OD.acct=o.acct||""}catch(e){OD.cid=OD_CLIENT}}
+function odSave(){try{localStorage.setItem(odKey(),JSON.stringify({rt:OD.srv?null:OD.rt,root:OD.root,acct:OD.acct}))}catch(e){}}
+/* máy chủ giữ phiên OneDrive (khi đã cài OD_SECRET): đăng nhập 1 lần cho mọi máy của chủ sổ, phiên tự gia hạn, thư mục gốc dùng chung.
+   Máy chủ chưa có OD_SECRET thì dùng cách cũ: phiên giữ trên từng máy (Microsoft chỉ cho sống 24 giờ). */
+async function odSrv(q){const u=window.firebase&&firebase.auth().currentUser;if(!u)throw new Error("Chưa đăng nhập Sổ.");
+  const r=await fetch(PUSH_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({od:q,token:await u.getIdToken()})});return r.json()}
+function odTake(o){o=o||{};if(o.code==="nosecret"){OD.srv=false;return o}if(!o.ok)return o;
+  OD.srv=true;OD.linked=!!o.linked;OD.rt=null;
+  if(o.root)OD.root=o.root;else if(o.linked&&OD.root)odSrv({op:"root",root:OD.root}).catch(()=>{}); // thư mục gốc đã chọn trên máy này: đưa lên máy chủ
+  if(o.acct!=null)OD.acct=o.acct||"";
+  if(o.tok){OD.tok=o.tok;OD.exp=Math.min(o.exp||0,Date.now()+50*60000)}else if(!o.linked)OD.tok=null;
+  odSave();return o}
+let odSyncP=null,odSyncAt=0;
+function odSync(force){if(odSyncP&&(!force||Date.now()-odSyncAt<5000))return odSyncP;odSyncAt=Date.now();
+  odSyncP=odSrv({op:"tok"}).then(odTake).catch(e=>{if(OD.srv===null)OD.srv=false;return {ok:false,msg:e.message||String(e)}});return odSyncP}
+let odLoaded=false;const odInit=()=>{if(!odLoaded&&me()){odLoaded=true;odLoad();odSync().then(()=>{if(S.view==="od")renderMain()})}};
 const odOn=()=>boss()&&(!spaceOn()||SPACE==="mine");
 const odJob=j=>!!j&&odOn()&&isMine(j);
-const odReady=()=>{odInit();return !!OD.cid&&!!(OD.rt||OD.tok)};
+const odReady=()=>{odInit();return OD.srv?OD.linked:OD.srv===false&&!!(OD.rt||OD.tok)};
 const b64u=b=>btoa(String.fromCharCode(...new Uint8Array(b))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
-const odRedirect=()=>location.origin+location.pathname.replace(/[^/]*$/,"")+"od-auth.html";
+const odRedirect=()=>location.origin+location.pathname.replace(/[^/]*$/,"")+(OD.srv?"od-web.html":"od-auth.html");
 /* app cài trên màn hình chính (iPhone/iPad): cửa sổ bật lên không dùng được (bị chặn, hoặc mở ra Safari riêng không chung bộ nhớ),
    nên chuyển hẳn sang trang đăng nhập Microsoft rồi quay về app; odResume() đổi mã lấy phiên khi app mở lại */
 const odStandalone=()=>{try{return !!(navigator.standalone||matchMedia("(display-mode: standalone)").matches)}catch(e){return false}};
 async function odLogin(){odInit();
-  if(!OD.cid)throw new Error("Chưa có mã ứng dụng Microsoft.");
   const w=odStandalone()?null:open("about:blank","odlogin","width=500,height=680"); // mở ngay lúc bấm, trước mọi await, để Safari không chặn
+  try{await odSync(true)}catch(e){}
+  const srv=!!OD.srv,ru=odRedirect();
   const ver=b64u(crypto.getRandomValues(new Uint8Array(32))),ch=b64u(await crypto.subtle.digest("SHA-256",new TextEncoder().encode(ver))),st=b64u(crypto.getRandomValues(new Uint8Array(16)));
   try{localStorage.removeItem("sojob.odcb")}catch(e){}
-  const url=OD_AUTH+"/authorize?"+new URLSearchParams({client_id:OD.cid,response_type:"code",redirect_uri:odRedirect(),scope:OD_SCOPE,code_challenge:ch,code_challenge_method:"S256",state:st,prompt:"select_account"});
-  if(!w){try{localStorage.setItem("sojob.odpkce",JSON.stringify({ver,st,at:Date.now()}))}catch(e){throw new Error("Máy không cho lưu tạm để đăng nhập, thử lại.")}
-    location.href=url;return new Promise(()=>{})} // rời trang sang Microsoft; đăng nhập xong od-auth.html đưa về app
+  const url=OD_AUTH+"/authorize?"+new URLSearchParams({client_id:OD_CLIENT,response_type:"code",redirect_uri:ru,scope:OD_SCOPE,code_challenge:ch,code_challenge_method:"S256",state:st,prompt:"select_account"});
+  if(!w){try{localStorage.setItem("sojob.odpkce",JSON.stringify({ver,st,srv,ru,at:Date.now()}))}catch(e){throw new Error("Máy không cho lưu tạm để đăng nhập, thử lại.")}
+    location.href=url;return new Promise(()=>{})} // rời trang sang Microsoft; đăng nhập xong trang quay về đưa về app
   w.location.href=url;
   const q=await new Promise((res,rej)=>{let closedAt=0;const t=setInterval(()=>{let h="";try{h=w.location.href}catch(e){}
       let cb=null;try{cb=JSON.parse(localStorage.getItem("sojob.odcb")||"null")}catch(e){}
       if(cb&&cb.q){clearInterval(t);try{localStorage.removeItem("sojob.odcb");w.close()}catch(e){}return res(new URLSearchParams(cb.q))}
-      if(h&&h.indexOf(odRedirect())===0){clearInterval(t);try{w.close()}catch(e){}return res(new URL(h).searchParams)}
+      if(h&&h.indexOf(ru)===0){clearInterval(t);try{w.close()}catch(e){}return res(new URL(h).searchParams)}
       if(w.closed){closedAt=closedAt||Date.now();if(Date.now()-closedAt>2500){clearInterval(t);rej(new Error("Đã đóng cửa sổ đăng nhập."))}}},350)});
   if(q.get("state")!==st)throw new Error("Đăng nhập không hợp lệ (sai mã trạng thái), thử lại.");
   if(!q.get("code"))throw new Error(q.get("error_description")||q.get("error")||"Không đăng nhập được.");
-  await odToken({grant_type:"authorization_code",code:q.get("code"),redirect_uri:odRedirect(),code_verifier:ver});
-  try{const u=await odApi("/me?$select=displayName,mail,userPrincipalName");OD.acct=u.mail||u.userPrincipalName||u.displayName||"";odSave()}catch(e){}
-}
+  await odFinish(q.get("code"),ver,ru,srv)}
+async function odFinish(code,ver,ru,srv){
+  if(srv){const o=odTake(await odSrv({op:"code",code,redirect:ru,ver}));if(!o.ok)throw new Error(o.msg||"Máy chủ chưa nối được OneDrive.");if(!o.linked)throw new Error("Chưa nối được OneDrive, thử lại.");return}
+  await odToken({grant_type:"authorization_code",code,redirect_uri:ru,code_verifier:ver});
+  try{const u=await odApi("/me?$select=displayName,mail,userPrincipalName");OD.acct=u.mail||u.userPrincipalName||u.displayName||"";odSave()}catch(e){}}
 async function odResume(){let p=null,cb=null;try{p=JSON.parse(localStorage.getItem("sojob.odpkce")||"null");cb=JSON.parse(localStorage.getItem("sojob.odcb")||"null")}catch(e){}
   if(!p||!cb||!cb.q)return false;try{localStorage.removeItem("sojob.odpkce");localStorage.removeItem("sojob.odcb")}catch(e){}
   if(Date.now()-p.at>20*60000)return toast("Phiên đăng nhập OneDrive đã quá hạn, bấm Đăng nhập lại."),false;
   const q=new URLSearchParams(cb.q);if(q.get("state")!==p.st)return toast("Đăng nhập OneDrive không hợp lệ, thử lại."),false;
   if(!q.get("code"))return toast(q.get("error_description")||q.get("error")||"Chưa đăng nhập được OneDrive."),false;
-  odInit();await odToken({grant_type:"authorization_code",code:q.get("code"),redirect_uri:odRedirect(),code_verifier:p.ver});
-  try{const u=await odApi("/me?$select=displayName,mail,userPrincipalName");OD.acct=u.mail||u.userPrincipalName||u.displayName||"";odSave()}catch(e){}
+  odInit();if(p.srv)OD.srv=true;await odFinish(q.get("code"),p.ver,p.ru||odRedirect(),!!p.srv);
   toast("Đã nối OneDrive"+(OD.acct?": "+OD.acct:"")+".");
-  if(odOn()||boss()){if(spaceOn()&&SPACE!=="mine"&&typeof setSpace==="function")await setSpace("mine");S.odPick=null;S.view="od";S.sel=null;renderAll(true)}
+  if(odOn()||boss()){if(spaceOn()&&SPACE!=="mine"&&typeof setSpace==="function")await setSpace("mine");S.odPick=null;S.odPath=null;S.view="od";S.sel=null;renderAll(true)}
   return true}
 {let n=0;const t=setInterval(()=>{if(++n>60)return clearInterval(t);if(!me()||!S.all)return;clearInterval(t);odResume().catch(e=>toast("OneDrive: "+(e.message||e)))},1000)}
 async function odToken(p){
-  const r=await fetch(OD_AUTH+"/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(Object.assign({client_id:OD.cid,scope:OD_SCOPE},p))});
+  const r=await fetch(OD_AUTH+"/token",{method:"POST",headers:{"Content-Type":"application/x-www-form-urlencoded"},body:new URLSearchParams(Object.assign({client_id:OD_CLIENT,scope:OD_SCOPE},p))});
   let j={};try{j=await r.json()}catch(e){}
   if(!r.ok||!j.access_token){if(p.grant_type==="refresh_token"){OD.rt=null;odSave()}throw new Error(j.error_description||j.error||("Đăng nhập lỗi "+r.status))}
   OD.tok=j.access_token;OD.exp=Date.now()+((j.expires_in||3600)-120)*1000;if(j.refresh_token)OD.rt=j.refresh_token;odSave();return OD.tok}
-async function odTok(){odInit();if(OD.tok&&Date.now()<OD.exp)return OD.tok;if(OD.rt){try{return await odToken({grant_type:"refresh_token",refresh_token:OD.rt})}catch(e){}}
+async function odTok(){odInit();if(OD.tok&&Date.now()<OD.exp)return OD.tok;
+  if(OD.srv!==false){await odSync(true);if(OD.srv){if(OD.linked&&OD.tok)return OD.tok;throw Object.assign(new Error("Chưa nối OneDrive hoặc phiên đã hết, bấm Đăng nhập OneDrive."),{login:true})}}
+  if(OD.rt){try{return await odToken({grant_type:"refresh_token",refresh_token:OD.rt})}catch(e){}}
   throw Object.assign(new Error("Phiên OneDrive đã hết, bấm Đăng nhập OneDrive lại."),{login:true})}
 async function odApi(path,opt={}){const t=await odTok();
   const r=await fetch(/^https:/.test(path)?path:OD_G+path,Object.assign({},opt,{headers:Object.assign({Authorization:"Bearer "+t},opt.headers||{})}));
@@ -4567,8 +4591,9 @@ async function odFill(el,j){const b=el.querySelector("#odBody");if(!b||!odJob(j)
       if(!OD.root)return put(`<p class="muted" style="margin:0">Chưa chọn thư mục gốc (chứa các FWD). <button class="ghost sm" data-act="cloudTab">Chọn trong tab OneDrive</button></p>`);
       if(OD.tried.has(id))return put(odMissHtml(j,OD.tried.r&&OD.tried.r[id]));
       OD.tried.add(id);put(`<p class="muted" style="margin:0">Đang tìm thư mục của ${esc(j.company||"khách")}…</p>`);
-      const r=await odAuto(j,odOpen(j));(OD.tried.r=OD.tried.r||{})[id]=r;
-      if(r.lo){odLink(j,r);toast(`Đã gắn ${j.code} với thư mục OneDrive: ${j.od.path}`)}else return put(odMissHtml(j,r));
+      if(odOpen(j)&&j.company){await odEnsure(j);toast(`Đã gắn ${j.code} với thư mục OneDrive: ${j.od.path}. Sai thì bấm Đổi thư mục.`)}
+      else{const r=await odAuto(j,false);(OD.tried.r=OD.tried.r||{})[id]=r;
+        if(r.lo){odLink(j,r);toast(`Đã gắn ${j.code} với thư mục OneDrive: ${j.od.path}`)}else return put(odMissHtml(j,r))}
     }
     const L=await odKids(j.od.id);
     put(`<div class="od-path">${svi("folder")}<a href="${esc(j.od.url)}" target="_blank" rel="noopener">${esc(j.od.path||j.od.name)}</a>${j.od.auto===false?"":""}<button class="ghost sm" data-act="cloudRefresh" title="Tải lại">${svi("refresh")}</button><button class="ghost sm danger" data-act="cloudUnlink">Bỏ gắn</button></div>`+
@@ -4613,21 +4638,25 @@ S.odPath=null;S.odPick=null;S.odQ="";
 const odAt=()=>S.odPath&&S.odPath[S.odPath.length-1];
 function odLv(){if(!OD.root||!S.odPath)return -1;const i=S.odPath.findIndex(x=>x.id===OD.root.id);return i<0?-1:S.odPath.length-1-i}
 function renderOd(el){odInit();el.dataset.v="od";
-  if(!OD.cid){el.innerHTML=odSetupHtml();return}
-  if(!odReady()){el.innerHTML=`<div class="od-wrap"><div class="od-card"><h2>${svi("folder")}OneDrive · Việc riêng</h2><p>Nối OneDrive cá nhân để xem thư mục FWD / khách hàng, tải chứng từ lên và tự gắn job riêng với thư mục lô.</p>
-    <p class="muted">Chỉ máy này giữ phiên đăng nhập; không lưu lên Sổ chung, nhân viên không xem được.</p><div class="lrow"><button class="primary" data-odlogin>Đăng nhập OneDrive</button><button class="ghost" data-odcid>Đổi mã ứng dụng</button></div></div></div>`;return}
+  if(!odReady()&&OD.srv===null){el.innerHTML=`<div class="od-wrap"><p class="muted"><span class="spin"></span> Đang kiểm tra kết nối OneDrive…</p></div>`;odSync().then(()=>{if(S.view==="od")renderMain()});return}
+  if(!odReady()){el.innerHTML=`<div class="od-wrap"><div class="od-card"><h2>${svi("folder")}OneDrive · Việc riêng</h2><p>Nối OneDrive cá nhân để xem thư mục FWD / khách hàng, tải chứng từ lên, tự tạo thư mục lô cho job riêng và lưu tệp gửi qua bot Zalo.</p>
+    <p class="muted">${OD.srv?"Đăng nhập 1 lần: máy chủ của Sổ giữ phiên cho mọi máy của anh, không phải đăng nhập lại. Chỉ chủ sổ dùng được, nhân viên không xem được.":"Phiên đăng nhập giữ trên máy này (Microsoft cho sống 24 giờ). Cài OD_SECRET trên máy chủ để đăng nhập 1 lần cho mọi máy."}</p><div class="lrow"><button class="primary" data-odlogin>Đăng nhập OneDrive</button></div></div></div>`;return}
   if(!S.odPath)S.odPath=OD.root?[{id:OD.root.id,name:OD.root.name}]:[{id:"root",name:"OneDrive"}];
-  el.innerHTML=`<div class="od-wrap"><div id="odTop"></div><input class="od-q" id="odQ" placeholder="Lọc trong thư mục này…" value="${esc(S.odQ)}" aria-label="Lọc tên"><div class="od-list od-drop" id="odList"><p class="muted">Đang tải…</p></div>
-    <p class="muted od-foot">${OD.acct?"Đã nối: "+esc(OD.acct)+" · ":""}<button class="ghost sm" data-odout>Ngắt kết nối</button></p></div>`;
+  el.innerHTML=`<div class="od-wrap"><div id="odHome"></div><div id="odTop"></div><input class="od-q" id="odQ" placeholder="Lọc trong thư mục này…" value="${esc(S.odQ)}" aria-label="Lọc tên"><div class="od-list od-drop" id="odList"><p class="muted">Đang tải…</p></div>
+    <p class="muted od-foot">${OD.acct?"Đã nối: "+esc(OD.acct)+(OD.srv?" (dùng chung mọi máy)":" (chỉ máy này)")+" · ":""}<button class="ghost sm" data-odout>Ngắt kết nối</button></p></div>`;
   odPaint()}
-function odSetupHtml(){const ru=odRedirect();return `<div class="od-wrap"><div class="od-card"><h2>${svi("folder")}Nối OneDrive cá nhân (làm 1 lần)</h2>
-  <ol class="od-steps"><li>Vào <a href="https://entra.microsoft.com/#view/Microsoft_AAD_RegisteredApps/ApplicationsListBlade" target="_blank" rel="noopener">Microsoft Entra → App registrations</a>, đăng nhập bằng tài khoản Microsoft cá nhân (cùng tài khoản OneDrive). Nếu trang báo cần “directory / tenant”: đăng ký Azure miễn phí trước rồi quay lại.</li>
-  <li>Bấm <b>New registration</b>. Name: <code>So Job OneDrive</code>. Supported account types: chọn <b>Personal Microsoft accounts only</b>.</li>
-  <li>Redirect URI: chọn <b>Single-page application (SPA)</b>, dán: <code>${esc(ru)}</code> rồi bấm <b>Register</b>.</li>
-  <li>Thêm 2 Redirect URI nữa (Authentication → Add URI) để dùng được cả link phụ: <code>https://opsdad.net/od-auth.html</code> và <code>https://xduc2507.github.io/sojob/od-auth.html</code>.</li>
-  <li>Ở trang Overview, chép <b>Application (client) ID</b> (dạng 8-4-4-4-12 ký tự) và dán vào ô dưới. Mã này công khai, không phải mật khẩu.</li></ol>
-  <div class="lrow"><input id="odCid" placeholder="Application (client) ID" autocomplete="off" style="flex:1;min-width:240px"><button class="primary" data-odcidsave>Lưu và đăng nhập</button></div></div></div>`}
-async function odPaint(fresh){const top=$("#odTop"),list=$("#odList");if(!top||!list)return;const at=odAt(),lv=odLv(),pj=S.odPick?S.all.find(x=>x.id===S.odPick):null;
+/* khối trên cùng tab OneDrive: tệp Zalo chờ lưu · job riêng chưa có thư mục · lô gần đây */
+function odHomeHtml(){const M=S.all.filter(j=>isMine(j)&&!(typeof isArch==="function"&&isArch(j)));
+  const pend=M.filter(j=>Array.isArray(j.odPending)&&j.odPending.length),np=pend.reduce((a,j)=>a+j.odPending.length,0);
+  const miss=M.filter(j=>!j.od&&odOpen(j)).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0));
+  const rec=M.filter(j=>j.od&&j.od.id).sort((a,b)=>(b.updatedAt||0)-(a.updatedAt||0)).slice(0,6);
+  const row=(j,act)=>`<div class="od-jr"><span class="mono">${esc(j.code||"")}</span>${act}</div>`;
+  return (np?`<div class="od-blk od-blk-pend">${svi("clip")}<span><b>${np} tệp gửi qua Zalo</b> đang chờ lưu · ${pend.map(j=>esc(j.code)).join(", ")}</span><button class="primary sm" data-odsweep>Lưu ngay</button></div>`:"")+
+    (miss.length?`<div class="od-blk"><div class="od-bh"><b>Job riêng chưa có thư mục</b><span class="mono">${miss.length}</span><span class="sp"></span>${OD.root?`<button class="ghost sm" data-odauto>${svi("link")}Tạo / gắn tất cả</button>`:""}</div>
+      ${OD.root?"":`<p class="muted" style="margin:2px 0 6px">Chọn thư mục gốc (thư mục chứa các FWD) ở dưới trước.</p>`}
+      ${miss.slice(0,8).map(j=>row(j,`<span class="nm">${esc(j.company||odShort(j)||"")}</span>${OD.root?`<button class="ghost sm" data-odmkjob="${esc(j.id)}">${j.company?"Tạo / gắn thư mục":"Chọn thư mục…"}</button>`:""}`)).join("")}${miss.length>8?`<small class="muted">+${miss.length-8} job nữa</small>`:""}</div>`:"")+
+    (rec.length?`<div class="od-blk"><div class="od-bh"><b>Lô gần đây</b></div>${rec.map(j=>row(j,`<button type="button" class="od-lnk" data-odopen="${esc(j.id)}">${svi("folder")}<span>${esc(j.od.path||j.od.name)}</span></button><button class="ghost sm" data-odjob="${esc(j.id)}">Mở job</button>`)).join("")}</div>`:"")}
+async function odPaint(fresh){const hm=$("#odHome");if(hm)hm.innerHTML=odHomeHtml();const top=$("#odTop"),list=$("#odList");if(!top||!list)return;const at=odAt(),lv=odLv(),pj=S.odPick?S.all.find(x=>x.id===S.odPick):null;
   const LBL=["Các FWD","Khách hàng","Lô hàng"];
   top.innerHTML=`${pj?`<div class="od-pick">${svi("link")}<span>Đang chọn thư mục cho <b>${esc(pj.code)}</b> · ${esc(pj.company||odShort(pj))}. Mở tới thư mục lô rồi bấm <b>Gắn vào đây</b>.</span><button class="primary sm" data-odpickhere>Gắn vào đây</button><button class="ghost sm" data-odpickno>Huỷ</button></div>`:""}
     <div class="od-crumb">${S.odPath.map((p,i)=>`<button type="button" data-odcr="${i}" class="${i===S.odPath.length-1?"on":""}">${esc(p.name)}</button>`).join("<span>›</span>")}</div>
@@ -4639,9 +4668,9 @@ async function odPaint(fresh){const top=$("#odTop"),list=$("#odList");if(!top||!
     list.innerHTML=V.length?V.map(odRowHtml).join(""):`<p class="muted">${q?"Không có mục nào khớp.":"Thư mục trống. Kéo thả tệp vào đây để tải lên."}</p>`}
   catch(e){list.innerHTML=`<p class="muted">${esc(e.message||String(e))}</p>${e.login?`<button class="primary" data-odlogin>Đăng nhập OneDrive</button>`:""}`}}
 async function odAutoAll(btn){const L=S.all.filter(j=>isMine(j)&&!j.od&&odOpen(j));if(!L.length)return toast("Job riêng đang làm đều đã có thư mục.");
-  btn.disabled=true;let ok=0;const miss=[];
-  for(const j of L){btn.textContent=`Đang gắn ${ok+miss.length+1}/${L.length}…`;try{const r=await odAuto(j,true);if(r.lo){odLink(j,r);ok++}else miss.push(j.code)}catch(e){miss.push(j.code)}}
-  btn.disabled=false;toast(`Đã gắn ${ok} job.${miss.length?` Chưa tìm thấy thư mục khách cho: ${miss.join(", ")} (mở job để tạo / chọn).`:""}`);odPaint(true)}
+  btn.disabled=true;let ok=0;const miss=[],bad=[];
+  for(const j of L){btn.textContent=`Đang gắn ${ok+miss.length+bad.length+1}/${L.length}…`;if(!j.company){miss.push(j.code);continue}try{await odEnsure(j);ok++}catch(e){bad.push(j.code)}}
+  btn.disabled=false;toast(`Đã tạo / gắn thư mục cho ${ok} job.${miss.length?` Chưa có tên khách (bấm Chọn thư mục…): ${miss.join(", ")}.`:""}${bad.length?` Lỗi: ${bad.join(", ")}.`:""}`);odPaint(true)}
 /* tệp gửi qua bot Zalo Việc riêng: máy chủ cất tạm ở Drive của chủ sổ; app (chủ sổ, đã nối OneDrive) tự tạo thư mục lô, lưu tệp vào rồi bỏ bản tạm */
 async function ztCall(q){const u=window.firebase&&firebase.auth().currentUser;if(!u)throw new Error("Chưa đăng nhập.");
   const r=await fetch(PUSH_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({zfile:q,token:await u.getIdToken()})});return r.json()}
@@ -4671,18 +4700,24 @@ async function odSweep(){if(odSweeping||!odOn()||!odReady()||!OD.root||!canEdit(
   if(S.view==="od")odPaint(true)}
 setInterval(()=>{odSweep().catch(()=>{})},30000);setTimeout(()=>{odSweep().catch(()=>{})},6000);
 document.addEventListener("input",e=>{if(e.target.id==="odQ"){S.odQ=e.target.value;odPaint()}});
-document.addEventListener("click",async e=>{const t=e.target.closest("[data-odlogin],[data-odcid],[data-odcidsave],[data-odout],[data-odgo],[data-odcr],[data-odup],[data-odmk],[data-odroot],[data-odauto],[data-odref],[data-odpickhere],[data-odpickno]");if(!t||!odOn())return;
+document.addEventListener("click",async e=>{const t=e.target.closest("[data-odlogin],[data-odout],[data-odsweep],[data-odmkjob],[data-odopen],[data-odjob],[data-odgo],[data-odcr],[data-odup],[data-odmk],[data-odroot],[data-odauto],[data-odref],[data-odpickhere],[data-odpickno]");if(!t||!odOn())return;
   const d=t.dataset;
-  if(d.odcidsave!=null){const v=($("#odCid").value||"").trim();if(!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(v))return toast("Mã ứng dụng dạng 8-4-4-4-12 ký tự (chữ số và a–f).");OD.cid=v;odSave();}
-  if(d.odcid!=null){const v=await ask({title:"Mã ứng dụng Microsoft",text:"Application (client) ID của ứng dụng đã đăng ký trên Microsoft Entra.",fields:[{id:"v",label:"Client ID",value:OD.cid}],ok:"Lưu"});if(!v)return;OD.cid=String(v.v||"").trim();OD.rt=null;OD.tok=null;odSave();renderMain();return}
-  if(d.odlogin!=null||d.odcidsave!=null){try{await odLogin();toast("Đã nối OneDrive"+(OD.acct?": "+OD.acct:"")+".");}catch(er){toast(er.message||String(er))}S.odPath=null;renderMain();return}
-  if(d.odout!=null){const v=await ask({title:"Ngắt kết nối OneDrive?",text:"Xoá phiên đăng nhập OneDrive trên máy này. Thư mục đã gắn với job vẫn giữ.",ok:"Ngắt",danger:true});if(!v)return;OD.rt=null;OD.tok=null;OD.acct="";odSave();renderMain();return}
+  if(d.odlogin!=null){try{await odLogin();toast("Đã nối OneDrive"+(OD.acct?": "+OD.acct:"")+".");}catch(er){toast(er.message||String(er))}S.odPath=null;renderMain();return}
+  if(d.odout!=null){const v=await ask({title:"Ngắt kết nối OneDrive?",text:OD.srv?"Máy chủ bỏ phiên OneDrive: mọi máy của anh và bot Zalo thôi lưu vào OneDrive cho tới khi đăng nhập lại. Thư mục đã gắn với job vẫn giữ.":"Xoá phiên đăng nhập OneDrive trên máy này. Thư mục đã gắn với job vẫn giữ.",ok:"Ngắt",danger:true});if(!v)return;
+    if(OD.srv){try{odTake(await odSrv({op:"out"}))}catch(er){return toast("Chưa ngắt được: "+(er.message||er))}}OD.rt=null;OD.tok=null;OD.linked=false;OD.acct="";odSave();renderMain();return}
+  if(d.odsweep!=null){OD.ztFail.clear();t.disabled=true;t.textContent="Đang lưu…";await odSweep().catch(er=>toast(er.message||String(er)));odPaint(true);return}
+  if(d.odjob){openJobAny(d.odjob);return}
+  if(d.odopen){const j=S.all.find(x=>x.id===d.odopen);if(!j||!j.od)return;const P=[OD.root?{id:OD.root.id,name:OD.root.name}:{id:"root",name:"OneDrive"}];
+    if(j.od.fwd)P.push(j.od.fwd);if(j.od.kh)P.push(j.od.kh);P.push({id:j.od.id,name:j.od.name});S.odPath=P;S.odQ="";renderOd($("#content"));return}
+  if(d.odmkjob){const j=S.all.find(x=>x.id===d.odmkjob);if(!j)return;
+    if(!j.company){S.odPick=j.id;S.odPath=[{id:OD.root.id,name:OD.root.name}];toast("Mở tới thư mục lô rồi bấm Gắn vào đây.");renderOd($("#content"));return}
+    t.disabled=true;t.textContent="Đang tạo…";try{await odEnsure(j);toast(`Đã gắn ${j.code} với ${j.od.path}.`)}catch(er){toast("Chưa tạo được: "+(er.message||er))}odPaint(true);return}
   if(d.odgo){S.odPath.push({id:d.odgo,name:d.odname||""});S.odQ="";renderOd($("#content"));return}
   if(d.odcr!=null){S.odPath=S.odPath.slice(0,+d.odcr+1);S.odQ="";renderOd($("#content"));return}
   if(d.odref!=null){odPaint(true);return}
   if(d.odup!=null){const at=odAt();odUpTo={id:at.id,after:()=>odPaint(true)};odInput.click();return}
   if(d.odmk!=null){const v=await ask({title:"Thư mục mới",text:"Tạo trong “"+odAt().name+"”.",fields:[{id:"n",label:"Tên thư mục"}],ok:"Tạo"});if(!v||!String(v.n||"").trim())return;try{await odMkdir(odAt().id,v.n);odPaint(true)}catch(er){toast("Chưa tạo được: "+(er.message||er))}return}
-  if(d.odroot!=null){const at=odAt();OD.root={id:at.id,name:at.name};odSave();S.odPath=[{id:at.id,name:at.name}];toast(`Đã đặt “${at.name}” làm thư mục gốc (chứa các FWD).`);renderOd($("#content"));return}
+  if(d.odroot!=null){const at=odAt();OD.root={id:at.id,name:at.name};odSave();if(OD.srv)odSrv({op:"root",root:OD.root}).then(odTake).catch(()=>toast("Chưa lưu được thư mục gốc lên máy chủ, thử lại sau."));S.odPath=[{id:at.id,name:at.name}];toast(`Đã đặt “${at.name}” làm thư mục gốc (chứa các FWD).`);renderOd($("#content"));return}
   if(d.odauto!=null){odAutoAll(t);return}
   if(d.odpickno!=null){S.odPick=null;odPaint();return}
   if(d.odpickhere!=null){const j=S.all.find(x=>x.id===S.odPick);if(!j)return;const P=S.odPath,lv=odLv(),at=odAt();
