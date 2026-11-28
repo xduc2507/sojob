@@ -2,7 +2,7 @@
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="manifest" href="manifest.webmanifest">
 <script src="firebase-config.js?v=483007a3c3"></script>
-<script src="static-shim.js?v=41f3c09777"></script>
+<script src="static-shim.js?v=a4ea1f9aa7"></script>
 <script>/* giao diện kiểu iOS: mặc định cho mọi người; ?ios=0 tắt, ?ios=1 bật lại (nhớ trên máy) */
 (function(){var on=true;try{var q=location.search.match(/[?&]ios=([01])/);if(q)localStorage.setItem("sojob.ios2",q[1]);on=localStorage.getItem("sojob.ios2")!=="0"}catch(e){}if(on)document.documentElement.classList.add("ios")})();</script>
 <script>/* giao diện app máy tính: bật khi mở bằng app đã cài (cửa sổ riêng); ?desk=1 bật, ?desk=0 tắt (nhớ trên máy) */
@@ -1045,6 +1045,7 @@ body.perm-view [data-mjgan],body.perm-view [data-mjpick]{display:none!important}
 .od-row .ext{flex:none;min-width:38px;text-align:center;font-size:10.5px;padding:3px 4px;border-radius:6px;background:color-mix(in srgb,#007AFF 12%,var(--surface));color:#0060D0}
 .od-jobs{display:flex;gap:4px}.od-jobs i{font-style:normal;font-size:11px;font-weight:600;padding:2px 7px;border-radius:999px;background:color-mix(in srgb,#34C759 16%,var(--surface));color:#1E8E3E}
 .od-pick{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;border-radius:12px;background:color-mix(in srgb,#007AFF 10%,var(--surface));font-size:14px}.od-pick span{flex:1;min-width:200px}
+.od-pend{display:flex;align-items:center;gap:6px;margin:0 0 8px;padding:6px 10px;border-radius:9px;background:color-mix(in srgb,#007AFF 9%,var(--surface));font-size:13px}.od-pend .svi{width:15px;height:15px;color:#007AFF;flex:none}
 .od-path{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:14px}.od-path a{font-weight:600;color:#007AFF;word-break:break-word}.od-path .svi{color:#F5A623}
 .od-sec.od-over,.od-drop.od-over{outline:2px dashed #007AFF;outline-offset:2px}
 .od-foot{text-align:right;margin:0}
@@ -1877,6 +1878,7 @@ async function unlockMine(){
 }
 let SPACE=(()=>{try{return localStorage.getItem(SPACE_LS)==="mine"&&mineOpen()?"mine":"team"}catch(e){return "team"}})();
 const spaceOn=()=>team()&&boss(),mineOn=()=>spaceOn()&&SPACE==="mine";
+window.sojobRieng=()=>mineOn(); // shim gửi cờ này để máy chủ dùng Claude API trả phí cho Việc riêng
 const isMine=j=>!j.shared&&(!j.createdBy||j.createdBy===me());
 const inSpace=j=>!spaceOn()||(SPACE==="mine"?isMine(j):!isMine(j));
 function applySpace(){S.jobs=S.all.filter(inSpace);if(S.sel&&!cur())S.sel=null;if(S.group!=="__all"&&!S.jobs.some(j=>groupKey(j)===S.group))S.group="__all";document.body.classList.toggle("space-mine",mineOn())}
@@ -4417,7 +4419,7 @@ const FA={copy:"fa-copy ic-blue",doc:"fa-file-text-o",xlsx:"fa-file-excel-o ic-a
   add:"fa-plus ic-add",send:"fa-send ic-blue",search:"fa-search",barcode:"fa-barcode",del:"fa-remove ic-del",next:"fa-arrow-right",fail:"fa-ban ic-del",clip:"fa-paperclip ic-blue",
   chat:"fa-comments",board:"fa-columns",list:"fa-list",team:"fa-building",lock:"fa-lock",bell:"fa-bell",refresh:"fa-refresh ic-add",check:"fa-check ic-blue",close:"fa-times"};
 const ic=n=>FA[n]?`<i class="fa ${FA[n]} ic-fa" aria-hidden="true"></i>`:"";
-const APP_VER="2026-11-27j";
+const APP_VER="2026-11-28a";
 let notifyBusy=false;const diagSent=new Set();
 const withTimeout=(p,ms,stage)=>Promise.race([p,new Promise((_,rej)=>setTimeout(()=>rej(new Error("kẹt ở bước "+stage+" quá "+ms/1000+" giây")),ms))]);
 function pushDiag(stage,err){ // ghi lý do lên máy chủ để kiểm tra từ xa (mỗi lý do 1 lần / phiên)
@@ -4539,7 +4541,9 @@ function odLink(j,r){j.od={id:r.lo.id,name:r.lo.name,url:r.lo.webUrl||"",path:[r
 /* ---------- mục "Thư mục OneDrive" trong phiếu job riêng ---------- */
 function odSecHtml(j){return `<div class="sec od-sec" id="odSec"><h3 style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">${svi("folder")}Thư mục OneDrive<span class="srcadd">${j.od?`<button class="ghost sm" data-act="cloudUp">${svi("clip")}Tải tệp lên</button><button class="ghost sm" data-act="cloudPick">Đổi thư mục</button>`:""}</span></h3><div class="od-body" id="odBody"><p class="muted" style="margin:0">Đang mở…</p></div></div>`}
 async function odFill(el,j){const b=el.querySelector("#odBody");if(!b||!odJob(j))return;const id=j.id;
-  const put=h=>{const x=document.querySelector("#odBody");if(x&&S.sel===id)x.innerHTML=h};
+  const np=Array.isArray(j.odPending)?j.odPending.length:0,pend=np?`<p class="od-pend">${svi("clip")}${np} tệp gửi qua Zalo đang chờ lưu vào thư mục lô${odReady()&&OD.root?"…":" (nối OneDrive và chọn thư mục gốc để Sổ tự lưu)"}</p>`:"";
+  const put=h=>{const x=document.querySelector("#odBody");if(x&&S.sel===id)x.innerHTML=pend+h};
+  if(np&&odReady()&&OD.root&&!odSweeping&&!OD.ztFail.has(id)){odSweep().catch(()=>{});return put(`<p class="muted" style="margin:0">Đang tạo thư mục và lưu tệp…</p>`)}
   if(!odReady())return put(`<p class="muted" style="margin:0">Chưa nối OneDrive. <button class="ghost sm" data-act="cloudTab">Mở tab OneDrive để nối</button></p>`);
   try{
     if(!j.od){
@@ -4573,7 +4577,7 @@ async function odAct(a,j,b){
   if(!j)return;
   if(a==="cloudUp"&&j.od){odUpTo={id:j.od.id,after:()=>{delete OD.cache[j.od.id];odFill($("#detail"),j)}};odInput.click();return}
   if(a==="cloudRefresh"&&j.od){delete OD.cache[j.od.id];odFill($("#detail"),j);return}
-  if(a==="cloudRetry"){OD.tried.delete(j.id);for(const k in OD.cache)delete OD.cache[k];odFill($("#detail"),j);return}
+  if(a==="cloudRetry"){OD.tried.delete(j.id);OD.ztFail.delete(j.id);for(const k in OD.cache)delete OD.cache[k];odFill($("#detail"),j);return}
   if(a==="cloudUnlink"){const v=await ask({title:"Bỏ gắn thư mục?",text:`Bỏ gắn ${j.code} với thư mục “${j.od&&j.od.path}”. Thư mục và tệp trên OneDrive vẫn giữ nguyên.`,ok:"Bỏ gắn",danger:true});if(!v)return;
     delete j.od;OD.tried.add(j.id);(OD.tried.r=OD.tried.r||{})[j.id]={};queueSave(j);renderDetail(true);return}
   if(a==="cloudMkKh"){const r=(OD.tried.r||{})[j.id];if(!r||!r.fwd)return;b.disabled=true;
@@ -4621,6 +4625,34 @@ async function odAutoAll(btn){const L=S.all.filter(j=>isMine(j)&&!j.od&&odOpen(j
   btn.disabled=true;let ok=0;const miss=[];
   for(const j of L){btn.textContent=`Đang gắn ${ok+miss.length+1}/${L.length}…`;try{const r=await odAuto(j,true);if(r.lo){odLink(j,r);ok++}else miss.push(j.code)}catch(e){miss.push(j.code)}}
   btn.disabled=false;toast(`Đã gắn ${ok} job.${miss.length?` Chưa tìm thấy thư mục khách cho: ${miss.join(", ")} (mở job để tạo / chọn).`:""}`);odPaint(true)}
+/* tệp gửi qua bot Zalo Việc riêng: máy chủ cất tạm ở Drive của chủ sổ; app (chủ sổ, đã nối OneDrive) tự tạo thư mục lô, lưu tệp vào rồi bỏ bản tạm */
+async function ztCall(q){const u=window.firebase&&firebase.auth().currentUser;if(!u)throw new Error("Chưa đăng nhập.");
+  const r=await fetch(PUSH_URL,{method:"POST",headers:{"Content-Type":"text/plain"},body:JSON.stringify({zfile:q,token:await u.getIdToken()})});return r.json()}
+async function odEnsure(j){if(j.od&&j.od.id)return j.od.id;
+  let r=await odAuto(j,true);
+  if(!r.lo){const fwds=(await odKids(OD.root.id)).filter(x=>x.folder),fn=j.fwd||"Khác";
+    const fwd=r.fwd||(odBest(fwds,fn)||{}).f||await odMkdir(OD.root.id,fn);
+    const kh=r.kh||(j.company?(odBest(await odKids(fwd.id),j.company)||{}).f:null)||await odMkdir(fwd.id,j.company||"Chưa rõ khách");
+    r={fwd,kh,lo:await odMkdir(kh.id,`${j.code} - ${odShort(j)}`)}}
+  odLink(j,r);return j.od.id}
+async function odSub(base,sub){let id=base;for(const p of String(sub||"").split("/").filter(Boolean)){const nm=odSafe(p).toLowerCase();let f=(await odKids(id)).find(x=>x.folder&&x.name.toLowerCase()===nm);if(!f)f=await odMkdir(id,p);id=f.id}return id}
+const b64blob=(b,t)=>{const s=atob(b),a=new Uint8Array(s.length);for(let i=0;i<s.length;i++)a[i]=s.charCodeAt(i);return new Blob([a],{type:t||"application/octet-stream"})};
+let odSweeping=false;OD.ztFail=new Set(); // job lưu lỗi: không tự thử lại mỗi lần mở phiếu cho tới khi bấm "Tìm lại" hoặc tải lại trang
+async function odSweep(){if(odSweeping||!odOn()||!odReady()||!OD.root||!canEdit())return;
+  const L=S.all.filter(j=>isMine(j)&&Array.isArray(j.odPending)&&j.odPending.length&&!OD.ztFail.has(j.id));if(!L.length)return;
+  odSweeping=true;let ok=0;const bad=[],done=new Set();
+  try{for(const j of L){let dir;try{dir=await odEnsure(j)}catch(e){bad.push(j.code+": "+(e.message||e));OD.ztFail.add(j.id);continue}
+    for(const t of j.odPending.slice()){
+      try{const o=await ztCall({op:"get",id:t.id});
+        if(o.ok){await odUpload(await odSub(dir,t.sub),new File([b64blob(o.b64,o.mime)],o.n||t.n||"tep",{type:o.mime||t.mime||""}));ok++;ztCall({op:"del",id:t.id}).catch(()=>{})}
+        else if(!o.gone){bad.push((t.n||"tệp")+": "+(o.msg||"lỗi"));OD.ztFail.add(j.id);continue}
+        j.odPending=j.odPending.filter(x=>x.id!==t.id);queueSave(j);done.add(j.id)}
+      catch(e){bad.push((t.n||"tệp")+": "+(e.message||e));OD.ztFail.add(j.id)}}}}
+  finally{odSweeping=false}
+  if(ok||bad.length)toast(ok?`Đã lưu ${ok} tệp từ Zalo vào thư mục OneDrive của lô.${bad.length?" Chưa lưu được: "+bad.slice(0,3).join("; "):""}`:"Chưa lưu được tệp từ Zalo: "+bad.slice(0,3).join("; "));
+  if(S.sel&&L.some(x=>x.id===S.sel)){const j=S.all.find(x=>x.id===S.sel);if(j){if(j.od)delete OD.cache[j.od.id];odFill($("#detail"),j)}}
+  if(S.view==="od")odPaint(true)}
+setInterval(()=>{odSweep().catch(()=>{})},30000);setTimeout(()=>{odSweep().catch(()=>{})},6000);
 document.addEventListener("input",e=>{if(e.target.id==="odQ"){S.odQ=e.target.value;odPaint()}});
 document.addEventListener("click",async e=>{const t=e.target.closest("[data-odlogin],[data-odcid],[data-odcidsave],[data-odout],[data-odgo],[data-odcr],[data-odup],[data-odmk],[data-odroot],[data-odauto],[data-odref],[data-odpickhere],[data-odpickno]");if(!t||!odOn())return;
   const d=t.dataset;
